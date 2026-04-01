@@ -16,6 +16,13 @@ These are required to create/manage SmartVoiceX agents via the ElevenLabs API fr
     - `firebase functions:secrets:set ELEVENLABS_API_KEY`
     - Attach to v2 function with `onRequest({ secrets: ['ELEVENLABS_API_KEY'] }, ...)`
 
+## SmartVoiceX app downloads (Windows .exe)
+- **`SVX_WINDOWS_RELEASES_PREFIX`** *(config value; not a secret)*
+  - What: The Firebase Storage folder/prefix where you upload Windows installer builds (we look for the latest `*.exe`).
+  - Where used: `GET /api/svx/app/latest-exe`.
+  - Default: `releases/windows/`
+  - You said you’ll provide the exact Storage path later — when you do, we’ll set this.
+
 ## (Optional / future)
 Add here as we wire up more features.
 

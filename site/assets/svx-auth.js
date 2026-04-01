@@ -78,6 +78,19 @@
     setStatus('');
   }
 
+  // Signed-in "dashboard" modal
+  function openSignedInModal() {
+    $('#svx-auth-backdrop')?.classList.add('open');
+    $('#svx-signedin-modal')?.classList.add('open');
+  }
+
+  function closeSignedInModal() {
+    $('#svx-signedin-modal')?.classList.remove('open');
+    if (!$('#svx-auth-modal')?.classList.contains('open') && !$('#svx-agent-modal')?.classList.contains('open')) {
+      $('#svx-auth-backdrop')?.classList.remove('open');
+    }
+  }
+
   function setMode(mode) {
     const signinTab = $('#svx-tab-signin');
     const signupTab = $('#svx-tab-signup');
@@ -109,10 +122,11 @@
     const menu = $('#svx-auth-menu');
     if (menu) {
       menu.innerHTML = '';
-      const accountBtn = el('button', { class: 'svx-menu-item', text: 'Open DentAI app' });
-      accountBtn.addEventListener('click', () => {
-        // Placeholder: you can change this to wherever the web app lives.
-        window.open('https://smartvoicex.com', '_blank');
+
+      const signedInBtn = el('button', { class: 'svx-menu-item', text: 'Account' });
+      signedInBtn.addEventListener('click', () => {
+        menu.classList.remove('open');
+        try { openSignedInModal(); } catch (_) {}
       });
 
       const signOutBtn = el('button', { class: 'svx-menu-item', text: 'Sign out' });
@@ -126,7 +140,8 @@
         }
       });
 
-      menu.appendChild(accountBtn);
+      menu.appendChild(signedInBtn);
+      // Agent creator menu item is injected later (kept).
       menu.appendChild(signOutBtn);
     }
   }
@@ -228,6 +243,39 @@
 
     document.body.appendChild(backdrop);
     document.body.appendChild(modal);
+
+    // Signed-in modal shell
+    const signedInModal = el('div', { id: 'svx-signedin-modal', role: 'dialog', 'aria-modal': 'true' }, [
+      el('div', { class: 'svx-modal' }, [
+        el('div', { class: 'svx-modal-header' }, [
+          el('div', {}, [
+            el('div', { class: 'svx-modal-title', text: 'SmartVoiceX' }),
+            el('div', { class: 'svx-modal-sub', text: 'Signed in' }),
+          ]),
+          el('button', { class: 'svx-close', type: 'button', text: '×', id: 'svx-signedin-close' }),
+        ]),
+
+        el('div', { class: 'svx-section-title', text: 'Latest update' }),
+        el('div', { class: 'svx-card' }, [
+          el('button', { class: 'svx-primary', type: 'button', text: 'Latest version here', id: 'svx-latest-version-btn' }),
+          el('div', { class: 'svx-card-sub', text: 'Downloads the latest Windows .exe from our release folder (auto-updating).' }),
+          el('div', { id: 'svx-latest-version-status', class: 'svx-status' }),
+        ]),
+
+        el('div', { class: 'svx-section-title', text: 'Live summaries' }),
+        el('div', { class: 'svx-card' }, [
+          el('div', { class: 'svx-card-sub', text: 'This section will show real-time call summaries for your agent (coming from Firestore / ElevenLabs events).' }),
+          el('div', { class: 'svx-card-sub', text: 'For now: use the desktop app’s Live Summaries view.' }),
+        ]),
+
+        el('div', { class: 'svx-section-title', text: 'Appointments' }),
+        el('div', { class: 'svx-card' }, [
+          el('div', { class: 'svx-card-sub', text: 'This section will show upcoming appointments and bookings (coming soon).' }),
+        ]),
+      ]),
+    ]);
+
+    document.body.appendChild(signedInModal);
     document.body.appendChild(fab);
 
     // Events
@@ -247,9 +295,44 @@
     });
 
     $('.svx-close', modal)?.addEventListener('click', closeModal);
+
+    $('#svx-signedin-close')?.addEventListener('click', closeSignedInModal);
+
     backdrop.addEventListener('click', () => {
       $('#svx-auth-menu')?.classList.remove('open');
       closeModal();
+      closeSignedInModal();
+    });
+
+    $('#svx-latest-version-btn')?.addEventListener('click', async () => {
+      const st = $('#svx-latest-version-status');
+      if (st) st.textContent = 'Checking latest version…';
+
+      try {
+        const { auth } = ensureFirebase();
+        const user = auth.currentUser;
+        if (!user) {
+          if (st) st.textContent = 'Please sign in first.';
+          return;
+        }
+
+        const token = await user.getIdToken();
+        const resp = await fetch('/api/svx/app/latest-exe', {
+          method: 'GET',
+          headers: { authorization: `Bearer ${token}` },
+        });
+
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok || !data.ok || !data.url) {
+          if (st) st.textContent = data.error || 'No release found yet.';
+          return;
+        }
+
+        if (st) st.textContent = `Downloading: ${data.name || 'latest.exe'}`;
+        window.location.href = data.url;
+      } catch (e) {
+        if (st) st.textContent = e?.message || 'Failed to load latest version.';
+      }
     });
 
     $('#svx-tab-signin')?.addEventListener('click', () => setMode('signin'));

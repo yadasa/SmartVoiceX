@@ -1,5 +1,6 @@
 const { onRequest } = require('firebase-functions/v2/https');
 const admin = require('firebase-admin');
+const { findLatestExe } = require('./_latestRelease');
 
 if (!admin.apps.length) {
   admin.initializeApp();
@@ -79,6 +80,36 @@ async function elevenFetch(path, { method = 'GET', body } = {}) {
   }
 
   return data;
+}
+
+// POST /api/svx/agents/create
+// Body: { business, goals, mustDos, neverDos, scripts, firstMessage, personality, industry, seniority, hideAI, transferCalls, transferTo, greetingSound }
+async function handleLatestExe(req, res) {
+  // Public or authed? We'll require auth so random users can't hotlink signed URLs.
+  const decoded = await requireAuth(req);
+  void decoded;
+
+  const bucket = admin.storage().bucket();
+  const prefix = String(process.env.SVX_WINDOWS_RELEASES_PREFIX || 'releases/windows/');
+
+  const latest = await findLatestExe(bucket, prefix);
+  if (!latest) {
+    return json(res, 404, { ok: false, error: 'no_exe_found', prefix });
+  }
+
+  const file = latest.file;
+  const [url] = await file.getSignedUrl({
+    version: 'v4',
+    action: 'read',
+    expires: Date.now() + 60 * 60 * 1000, // 1 hour
+  });
+
+  return json(res, 200, {
+    ok: true,
+    name: file.name,
+    updated: latest.meta?.updated || null,
+    url,
+  });
 }
 
 // POST /api/svx/agents/create
@@ -221,6 +252,10 @@ function api(req, res) {
 
     if (req.method === 'POST' && (path === '/svx/agents/create' || path === '/api/svx/agents/create')) {
       return handleCreateAgent(req, res);
+    }
+
+    if (req.method === 'GET' && (path === '/svx/app/latest-exe' || path === '/api/svx/app/latest-exe')) {
+      return handleLatestExe(req, res);
     }
 
     return json(res, 404, { ok: false, error: 'not_found', path });
