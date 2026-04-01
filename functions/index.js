@@ -158,13 +158,24 @@ async function handleCreateAgent(req, res) {
   // The exact endpoint/payload will be updated once we confirm the current ElevenLabs docs.
   let eleven = null;
   try {
-    // Attempt a known conversation agent endpoint path (may change; will be corrected).
-    eleven = await elevenFetch('/v1/convai/agents', {
+    // ElevenLabs Conversational AI: Create Agent
+    // OpenAPI indicates: POST /v1/convai/agents/create with required { conversation_config: { agent: { ... } } }
+    eleven = await elevenFetch('/v1/convai/agents/create', {
       method: 'POST',
       body: {
         name: `SVX - ${business}`,
-        // These fields are placeholders until we finalize schema.
-        system_prompt: systemPrompt,
+        conversation_config: {
+          agent: {
+            language: 'en',
+            first_message: firstMessage,
+            prompt: {
+              prompt: systemPrompt,
+              // Let ElevenLabs use the default model unless you want to pin it.
+              // llm: 'gpt-5-mini',
+            },
+          },
+        },
+        tags: ['smartvoicex', industry].filter(Boolean),
       },
     });
 
