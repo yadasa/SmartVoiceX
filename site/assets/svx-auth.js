@@ -404,3 +404,194 @@
     init();
   }
 })();
+
+// =========================
+// SmartVoiceX Agent Creator (questionnaire → Firebase Function → ElevenLabs)
+// =========================
+(function () {
+  function $(sel, root = document) { return root.querySelector(sel); }
+
+  function el(tag, attrs = {}, children = []) {
+    const node = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === 'class') node.className = v;
+      else if (k === 'text') node.textContent = v;
+      else if (k === 'html') node.innerHTML = v;
+      else node.setAttribute(k, v);
+    }
+    for (const c of children) node.appendChild(c);
+    return node;
+  }
+
+  function setAgentStatus(text, kind = 'info') {
+    const s = $('#svx-agent-status');
+    if (!s) return;
+    s.classList.remove('error', 'success');
+    if (kind === 'error') s.classList.add('error');
+    if (kind === 'success') s.classList.add('success');
+    s.textContent = text || '';
+  }
+
+  function openAgentModal() {
+    $('#svx-auth-backdrop')?.classList.add('open');
+    $('#svx-agent-modal')?.classList.add('open');
+    setAgentStatus('');
+  }
+
+  function closeAgentModal() {
+    $('#svx-agent-modal')?.classList.remove('open');
+    // Keep backdrop open only if auth modal is open
+    if (!$('#svx-auth-modal')?.classList.contains('open')) {
+      $('#svx-auth-backdrop')?.classList.remove('open');
+    }
+    setAgentStatus('');
+  }
+
+  function mountAgentUI() {
+    if ($('#svx-agent-modal')) return;
+
+    const modal = el('div', { id: 'svx-agent-modal', role: 'dialog', 'aria-modal': 'true' }, [
+      el('div', { class: 'svx-modal' }, [
+        el('div', { class: 'svx-modal-header' }, [
+          el('div', {}, [
+            el('div', { class: 'svx-modal-title', text: 'Create a SmartVoiceX agent' }),
+            el('div', { class: 'svx-modal-sub', text: 'Answer a few questions so we can tailor your voice agent.' }),
+          ]),
+          el('button', { class: 'svx-close', type: 'button', text: '×', id: 'svx-agent-close' }),
+        ]),
+
+        el('form', { id: 'svx-agent-form', class: 'svx-form' }, [
+          el('label', {}, [el('span', { text: 'Business name' }), el('input', { id: 'svx-agent-business', type: 'text', placeholder: 'e.g. Acme Dental' })]),
+          el('label', {}, [el('span', { text: 'Industry' }), el('input', { id: 'svx-agent-industry', type: 'text', placeholder: 'e.g. Dental, Real Estate, Home Services' })]),
+          el('label', {}, [el('span', { text: 'Goals (what should this agent achieve?)' }), el('input', { id: 'svx-agent-goals', type: 'text', placeholder: 'e.g. book appointments, qualify leads, answer FAQs' })]),
+          el('label', {}, [el('span', { text: 'Must-do’s (rules it must follow)' }), el('input', { id: 'svx-agent-mustdos', type: 'text', placeholder: 'e.g. always confirm phone number; always offer next available slot' })]),
+          el('label', {}, [el('span', { text: 'Never-do’s (hard prohibitions)' }), el('input', { id: 'svx-agent-neverdos', type: 'text', placeholder: 'e.g. never quote prices; never give medical advice' })]),
+          el('label', {}, [el('span', { text: 'Scripts / talk tracks (optional)' }), el('input', { id: 'svx-agent-scripts', type: 'text', placeholder: 'Paste short scripts or guidelines' })]),
+          el('label', {}, [el('span', { text: 'First message (exact first line when the call connects)' }), el('input', { id: 'svx-agent-firstmessage', type: 'text', placeholder: 'Hi, thanks for calling Acme Dental. How can I help?' })]),
+          el('label', {}, [el('span', { text: 'Personality' }), el('input', { id: 'svx-agent-personality', type: 'text', placeholder: 'Warm, confident, concise, professional' })]),
+          el('label', {}, [el('span', { text: 'Seniority / role style' }), el('input', { id: 'svx-agent-seniority', type: 'text', placeholder: 'e.g. receptionist, office manager, sales rep' })]),
+
+          el('label', {}, [
+            el('span', { text: 'Should it hide that it’s AI?' }),
+            el('input', { id: 'svx-agent-hideai', type: 'checkbox' }),
+          ]),
+
+          el('label', {}, [
+            el('span', { text: 'Can it transfer calls?' }),
+            el('input', { id: 'svx-agent-transfer', type: 'checkbox' }),
+          ]),
+          el('label', { id: 'svx-agent-transfer-to-wrap', hidden: 'hidden' }, [
+            el('span', { text: 'If yes, where should it transfer?' }),
+            el('input', { id: 'svx-agent-transfer-to', type: 'text', placeholder: 'e.g. +1 312 555 0100 or “front desk”' }),
+          ]),
+
+          el('label', {}, [el('span', { text: 'How should the initial greeting sound?' }), el('input', { id: 'svx-agent-greeting-sound', type: 'text', placeholder: 'e.g. upbeat + calm, slight smile in voice, no jargon' })]),
+
+          el('div', { class: 'svx-actions' }, [
+            el('button', { class: 'svx-primary', type: 'submit', text: 'Create agent' }),
+            el('button', { class: 'svx-secondary', type: 'button', text: 'Cancel', id: 'svx-agent-cancel' }),
+          ]),
+
+          el('div', { id: 'svx-agent-status', class: 'svx-status' }),
+        ]),
+      ]),
+    ]);
+
+    document.body.appendChild(modal);
+
+    $('#svx-agent-close')?.addEventListener('click', closeAgentModal);
+    $('#svx-agent-cancel')?.addEventListener('click', closeAgentModal);
+
+    const transfer = $('#svx-agent-transfer');
+    transfer?.addEventListener('change', () => {
+      const wrap = $('#svx-agent-transfer-to-wrap');
+      if (!wrap) return;
+      if (transfer.checked) wrap.removeAttribute('hidden');
+      else wrap.setAttribute('hidden', 'hidden');
+    });
+
+    $('#svx-agent-form')?.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      setAgentStatus('Creating agent…');
+
+      if (!window.firebase) return setAgentStatus('Firebase not loaded.', 'error');
+      const auth = firebase.auth();
+      const user = auth.currentUser;
+      if (!user) return setAgentStatus('Please sign in first.', 'error');
+
+      const body = {
+        business: String($('#svx-agent-business')?.value || '').trim(),
+        industry: String($('#svx-agent-industry')?.value || '').trim(),
+        goals: String($('#svx-agent-goals')?.value || '').trim(),
+        mustDos: String($('#svx-agent-mustdos')?.value || '').trim(),
+        neverDos: String($('#svx-agent-neverdos')?.value || '').trim(),
+        scripts: String($('#svx-agent-scripts')?.value || '').trim(),
+        firstMessage: String($('#svx-agent-firstmessage')?.value || '').trim(),
+        personality: String($('#svx-agent-personality')?.value || '').trim(),
+        seniority: String($('#svx-agent-seniority')?.value || '').trim(),
+        hideAI: Boolean($('#svx-agent-hideai')?.checked),
+        transferCalls: Boolean($('#svx-agent-transfer')?.checked),
+        transferTo: String($('#svx-agent-transfer-to')?.value || '').trim(),
+        greetingSound: String($('#svx-agent-greeting-sound')?.value || '').trim(),
+      };
+
+      try {
+        const token = await user.getIdToken();
+        const resp = await fetch('/api/svx/agents/create', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            'authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify(body),
+        });
+
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok || !data.ok) {
+          setAgentStatus(data.error || 'Failed to create agent.', 'error');
+          return;
+        }
+
+        setAgentStatus('Agent created.', 'success');
+        setTimeout(closeAgentModal, 700);
+      } catch (e) {
+        setAgentStatus(e?.message || 'Failed to create agent.', 'error');
+      }
+    });
+  }
+
+  function injectMenuItem() {
+    const menu = $('#svx-auth-menu');
+    if (!menu) return;
+    if ($('#svx-menu-create-agent')) return;
+
+    const btn = el('button', {
+      class: 'svx-menu-item',
+      id: 'svx-menu-create-agent',
+      type: 'button',
+      text: 'Create SmartVoiceX agent',
+    });
+
+    btn.addEventListener('click', () => {
+      menu.classList.remove('open');
+      openAgentModal();
+    });
+
+    menu.prepend(btn);
+  }
+
+  function init() {
+    mountAgentUI();
+
+    try {
+      if (!window.firebase) return;
+      const auth = firebase.auth();
+      auth.onAuthStateChanged((user) => {
+        if (user) injectMenuItem();
+      });
+    } catch (_) {}
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
