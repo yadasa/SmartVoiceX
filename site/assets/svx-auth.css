@@ -124,7 +124,9 @@
   color: rgba(255,255,255,0.65);
 }
 
-#svx-auth-modal .svx-modal {
+#svx-auth-modal .svx-modal,
+#svx-agent-modal .svx-modal,
+#svx-signedin-modal .svx-modal {
   width: min(520px, 94vw);
   border-radius: 20px;
   border: 1px solid rgba(255,255,255,0.12);

@@ -102,6 +102,8 @@ async function handleLatestExe(req, res) {
     version: 'v4',
     action: 'read',
     expires: Date.now() + 60 * 60 * 1000, // 1 hour
+    responseDisposition: 'attachment; filename="SmartVoiceX-latest.exe"',
+    responseType: 'application/octet-stream',
   });
 
   return json(res, 200, {

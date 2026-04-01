@@ -258,7 +258,7 @@
         el('div', { class: 'svx-section-title', text: 'Latest update' }),
         el('div', { class: 'svx-card' }, [
           el('button', { class: 'svx-primary', type: 'button', text: 'Latest version here', id: 'svx-latest-version-btn' }),
-          el('div', { class: 'svx-card-sub', text: 'Downloads the latest Windows .exe from our release folder (auto-updating).' }),
+          el('div', { class: 'svx-card-sub', text: 'Always downloads the newest Windows installer from our releases folder.' }),
           el('div', { id: 'svx-latest-version-status', class: 'svx-status' }),
         ]),
 
@@ -329,7 +329,7 @@
         }
 
         if (st) st.textContent = `Downloading: ${data.name || 'latest.exe'}`;
-        window.location.href = data.url;
+        window.open(data.url, '_blank', 'noopener');
       } catch (e) {
         if (st) st.textContent = e?.message || 'Failed to load latest version.';
       }
