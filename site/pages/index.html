@@ -36,8 +36,10 @@
       --text: rgba(255,255,255,0.92);
       --muted: rgba(255,255,255,0.68);
       --muted2: rgba(255,255,255,0.55);
-      --accent:#6214d9;
-      --accent2:#1aff75;
+      --accent:#6214d9;   /* purple */
+      --accent2:#4f7bff;  /* blue */
+      --ring: rgba(98,20,217,0.35);
+      --shadow: rgba(0,0,0,0.40);
     }
 
     *{box-sizing:border-box}
@@ -78,17 +80,18 @@
       animation: drift 10s ease-in-out infinite alternate;
     }
 
+    /* Blue/purple only */
     #bg-blobs .blob.b1{left:-340px; top:-320px}
     #bg-blobs .blob.b1 .inner{background: radial-gradient(circle at 30% 30%, rgba(98,20,217,0.98), rgba(98,20,217,0.00) 68%)}
 
     #bg-blobs .blob.b2{right:-420px; top:-320px; width: 1100px; height: 1100px; opacity:0.55}
     #bg-blobs .blob.b2 .inner{background: radial-gradient(circle at 60% 35%, rgba(120,54,255,0.90), rgba(120,54,255,0.00) 70%); animation-duration: 12s}
 
-    #bg-blobs .blob.b3{left:-360px; bottom:-520px; width: 1300px; height: 1300px; opacity:0.48}
-    #bg-blobs .blob.b3 .inner{background: radial-gradient(circle at 40% 60%, rgba(26,255,117,0.18), rgba(98,20,217,0.78), rgba(98,20,217,0.00) 72%); animation-duration: 14s}
+    #bg-blobs .blob.b3{left:-360px; bottom:-520px; width: 1300px; height: 1300px; opacity:0.50}
+    #bg-blobs .blob.b3 .inner{background: radial-gradient(circle at 40% 60%, rgba(79,123,255,0.22), rgba(98,20,217,0.78), rgba(98,20,217,0.00) 72%); animation-duration: 14s}
 
     #bg-blobs .blob.b4{right:-360px; bottom:-500px; width: 1000px; height: 1000px; opacity:0.52}
-    #bg-blobs .blob.b4 .inner{background: radial-gradient(circle at 50% 55%, rgba(70,130,255,0.78), rgba(70,130,255,0.00) 70%); animation-duration: 11s}
+    #bg-blobs .blob.b4 .inner{background: radial-gradient(circle at 50% 55%, rgba(79,123,255,0.78), rgba(79,123,255,0.00) 70%); animation-duration: 11s}
 
     @keyframes drift{
       0%{transform: translate3d(0px,0px,0) scale(1)}
@@ -131,15 +134,15 @@
       background: rgba(255,255,255,0.04);
     }
 
-    .navlinks{display:flex;gap:14px;align-items:center;color:var(--muted);font-weight:700;font-size:13px}
+    .navlinks{display:flex;gap:14px;align-items:center;color:var(--muted);font-weight:800;font-size:13px}
     .navlinks a{padding:8px 10px;border-radius:10px}
     .navlinks a:hover{background: rgba(255,255,255,0.06); color: var(--text)}
 
-    .hero{padding:72px 0 28px 0}
+    .hero{padding:74px 0 26px 0}
     .hero-grid{display:grid;grid-template-columns: 1.25fr 0.75fr;gap:18px;align-items:start}
 
-    h1{margin:0;font-size:52px;line-height:1.02;letter-spacing:-0.06em}
-    .sub{margin-top:14px;color:var(--muted);font-size:16px;line-height:1.55;max-width:52ch}
+    h1{margin:0;font-size:54px;line-height:1.02;letter-spacing:-0.06em}
+    .sub{margin-top:14px;color:var(--muted);font-size:16px;line-height:1.6;max-width:56ch}
 
     .cta-row{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap}
 
@@ -150,22 +153,21 @@
       border: 1px solid var(--border);
       background: rgba(255,255,255,0.06);
       color: var(--text);
-      font-weight: 900;
+      font-weight: 950;
       font-size: 13px;
       cursor:pointer;
     }
-    .btn.primary{background: rgba(98,20,217,0.80); border-color: rgba(98,20,217,0.85)}
-    .btn.primary:hover{background: rgba(98,20,217,0.92)}
+    .btn.primary{background: rgba(98,20,217,0.84); border-color: rgba(98,20,217,0.92)}
+    .btn.primary:hover{background: rgba(98,20,217,0.96)}
     .btn.secondary:hover{background: rgba(255,255,255,0.09)}
+    .btn.ghost{background: rgba(0,0,0,0.10)}
+    .btn.ghost:hover{background: rgba(0,0,0,0.22)}
 
-    .note{margin-top:10px;color:var(--muted2);font-size:12px;line-height:1.4}
+    .note{margin-top:10px;color:var(--muted2);font-size:12px;line-height:1.45}
 
-    .proof{
-      margin-top: 22px;
-      display:flex;flex-wrap:wrap;gap:10px;
-    }
+    .proof{margin-top: 22px;display:flex;flex-wrap:wrap;gap:10px}
     .pill{
-      font-weight:800;
+      font-weight:900;
       font-size:12px;
       color: rgba(255,255,255,0.86);
       padding:8px 10px;
@@ -179,43 +181,75 @@
       background: rgba(255,255,255,0.06);
       border-radius: 18px;
       padding: 14px;
-      box-shadow: 0 20px 70px rgba(0,0,0,0.35);
+      box-shadow: 0 20px 70px var(--shadow);
     }
 
     .side-card{position:sticky; top: 88px}
 
-    .side-title{font-weight:950;font-size:14px}
-    .side-sub{margin-top:8px;color:var(--muted);font-weight:700;font-size:12px;line-height:1.45}
+    .side-title{font-weight:1000;font-size:14px}
+    .side-sub{margin-top:8px;color:var(--muted);font-weight:750;font-size:12px;line-height:1.5}
 
     .side-list{margin-top:10px;display:grid;gap:8px}
     .side-item{padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,0.10);background:rgba(0,0,0,0.22)}
     .side-item b{display:block;font-size:12px}
-    .side-item span{display:block;margin-top:4px;color:var(--muted2);font-size:11px;line-height:1.35;font-weight:700}
+    .side-item span{display:block;margin-top:4px;color:var(--muted2);font-size:11px;line-height:1.4;font-weight:750}
 
-    .section{padding:34px 0}
-    .kicker{color: rgba(26,255,117,0.88); font-weight:900; font-size:12px; letter-spacing:0.08em; text-transform:uppercase}
-    .h2{margin:10px 0 0 0; font-size:34px; letter-spacing:-0.05em; line-height:1.1}
-    .lead{margin-top:10px;color:var(--muted);font-size:14px;line-height:1.6;max-width:70ch}
+    .section{padding:38px 0}
+    .kicker{color: rgba(120,54,255,0.92); font-weight:950; font-size:12px; letter-spacing:0.08em; text-transform:uppercase}
+    .h2{margin:10px 0 0 0; font-size:34px; letter-spacing:-0.05em; line-height:1.12}
+    .lead{margin-top:10px;color:var(--muted);font-size:14px;line-height:1.65;max-width:76ch}
 
     .grid{margin-top:16px;display:grid;grid-template-columns: repeat(3, 1fr);gap:12px}
     .grid .card b{display:block;font-size:13px}
-    .grid .card p{margin:8px 0 0 0;color:var(--muted);font-weight:650;font-size:12px;line-height:1.5}
+    .grid .card p{margin:8px 0 0 0;color:var(--muted);font-weight:700;font-size:12px;line-height:1.55}
 
     .split{display:grid;grid-template-columns: 1fr 1fr;gap:12px;margin-top:16px}
 
+    .logo-cloud{margin-top:14px;display:flex;flex-wrap:wrap;gap:10px}
+    .logo{
+      padding:10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.78);
+      font-weight:900;
+      font-size:12px;
+      letter-spacing:0.02em;
+    }
+
+    .metrics{margin-top:14px;display:grid;grid-template-columns: repeat(3, 1fr);gap:12px}
+    .metric{border:1px solid rgba(255,255,255,0.10);background:rgba(0,0,0,0.22);border-radius:16px;padding:12px}
+    .metric b{display:block;font-size:18px;letter-spacing:-0.03em}
+    .metric span{display:block;margin-top:6px;color:var(--muted);font-weight:750;font-size:12px;line-height:1.45}
+
     .how{margin-top:16px;display:grid;grid-template-columns: repeat(4, 1fr);gap:10px}
     .step{border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.05);border-radius:16px;padding:12px}
-    .step .n{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:10px;background:rgba(98,20,217,0.30);border:1px solid rgba(98,20,217,0.55);font-weight:950}
+    .step .n{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:10px;background:rgba(98,20,217,0.30);border:1px solid rgba(98,20,217,0.55);font-weight:1000}
     .step b{display:block;margin-top:10px;font-size:13px}
-    .step p{margin:7px 0 0 0;color:var(--muted);font-weight:650;font-size:12px;line-height:1.5}
+    .step p{margin:7px 0 0 0;color:var(--muted);font-weight:700;font-size:12px;line-height:1.55}
+
+    .checklist{margin-top:12px;display:grid;gap:8px}
+    .check{display:flex;gap:10px;align-items:flex-start}
+    .dot{width:10px;height:10px;border-radius:999px;background:rgba(79,123,255,0.85);box-shadow: 0 0 0 6px rgba(79,123,255,0.14)}
+    .check b{display:block;font-size:12px}
+    .check span{display:block;margin-top:3px;color:var(--muted2);font-weight:750;font-size:11px;line-height:1.4}
 
     .faq{margin-top:16px;display:grid;gap:10px}
     details{border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.05);border-radius:16px;padding:12px}
-    summary{cursor:pointer;font-weight:900}
-    details p{margin:10px 0 0 0;color:var(--muted);font-weight:650;font-size:12px;line-height:1.55}
+    summary{cursor:pointer;font-weight:950}
+    details p{margin:10px 0 0 0;color:var(--muted);font-weight:700;font-size:12px;line-height:1.6}
+
+    .final-cta{padding: 32px 0 10px 0}
+    .cta-panel{
+      border:1px solid rgba(255,255,255,0.12);
+      background: linear-gradient(135deg, rgba(98,20,217,0.20), rgba(79,123,255,0.14));
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 30px 90px rgba(0,0,0,0.44);
+    }
 
     .footer{padding:34px 0 70px 0;color:var(--muted2);font-size:12px}
-    .footer a{color:rgba(255,255,255,0.78);font-weight:800}
+    .footer a{color:rgba(255,255,255,0.78);font-weight:850}
 
     @media (max-width: 980px){
       .hero-grid{grid-template-columns:1fr}
@@ -224,6 +258,7 @@
       .grid{grid-template-columns:1fr}
       .split{grid-template-columns:1fr}
       .how{grid-template-columns:1fr}
+      .metrics{grid-template-columns:1fr}
       .navlinks{display:none}
     }
   </style>
@@ -239,18 +274,23 @@
   <div class="topbar">
     <div class="container">
       <div class="nav">
+        <!-- Hosting root (/) is /site/index.html which redirects to /pages/index.html -->
         <a class="brand" href="/">
           <img class="logo-img" src="/assets/675d725b1b8cce39ec.png" alt="SmartVoiceX" width="30" height="30" />
           <span>SmartVoiceX</span>
         </a>
+
         <div class="navlinks" aria-label="Primary">
+          <a href="#proof">Proof</a>
           <a href="#use-cases">Use cases</a>
           <a href="#capabilities">Capabilities</a>
-          <a href="#how-it-works">How it works</a>
+          <a href="#integrations">Integrations</a>
+          <a href="#security">Trust</a>
           <a href="#pricing">Pricing</a>
           <a href="#faq">FAQ</a>
           <a href="/pages/contact.html">Contact</a>
         </div>
+
         <div style="display:flex;gap:10px;align-items:center">
           <button class="btn secondary" type="button" onclick="window.SVXAuth?.openSignIn?.()">Sign in</button>
           <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
@@ -259,23 +299,25 @@
     </div>
   </div>
 
-  <div class="container">
-    <section class="hero">
+  <main class="container">
+    <section class="hero" aria-label="Hero">
       <div class="hero-grid">
         <div>
-          <div class="kicker">Premium AI phone operations</div>
-          <h1>Stop missing calls.
-            <br>Deploy an AI employee that runs your phone workflows.</h1>
+          <div class="kicker">AI employee for phone operations</div>
+          <h1>Deploy an AI employee
+            <br>that runs your phone workflows.</h1>
+
           <div class="sub">
             SmartVoiceX deploys custom voice agents that <b>make and take calls</b>, <b>book and confirm appointments</b>, and <b>run outbound follow‑up</b>—with multilingual support, transfer logic, and integrations.
           </div>
 
           <div class="cta-row">
-            <button class="btn primary" type="button" onclick="window.SVXAuth?.openAgentCreator?.()">Create / deploy an agent</button>
-            <button class="btn secondary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Sign up</button>
-            <button class="btn secondary" type="button" onclick="window.SVXAuth?.openSignIn?.()">Sign in</button>
+            <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
+            <button class="btn secondary" type="button" onclick="window.SVXAuth?.openAgentCreator?.()">Create / deploy an agent</button>
+            <button class="btn ghost" type="button" onclick="window.location.href='/pages/contact.html'">Get a workflow quote</button>
           </div>
-          <div class="note">Best fit: medical & dental front offices, patient access teams, and outbound call teams that need throughput without hiring linearly.</div>
+
+          <div class="note">Best fit: medical & dental front offices, patient access teams, and outbound calling teams that need throughput without hiring linearly.</div>
 
           <div class="proof" aria-label="Proof strip">
             <span class="pill">Inbound + outbound</span>
@@ -283,27 +325,54 @@
             <span class="pill">Multilingual (auto‑detect)</span>
             <span class="pill">Transfers + escalation</span>
             <span class="pill">Recordings + summaries</span>
-            <span class="pill">CRM / calendar sync</span>
+            <span class="pill">Workflow editing</span>
           </div>
         </div>
 
-        <aside class="card side-card" aria-label="Why teams switch">
-          <div class="side-title">The operational pain SmartVoiceX fixes</div>
-          <div class="side-sub">You already know the problem. We ship the fix: a deployed workflow, not just a dashboard.</div>
-          <div class="side-list">
-            <div class="side-item"><b>Missed calls → lost revenue</b><span>Every ring that goes to voicemail is a patient or lead drifting to a competitor.</span></div>
-            <div class="side-item"><b>No‑shows + scheduling friction</b><span>Confirmations, reminders, reschedules, and triage happen instantly—24/7.</span></div>
-            <div class="side-item"><b>Labor cost + inconsistency</b><span>Scripts, transfers, and follow‑up rules stay consistent across every call.</span></div>
-            <div class="side-item"><b>Outbound bottlenecks</b><span>List‑based calling and follow‑ups at scale without staffing a new call center.</span></div>
+        <aside class="card side-card" aria-label="Live product proof">
+          <div class="side-title">What “live demo” means</div>
+          <div class="side-sub">The site should sell with demonstrability. Use the CTA and hear the agent handle real workflows.</div>
+
+          <div class="side-list" role="list">
+            <div class="side-item" role="listitem"><b>Calls that sound professional</b><span>Natural conversation, consistent tone, and script control.</span></div>
+            <div class="side-item" role="listitem"><b>Operational specificity</b><span>Appointments, confirmations, routing, escalation, voicemail behavior.</span></div>
+            <div class="side-item" role="listitem"><b>Visibility + control</b><span>Recordings, transcripts, summaries, and workflow edits after go‑live.</span></div>
+            <div class="side-item" role="listitem"><b>Built for real buyers</b><span>Owners and ops leaders who need outcomes—not a generic voice bot.</span></div>
+          </div>
+
+          <div class="cta-row" style="margin-top:12px">
+            <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk live now</button>
+            <button class="btn secondary" type="button" onclick="window.SVXAuth?.openSignIn?.()">Sign in</button>
           </div>
         </aside>
       </div>
     </section>
 
-    <section class="section" id="use-cases">
+    <section class="section" id="proof" aria-label="Social proof">
+      <div class="kicker">Social proof (built for your category)</div>
+      <div class="h2">Premium by design — not vague “AI for everyone”</div>
+      <div class="lead">SmartVoiceX is positioned for teams that live on the phone: medical & dental workflows and outbound call teams. You’re buying a deployed capability, not just software.</div>
+
+      <div class="logo-cloud" aria-label="Industries">
+        <span class="logo">Medical groups</span>
+        <span class="logo">Dental practices</span>
+        <span class="logo">Patient access</span>
+        <span class="logo">Outreach teams</span>
+        <span class="logo">Service businesses</span>
+        <span class="logo">Multi‑location ops</span>
+      </div>
+
+      <div class="metrics" aria-label="Value metrics">
+        <div class="metric"><b>24/7</b><span>Overflow + after‑hours coverage without missed rings.</span></div>
+        <div class="metric"><b>1 → many</b><span>Handle multiple calls at once (no busy signals).</span></div>
+        <div class="metric"><b>Faster follow‑up</b><span>Outbound reminders and lead re‑engagement while intent is high.</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="use-cases" aria-label="Use cases">
       <div class="kicker">Use cases</div>
-      <div class="h2">Built for real workflows—medical and outbound teams first</div>
-      <div class="lead">SmartVoiceX is wider than an “AI receptionist.” It’s a deployed AI calling system that’s configured around your processes, then improved over time.</div>
+      <div class="h2">Built for real workflows — medical and outbound teams first</div>
+      <div class="lead">SmartVoiceX is wider than an “AI receptionist.” It’s a deployed AI calling system configured around your processes, then improved over time.</div>
 
       <div class="split">
         <div class="card">
@@ -319,31 +388,46 @@
       </div>
     </section>
 
-    <section class="section" id="capabilities">
+    <section class="section" aria-label="Problem and solution">
+      <div class="kicker">Problem → solution</div>
+      <div class="h2">Phone ops breaks when volume rises (and staffing can’t scale)</div>
+      <div class="lead">SmartVoiceX exists for the buying triggers that actually close: missed calls, delayed callbacks, staff time trapped in repetitive phone work, and the need to contact more leads or patients without hiring linearly.</div>
+
+      <div class="split">
+        <div class="card">
+          <b>What teams experience</b>
+          <div class="checklist">
+            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Missed calls → lost revenue</b><span>Every ring that goes to voicemail is a patient or lead drifting to a competitor.</span></div></div>
+            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Inconsistency + script drift</b><span>Different reps, different outcomes—and it’s hard to tighten control.</span></div></div>
+            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Outbound bottlenecks</b><span>Follow‑up cadence slips because humans can’t run lists all day.</span></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <b>What SmartVoiceX deploys</b>
+          <div class="checklist">
+            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>A live deployed agent</b><span>Configured to your workflows with voice, tone, and talk‑tracks.</span></div></div>
+            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Transfer + escalation logic</b><span>Route to humans when needed, with the right context.</span></div></div>
+            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Visibility + iteration</b><span>Recordings, transcripts, summaries, and workflow edits over time.</span></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="capabilities" aria-label="Capabilities">
       <div class="kicker">Capabilities</div>
       <div class="h2">Everything you need to run phone operations</div>
       <div class="lead">Operate inbound and outbound at once. Control behavior through editable workflows. Escalate to humans when required.</div>
 
       <div class="grid">
         <div class="card"><b>Answer inbound calls</b><p>First ring, no holds, no voicemails—consistent experience every time.</p></div>
-        <div class="card"><b>Place outbound calls</b><p>Follow‑up fast while intent is high. Work through contact lists.</p></div>
+        <div class="card"><b>Place outbound calls</b><p>Follow up fast while intent is high. Work through contact lists.</p></div>
         <div class="card"><b>Concurrent calls</b><p>Scale beyond a single human’s capacity—without busy signals.</p></div>
-        <div class="card"><b>Editable workflows</b><p>Adjust talk tracks, routing, and policies after deployment.</p></div>
+        <div class="card"><b>Book & confirm appointments</b><p>Scheduling, confirmations, reschedules, and reminders—24/7.</p></div>
+        <div class="card"><b>Navigate IVR systems</b><p>Handle phone trees, detect voicemail, and leave messages when needed.</p></div>
         <div class="card"><b>Multilingual support</b><p>Auto‑detect language; maintain brand tone across languages.</p></div>
-        <div class="card"><b>Integrations</b><p>Calendar / CRM sync and custom endpoints where available.</p></div>
-      </div>
-    </section>
-
-    <section class="section" id="how-it-works">
-      <div class="kicker">How it works</div>
-      <div class="h2">Deployed capability is the product</div>
-      <div class="lead">SmartVoiceX is not a self‑serve widget. You’re buying a live deployed agent, workflow setup, support, and infrastructure—so it works inside your operations.</div>
-
-      <div class="how">
-        <div class="step"><span class="n">1</span><b>Discovery</b><p>Define inbound + outbound workflows, transfer rules, escalations, and compliance requirements.</p></div>
-        <div class="step"><span class="n">2</span><b>Build & configure</b><p>We deploy a tailored agent: voice, tone, scripts, multilingual behavior, and system hooks.</p></div>
-        <div class="step"><span class="n">3</span><b>Go live</b><p>Start handling real calls. Capture recordings, transcripts, and summaries.</p></div>
-        <div class="step"><span class="n">4</span><b>Improve</b><p>Edit workflows over time. Tighten routing, refine talk tracks, and expand use cases.</p></div>
+        <div class="card"><b>Transfer to humans</b><p>Escalate with defined rules and collect context before handoff.</p></div>
+        <div class="card"><b>Workflow editing</b><p>Adjust routing, policies, and talk‑tracks after deployment.</p></div>
+        <div class="card"><b>Recordings + summaries</b><p>Review call outcomes with transcripts and structured summaries.</p></div>
       </div>
 
       <div class="cta-row" style="margin-top:16px">
@@ -352,26 +436,77 @@
       </div>
     </section>
 
-    <section class="section" id="pricing">
+    <section class="section" id="integrations" aria-label="Integrations">
+      <div class="kicker">Integrations</div>
+      <div class="h2">Connect SmartVoiceX to the systems you already run</div>
+      <div class="lead">SmartVoiceX is designed to operate inside a real business workflow. We scope integrations during discovery and ship what’s needed for the workflow to work end‑to‑end.</div>
+
+      <div class="split">
+        <div class="card">
+          <b>Common integration patterns</b>
+          <p><b>Calendar / scheduling</b> for booking and confirmations.</p>
+          <p><b>CRM / lead systems</b> for logging calls, updating statuses, and driving follow‑up.</p>
+          <p><b>Custom endpoints</b> (webhooks / APIs) when your internal systems require it.</p>
+          <p style="color:var(--muted2)"><b>Note:</b> Availability depends on workable endpoints and your workflow scope.</p>
+        </div>
+        <div class="card">
+          <b>Operational control that matters</b>
+          <p>Define transfer rules, escalation paths, voicemail behavior, and allowed improvisation vs. strict scripting.</p>
+          <p>Support for multiple languages with auto‑detection, brand tone control, and post‑call visibility (recording + transcript + summary).</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="security" aria-label="Trust and security">
+      <div class="kicker">Trust & implementation</div>
+      <div class="h2">Trust comes from specificity, process, and transparency</div>
+      <div class="lead">Regulated and high‑stakes teams need clarity. SmartVoiceX emphasizes live demoability, a standardized onboarding process, and explicit handling of recording/consent and escalation boundaries.</div>
+
+      <div class="grid">
+        <div class="card"><b>Recording + consent considerations</b><p>We scope recording, consent, and compliance needs during onboarding and configure accordingly.</p></div>
+        <div class="card"><b>Human override</b><p>Transfer rules and escalation paths ensure a human can take over when needed.</p></div>
+        <div class="card"><b>Implementation handoff</b><p>Discovery → configuration → go‑live → iteration. Deployed capability is the product.</p></div>
+      </div>
+    </section>
+
+    <section class="section" id="how-it-works" aria-label="How it works">
+      <div class="kicker">How it works</div>
+      <div class="h2">Deployed capability is the product</div>
+      <div class="lead">SmartVoiceX isn’t a self‑serve widget. You’re buying a live deployed agent, workflow setup, support, and infrastructure—so it works inside your operations.</div>
+
+      <div class="how">
+        <div class="step"><span class="n">1</span><b>Discovery</b><p>Define inbound + outbound workflows, transfer rules, escalations, and requirements.</p></div>
+        <div class="step"><span class="n">2</span><b>Build & configure</b><p>Deploy voice, tone, scripts, multilingual behavior, and system hooks.</p></div>
+        <div class="step"><span class="n">3</span><b>Go live</b><p>Start handling real calls. Capture recordings, transcripts, and summaries.</p></div>
+        <div class="step"><span class="n">4</span><b>Improve</b><p>Edit workflows over time. Tighten routing, refine talk tracks, expand use cases.</p></div>
+      </div>
+    </section>
+
+    <section class="section" id="pricing" aria-label="Pricing">
       <div class="kicker">Pricing</div>
       <div class="h2">Flexible pricing that matches the real commercial model</div>
-      <div class="lead">Most teams start with a low monthly floor and usage‑based minutes, with custom scope for complex workflows and integrations. We’ll quote after a short workflow review.</div>
+      <div class="lead">Most teams start with a low monthly floor plus usage‑based minutes, with custom scope for complex workflows and integrations. We’ll quote after a short workflow review.</div>
 
       <div class="split">
         <div class="card">
           <b>Starting at</b>
           <p><b>$300/month</b> platform floor (typical), plus usage (minutes). Additional scoping for complex accounts.</p>
-          <p style="color:var(--muted2)"><b>Note:</b> Exact pricing depends on call volume, workflows, languages, and integrations.</p>
+          <p style="color:var(--muted2)"><b>Usage reference:</b> founder-described minutes around <b>$0.40/min</b> (varies by scope).</p>
         </div>
         <div class="card">
-          <b>Fast deployment</b>
+          <b>Deployment timeline</b>
           <p>Simple workflows can go live quickly. Complex deployments can take up to ~2 weeks.</p>
           <p>Implementation quality is part of the product—your first launch is team‑assisted.</p>
         </div>
       </div>
+
+      <div class="cta-row" style="margin-top:16px">
+        <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
+        <button class="btn secondary" type="button" onclick="window.location.href='/pages/contact.html'">Request a quote</button>
+      </div>
     </section>
 
-    <section class="section" id="faq">
+    <section class="section" id="faq" aria-label="FAQ">
       <div class="kicker">FAQ</div>
       <div class="h2">Objection handling, answered</div>
       <div class="lead">We aim for demonstrability over vague AI claims. If you want to evaluate SmartVoiceX, talk to the agent live.</div>
@@ -386,22 +521,30 @@
           <p>Simple workflows can move quickly; complex workflows can take up to about two weeks. Implementation quality is part of the product.</p>
         </details>
         <details>
-          <summary>What happens when a human is needed?</summary>
-          <p>You define transfer rules and escalation paths. The agent can route calls to the right person/team when needed.</p>
-        </details>
-        <details>
           <summary>Can it integrate with our systems?</summary>
           <p>Yes—calendar/CRM sync and custom integrations are available when workable endpoints exist. We scope integrations during discovery.</p>
+        </details>
+        <details>
+          <summary>What happens when a human is needed?</summary>
+          <p>You define transfer rules and escalation paths. The agent can route calls to the right person/team when needed.</p>
         </details>
         <details>
           <summary>Is this just an “AI receptionist”?</summary>
           <p>No. SmartVoiceX is a deployed AI employee for phone operations: inbound, outbound, workflows, concurrency, multilingual handling, and follow‑up automation.</p>
         </details>
       </div>
+    </section>
 
-      <div class="cta-row" style="margin-top:16px">
-        <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
-        <button class="btn secondary" type="button" onclick="window.SVXAuth?.openAgentCreator?.()">Create / deploy an agent</button>
+    <section class="final-cta" aria-label="Final CTA">
+      <div class="cta-panel">
+        <div class="kicker">Ready to evaluate it?</div>
+        <div class="h2" style="margin-top:10px">Talk to the agent live — then we’ll scope your workflow.</div>
+        <div class="lead">If SmartVoiceX fits, we’ll deploy a tailored agent with your scripts, transfer rules, and integration needs.</div>
+        <div class="cta-row" style="margin-top:14px">
+          <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
+          <button class="btn secondary" type="button" onclick="window.SVXAuth?.openAgentCreator?.()">Create / deploy an agent</button>
+          <button class="btn ghost" type="button" onclick="window.location.href='/pages/contact.html'">Contact sales</button>
+        </div>
       </div>
     </section>
 
@@ -415,7 +558,7 @@
         </div>
       </div>
     </footer>
-  </div>
+  </main>
 
   <script>
     document.getElementById('y').textContent = String(new Date().getFullYear());
