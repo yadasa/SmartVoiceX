@@ -181,9 +181,11 @@
       position:absolute;
       top:0;
       bottom:0;
-      left: calc(50% - 50vw);
-      transform: none;
-      width: 100vw; /* full-bleed so it visibly masks the global blobs */
+      left: 0;
+      right: 0;
+      /* full-bleed background from inside a centered container */
+      margin-left: calc(50% - 50vw);
+      margin-right: calc(50% - 50vw);
 
       pointer-events:none;
       border-radius: 0;
