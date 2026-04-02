@@ -73,7 +73,7 @@ async function elevenFetch(path, { method = 'GET', body } = {}) {
   try { data = text ? JSON.parse(text) : null; } catch (_) { data = { raw: text }; }
 
   if (!resp.ok) {
-    const err = new Error('elevenlabs_error');
+    const err = new Error('aphrisoft_error');
     err.status = 502;
     err.details = { status: resp.status, data };
     throw err;
@@ -169,7 +169,7 @@ async function handleCreateAgent(req, res) {
 
   await agentRef.set(draft, { merge: true });
 
-  // TODO: Replace placeholder mapping below with the exact ElevenLabs agent-create schema.
+  // TODO: Replace placeholder mapping below with the exact aphrisoft agent-create schema.
   // We intentionally keep the user's inputs stored even if the external API call fails.
   const systemPrompt = [
     `You are a SmartVoiceX voice agent for a business.`,
@@ -187,13 +187,13 @@ async function handleCreateAgent(req, res) {
     `First message to say when the call connects: ${firstMessage}`,
   ].filter(Boolean).join('\n');
 
-  // Placeholder: create an ElevenLabs "agent".
-  // The exact endpoint/payload will be updated once we confirm the current ElevenLabs docs.
-  let eleven = null;
+  // Placeholder: create an aphrisoft "agent".
+  // The exact endpoint/payload will be updated once we confirm the current provider docs.
+  let providerResp = null;
   try {
-    // ElevenLabs Conversational AI: Create Agent
+    // aphrisoft Conversational AI: Create Agent
     // OpenAPI indicates: POST /v1/convai/agents/create with required { conversation_config: { agent: { ... } } }
-    eleven = await elevenFetch('/v1/convai/agents/create', {
+    providerResp = await elevenFetch('/v1/convai/agents/create', {
       method: 'POST',
       body: {
         name: `SVX - ${business}`,
@@ -203,7 +203,7 @@ async function handleCreateAgent(req, res) {
             first_message: firstMessage,
             prompt: {
               prompt: systemPrompt,
-              // Let ElevenLabs use the default model unless you want to pin it.
+              // Let the provider use the default model unless you want to pin it.
               // llm: 'gpt-5-mini',
             },
           },
@@ -214,11 +214,11 @@ async function handleCreateAgent(req, res) {
 
     await agentRef.set({
       status: 'ready',
-      elevenlabs: eleven,
+      aphrisoft: providerResp,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     }, { merge: true });
 
-    return json(res, 200, { ok: true, agentId: agentRef.id, elevenlabs: eleven });
+    return json(res, 200, { ok: true, agentId: agentRef.id, aphrisoft: providerResp });
   } catch (e) {
     await agentRef.set({
       status: 'error',

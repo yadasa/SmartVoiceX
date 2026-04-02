@@ -7,11 +7,11 @@ This repo is currently a static-site mirror. As we add Firebase Functions + exte
   - The static site currently uses the Firebase Web config (public) for Auth + Firestore.
   - No extra secret is required for Firebase Auth/Firestore client usage.
 
-## ElevenLabs (Xi)
-These are required to create/manage SmartVoiceX agents via the ElevenLabs API from server-side code.
+## aphrisoft (Xi)
+These are required to create/manage SmartVoiceX agents via the aphrisoft API from server-side code.
 
 - **`ELEVENLABS_API_KEY`**
-  - Where used: Firebase Function endpoint that creates ElevenLabs agents.
+  - Where used: Firebase Function endpoint that creates aphrisoft agents.
   - Setup (example):
     - `firebase functions:secrets:set ELEVENLABS_API_KEY`
     - Attach to v2 function with `onRequest({ secrets: ['ELEVENLABS_API_KEY'] }, ...)`
@@ -32,4 +32,4 @@ Add here as we wire up more features.
 
 ## Notes
 - Do **not** embed private API keys in `site/assets/*.js` because this is a public static site.
-- All privileged calls (like creating ElevenLabs agents) must go through a server endpoint (Firebase Functions) that verifies the Firebase ID token.
+- All privileged calls (like creating aphrisoft agents) must go through a server endpoint (Firebase Functions) that verifies the Firebase ID token.
