@@ -99,6 +99,10 @@
     #bg-blobs .blob.b4{right:-360px; bottom:-500px; width: 1000px; height: 1000px; opacity:0.52}
     #bg-blobs .blob.b4 .inner{background: radial-gradient(circle at 50% 55%, rgba(79,123,255,0.78), rgba(79,123,255,0.00) 70%); animation-duration: 11s}
 
+    /* follower blob (mostly blue) */
+    #bg-blobs .blob.b5{left: calc(50% - 520px); top: -360px; width: 1040px; height: 1040px; opacity:0.42}
+    #bg-blobs .blob.b5 .inner{background: radial-gradient(circle at 55% 40%, rgba(79,123,255,0.92), rgba(79,123,255,0.22), rgba(79,123,255,0.00) 72%); animation-duration: 13s}
+
     @keyframes drift{
       0%{transform: translate3d(0px,0px,0) scale(1)}
       33%{transform: translate3d(360px,-260px,0) scale(1.16)}
@@ -425,6 +429,7 @@
     <div class="blob b2"><div class="inner"></div></div>
     <div class="blob b3"><div class="inner"></div></div>
     <div class="blob b4"><div class="inner"></div></div>
+    <div class="blob b5"><div class="inner"></div></div>
   </div>
 
   <div class="topbar">
@@ -764,6 +769,9 @@
       if (!wrap) return;
 
       const blobs = Array.from(wrap.querySelectorAll('.blob'));
+      const follower = wrap.querySelector('.blob.b5');
+      const leaders = follower ? blobs.filter(b => b !== follower) : blobs;
+
       // Each blob reacts differently to pointer (direction + magnitude).
       // Tuned for a "parallax / swirl" feel.
       const factors = [
@@ -798,11 +806,24 @@
         cx += (tx - cx) * 0.14;
         cy += (ty - cy) * 0.14;
 
-        blobs.forEach((b, i) => {
+        let sumX = 0, sumY = 0;
+        leaders.forEach((b, i) => {
           const f = factors[i % factors.length];
-          b.style.setProperty('--bpx', (cx * f.x).toFixed(2) + 'px');
-          b.style.setProperty('--bpy', (cy * f.y).toFixed(2) + 'px');
+          const bx = cx * f.x;
+          const by = cy * f.y;
+          b.style.setProperty('--bpx', bx.toFixed(2) + 'px');
+          b.style.setProperty('--bpy', by.toFixed(2) + 'px');
+          sumX += bx;
+          sumY += by;
         });
+
+        // follower blob: drift toward the average "center" of the others
+        if (follower && leaders.length) {
+          const avgX = sumX / leaders.length;
+          const avgY = sumY / leaders.length;
+          follower.style.setProperty('--bpx', (avgX * 1.05).toFixed(2) + 'px');
+          follower.style.setProperty('--bpy', (avgY * 1.05).toFixed(2) + 'px');
+        }
 
         requestAnimationFrame(tick);
       }
