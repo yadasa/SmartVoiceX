@@ -68,11 +68,23 @@
       c3 += vec2(0.07*cos(t*0.19), 0.10*sin(t*0.21));
       c4 += vec2(0.08*sin(t*0.17), 0.08*cos(t*0.25));
 
-      // Pointer influence (similar to previous per-blob factors)
-      c1 += u_ptr * vec2( 1.10, 0.72);
-      c2 += u_ptr * vec2(-0.95, 1.05);
-      c3 += u_ptr * vec2( 0.62,-1.12);
-      c4 += u_ptr * vec2(-0.78,-0.66);
+      // Pointer influence (make each blob respond differently; avoid simple quadrant mirroring)
+      vec2 p = u_ptr;
+      float amp = 0.95;
+
+      // helper: 2D rotation
+      mat2 r(float a){ float c = cos(a), s = sin(a); return mat2(c,-s,s,c); }
+
+      // derive a few nonlinearly-warped pointer vectors
+      vec2 pA = r(0.65) * vec2(p.x + 0.55*p.y, p.y - 0.25*p.x);
+      vec2 pB = r(-1.10) * vec2(p.x - 0.35*p.y, p.y + 0.70*p.x);
+      vec2 pC = r(1.75) * vec2(p.x + 0.10*sin(t*0.9), p.y + 0.08*cos(t*0.7));
+      vec2 pD = vec2(sin(p.x*8.0 + t*0.6), sin(p.y*7.0 - t*0.5)) * 0.10;
+
+      c1 += (pA + pD) * vec2( 1.20, 0.55) * amp;
+      c2 += (pB - 0.6*pD) * vec2( 0.75, 1.25) * amp;
+      c3 += (pC + vec2(p.y, -p.x)*0.35) * vec2( 1.05, 0.85) * amp;
+      c4 += (r(-0.35)*p + vec2(-p.x*p.x, p.y*p.y)*0.25) * vec2( 0.90, 1.10) * amp;
 
       // follower blob: tracks average center
       vec2 c5 = (c1 + c2 + c3 + c4) * 0.25;
