@@ -3,7 +3,7 @@
 
 (() => {
   const GLASS_PRESET = {
-    radius: 51,
+    radius: 21,
     thickness: 60,
     bezel: 60,
     ior: 3.0,
