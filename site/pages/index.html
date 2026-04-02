@@ -272,6 +272,7 @@
       overflow: hidden;
       box-shadow: 0 20px 70px var(--shadow);
     }
+    .card > b{text-align:center; display:block}
 
     .side-card{position:sticky; top: 88px; margin: 18px 0}
 
@@ -317,6 +318,9 @@
 
     .split{display:grid;grid-template-columns: 1fr 1fr;gap:12px;margin-top:16px}
 
+    .overview-gif-wrap{margin-top:14px}
+    .overview-gif{width:100%;height:auto;display:block;border-radius: 18px;border: 1px solid rgb(var(--c-white) / 0.10);box-shadow: 0 22px 80px rgb(var(--c-black) / 0.35)}
+
     .logo-cloud{margin-top:14px;display:flex;flex-wrap:wrap;gap:10px}
     .logo{
       padding:10px 12px;
@@ -331,13 +335,13 @@
 
     .metrics{margin-top:14px;display:grid;grid-template-columns: repeat(3, 1fr);gap:12px}
     .metric{border:1px solid rgb(var(--c-white) / 0.10);background:var(--ink-2);border-radius:16px;padding:12px}
-    .metric b{display:block;font-size:18px;letter-spacing:-0.03em}
+    .metric b{display:block;font-size:18px;letter-spacing:-0.03em; text-align:center}
     .metric span{display:block;margin-top:6px;color:var(--muted);font-weight:750;font-size:12px;line-height:1.45}
 
     .how{margin-top:16px;display:grid;grid-template-columns: repeat(4, 1fr);gap:10px}
     .step{border:1px solid rgb(var(--c-white) / 0.10);background:var(--glass-1);border-radius:16px;padding:12px}
     .step .n{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:10px;background: rgb(var(--c-blue) / 0.24);border:1px solid rgb(var(--c-blue) / 0.52);color: var(--svx-blueText);font-weight:1000}
-    .step b{display:block;margin-top:10px;font-size:13px}
+    .step b{display:block;margin-top:10px;font-size:13px; text-align:center}
     .step p{margin:7px 0 0 0;color:var(--muted);font-weight:700;font-size:12px;line-height:1.55}
 
     .checklist{margin-top:12px;display:grid;gap:8px}
@@ -416,7 +420,7 @@
       details .faq-body{transition:none}
     }
 
-    .final-cta{padding: 32px 0 10px 0}
+    .final-cta{padding: 32px 0 10px 0; position:relative; z-index:2}
     .cta-panel{
       border:1px solid rgb(var(--c-white) / 0.12);
       background: linear-gradient(135deg, rgb(var(--c-purple) / 0.20), rgb(var(--c-blue) / 0.14));
@@ -596,6 +600,10 @@
         <div class="kicker">Core capabilities</div>
       <div class="h2">Everything you need to run phone operations with more control.</div>
       <div class="lead">Handle inbound and outbound calls, control the workflow, and escalate to humans when needed.</div>
+
+      <div class="overview-gif-wrap" aria-label="Overview">
+        <img class="overview-gif" src="/assets/overview%20gif.gif" alt="SmartVoiceX overview" loading="lazy">
+      </div>
 
       <div class="grid" aria-label="Capabilities cards">
         <div class="card"><b>Answer inbound calls</b><p>Deliver a fast, consistent experience from the first ring.</p></div>
