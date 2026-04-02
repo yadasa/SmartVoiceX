@@ -384,7 +384,8 @@
   }
 
   function mountUI() {
-    if ($('#svx-auth-fab')) return;
+    // FAB removed; keep modal/backdrop support via navbar triggers.
+    // if ($('#svx-auth-fab')) return;
 
     const fab = el('div', { id: 'svx-auth-fab' }, [
       el('button', { id: 'svx-auth-btn', type: 'button', text: 'Sign in' }),
@@ -729,7 +730,8 @@
   }
 
   async function init() {
-    mountUI();
+    // FAB removed: we rely on the navbar Sign in button.
+    // mountUI();
 
     let auth, db;
     try {
