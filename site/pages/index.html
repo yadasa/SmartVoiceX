@@ -370,6 +370,31 @@
 <body>
   <div class="topbar-bg" aria-hidden="true"></div>
 
+  <div class="topbar">
+    <div class="container">
+      <div class="nav">
+        <!-- Hosting root (/) is /site/index.html which redirects to /pages/index.html -->
+        <a class="brand" href="/">
+          <img class="logo-img" src="https://framerusercontent.com/images/HGcdlN7zIfAfzoPYSAgqX6wl0.png?width=486&height=508" alt="SmartVoiceX" width="45" height="40" />
+          <span>SmartVoiceX</span>
+        </a>
+
+        <div class="navlinks" aria-label="Primary">
+          <a href="#use-cases">Use Cases</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#integrations">Integrations</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#faq">FAQ</a>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:center">
+          <a class="navutil" href="#" onclick="window.SVXAuth?.openSignIn?.(); return false;">Sign in</a>
+          <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <main class="container">
     <div class="journey" aria-label="Hero + proof sticky journey">
       <div class="journey-main">
