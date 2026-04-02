@@ -387,10 +387,11 @@
     // FAB removed; keep modal/backdrop support via navbar triggers.
     // if ($('#svx-auth-fab')) return;
 
-    const fab = el('div', { id: 'svx-auth-fab' }, [
-      el('button', { id: 'svx-auth-btn', type: 'button', text: 'Sign in' }),
-      el('div', { id: 'svx-auth-menu' }),
-    ]);
+    // FAB removed (we use the navbar Sign in button instead)
+    // const fab = el('div', { id: 'svx-auth-fab' }, [
+    //   el('button', { id: 'svx-auth-btn', type: 'button', text: 'Sign in' }),
+    //   el('div', { id: 'svx-auth-menu' }),
+    // ]);
 
     const backdrop = el('div', { id: 'svx-auth-backdrop' });
 
@@ -517,7 +518,6 @@
     ]);
 
     document.body.appendChild(signedInModal);
-    document.body.appendChild(fab);
 
     // Expose minimal programmatic API for on-page CTAs.
     window.SVXAuth = Object.assign(window.SVXAuth || {}, {
@@ -529,20 +529,7 @@
     });
 
     // Events
-    $('#svx-auth-btn')?.addEventListener('click', async () => {
-      const menu = $('#svx-auth-menu');
-      // If signed in, toggle menu; if signed out, open modal.
-      try {
-        const { auth } = ensureFirebase();
-        const user = auth.currentUser;
-        if (user) {
-          menu?.classList.toggle('open');
-          return;
-        }
-      } catch (_) {}
-
-      openModal('signin');
-    });
+    // (FAB removed: navbar buttons call window.SVXAuth.openSignIn/openSignUp directly)
 
     $('.svx-close', modal)?.addEventListener('click', closeModal);
     $('#svx-signedin-close')?.addEventListener('click', closeSignedInModal);
@@ -711,14 +698,7 @@
       }
     });
 
-    // close menu on outside click
-    document.addEventListener('click', (ev) => {
-      const menu = $('#svx-auth-menu');
-      const fab = $('#svx-auth-fab');
-      if (!menu || !fab) return;
-      if (fab.contains(ev.target)) return;
-      menu.classList.remove('open');
-    });
+    // (FAB removed) no menu-outside-click handler needed
 
     // refresh dashboard whenever it becomes visible
     const observer = new MutationObserver(() => {
@@ -730,8 +710,7 @@
   }
 
   async function init() {
-    // FAB removed: we rely on the navbar Sign in button.
-    // mountUI();
+    mountUI();
 
     let auth, db;
     try {
