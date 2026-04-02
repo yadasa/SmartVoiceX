@@ -20,12 +20,14 @@
   <meta name="twitter:description" content="Deploy a custom AI voice agent for inbound and outbound calls, appointment workflows, transfers, multilingual support, and integrations.">
 
   <link rel="stylesheet" href="/assets/svx-auth.css">
+  <link rel="stylesheet" href="/assets/liquid-glass/liquid-glass.css">
 
   <!-- Firebase (compat builds for static hosting) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="/assets/svx-auth.js" defer></script>
+  <script type="module" src="/assets/liquid-glass/liquid-glass-init.js" defer></script>
 
   <style>
     :root{
@@ -534,18 +536,19 @@
     </div>
 
     <!-- (6) Use Cases -->
-    <section class="section" id="use-cases" aria-label="Use cases">
+    <section class="section glass-section" id="use-cases" aria-label="Use cases">
+      <div class="liquid-glass-layer" aria-hidden="true"><canvas></canvas></div>
       <div class="kicker">Use Cases</div>
       <div class="h2">More than an AI receptionist. Built for the workflows your business actually runs.</div>
       <div class="lead">SmartVoiceX is a custom AI calling system configured around your process. It can answer inbound calls, place outbound calls, book appointments, confirm schedules, route conversations, and hand off to humans when needed.</div>
 
       <div class="grid" aria-label="Use case cards">
-        <div class="card"><b>Healthcare and dental</b><p>New patient scheduling, appointment confirmations, overflow handling, after‑hours call coverage, FAQs, and administrative follow‑up.</p></div>
-        <div class="card"><b>Legal teams</b><p>Intake screening, consultation scheduling, client updates, missed‑call capture, and routing to the right staff member.</p></div>
-        <div class="card"><b>Restaurants and hospitality</b><p>Reservation support, recurring guest questions, overflow handling, multi‑location routing, and follow‑up communication.</p></div>
-        <div class="card"><b>Construction and field service</b><p>Inbound job inquiries, estimate scheduling, dispatch coordination, follow‑up calls, and after‑hours lead capture.</p></div>
-        <div class="card"><b>Home and local service businesses</b><p>Call answering, appointment booking, reschedules, reminders, and lead follow‑up without tying up your staff.</p></div>
-        <div class="card"><b>Outbound calling teams</b><p>Warm outreach, cold outreach, reminders, lead qualification, and list‑based calling with higher throughput.</p></div>
+        <div class="card liquid-card"><b>Healthcare and dental</b><p>New patient scheduling, appointment confirmations, overflow handling, after‑hours call coverage, FAQs, and administrative follow‑up.</p></div>
+        <div class="card liquid-card"><b>Legal teams</b><p>Intake screening, consultation scheduling, client updates, missed‑call capture, and routing to the right staff member.</p></div>
+        <div class="card liquid-card"><b>Restaurants and hospitality</b><p>Reservation support, recurring guest questions, overflow handling, multi‑location routing, and follow‑up communication.</p></div>
+        <div class="card liquid-card"><b>Construction and field service</b><p>Inbound job inquiries, estimate scheduling, dispatch coordination, follow‑up calls, and after‑hours lead capture.</p></div>
+        <div class="card liquid-card"><b>Home and local service businesses</b><p>Call answering, appointment booking, reschedules, reminders, and lead follow‑up without tying up your staff.</p></div>
+        <div class="card liquid-card"><b>Outbound calling teams</b><p>Warm outreach, cold outreach, reminders, lead qualification, and list‑based calling with higher throughput.</p></div>
       </div>
     </section>
 

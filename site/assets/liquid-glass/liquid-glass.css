@@ -1,0 +1,50 @@
+/* Liquid Glass (phase 1)
+   Scope: only activates inside a section with .glass-section.
+   Cards opt-in via .liquid-card.
+*/
+
+.glass-section{
+  position: relative;
+  isolation: isolate; /* keep blending contained */
+}
+
+.glass-section .liquid-glass-layer{
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 0;
+}
+
+.glass-section .liquid-glass-layer canvas{
+  display:block;
+  width:100%;
+  height:100%;
+  opacity: 0.85;
+}
+
+/* ensure content sits above the canvas */
+.glass-section > *:not(.liquid-glass-layer){
+  position: relative;
+  z-index: 1;
+}
+
+/* Card treatment: keep existing .card layout but add glassy feel */
+.glass-section .liquid-card{
+  background: rgba(255,255,255,0.07); /* slightly brighter than default */
+  border-color: rgba(255,255,255,0.14);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+}
+
+/* optional: extra subtle inner highlight */
+.glass-section .liquid-card{
+  box-shadow:
+    0 20px 70px rgba(0,0,0,0.40),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+}
+
+@media (prefers-reduced-motion: reduce){
+  .glass-section .liquid-glass-layer canvas{opacity:0.55}
+}
