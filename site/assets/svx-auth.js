@@ -106,6 +106,9 @@
   }
 
   function setAuthButtonSignedOut() {
+    const nav = $('#svx-nav-auth');
+    if (nav) nav.textContent = 'Sign in';
+
     const btn = $('#svx-auth-btn');
     if (btn) btn.textContent = 'Sign in';
 
@@ -114,6 +117,9 @@
   }
 
   function setAuthButtonSignedIn(user, profile) {
+    const nav = $('#svx-nav-auth');
+    if (nav) nav.textContent = 'My Account';
+
     const btn = $('#svx-auth-btn');
     const label = (profile && profile.username) ? `@${profile.username}` : (user.email || 'Account');
     if (btn) btn.textContent = label;
@@ -521,9 +527,19 @@
 
     // Expose minimal programmatic API for on-page CTAs.
     window.SVXAuth = Object.assign(window.SVXAuth || {}, {
-      openSignIn: () => openModal('signin'),
+      openSignIn: async () => {
+        try {
+          const { auth } = ensureFirebase();
+          if (auth.currentUser) {
+            openSignedInModal();
+            refreshSignedInDashboard();
+            return;
+          }
+        } catch (_) {}
+        openModal('signin');
+      },
       openSignUp: () => openModal('signup'),
-      openAccount: () => openSignedInModal(),
+      openAccount: () => { openSignedInModal(); refreshSignedInDashboard(); },
       close: () => { closeModal(); closeSignedInModal(); },
       refreshDashboard: () => refreshSignedInDashboard(),
     });
@@ -720,6 +736,12 @@
       setAuthButtonSignedOut();
       return;
     }
+
+    // Ensure auth persists across modal closes/page focus (default is usually LOCAL,
+    // but set explicitly so it behaves consistently).
+    try {
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    } catch (_) {}
 
     auth.onAuthStateChanged(async (user) => {
       if (!user) {
