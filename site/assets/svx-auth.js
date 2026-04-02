@@ -204,23 +204,132 @@
     container.appendChild(ul);
   }
 
+  function setText(id, text) {
+    const n = typeof id === 'string' ? $(`#${id}`) : id;
+    if (!n) return;
+    n.textContent = text == null ? '' : String(text);
+  }
+
+  function renderSkeletonList(container, rows = 3) {
+    if (!container) return;
+    container.innerHTML = '';
+    const ul = el('ul', { class: 'svx-list svx-skeleton-list', 'aria-hidden': 'true' });
+    for (let i = 0; i < rows; i++) {
+      ul.appendChild(el('li', { class: 'svx-list-item svx-skeleton' }, [
+        el('div', { class: 'svx-skel-line svx-skel-title' }),
+        el('div', { class: 'svx-skel-line svx-skel-sub' }),
+      ]));
+    }
+    container.appendChild(ul);
+  }
+
+  async function refreshLatestWindowsDownload() {
+    const status = $('#svx-download-status');
+    const btn = $('#svx-download-btn');
+    const meta = $('#svx-download-meta');
+
+    if (status) {
+      status.classList.remove('error', 'success');
+      status.textContent = 'Checking for latest Windows app…';
+    }
+    if (btn) {
+      btn.setAttribute('disabled', 'disabled');
+      btn.removeAttribute('href');
+    }
+    if (meta) meta.textContent = '';
+
+    try {
+      const resp = await fetch('/api/svx/app/latest-exe', { method: 'GET' });
+      const data = await resp.json().catch(() => ({}));
+
+      if (!resp.ok || data?.ok === false) {
+        const msg = data?.error || `Download service error (HTTP ${resp.status}).`;
+        if (status) {
+          status.classList.add('error');
+          status.textContent = msg;
+        }
+        return;
+      }
+
+      const url = data?.url || data?.downloadUrl || data?.signedUrl;
+      const filename = data?.filename || data?.name || 'SmartVoiceX-Setup.exe';
+      const version = data?.version || data?.tag || '';
+      const size = Number(data?.sizeBytes || data?.size || 0);
+      const updatedAt = data?.updatedAt || data?.createdAt || data?.publishedAt;
+
+      if (!url) {
+        if (status) {
+          status.classList.add('error');
+          status.textContent = 'No download URL returned.';
+        }
+        return;
+      }
+
+      if (btn) {
+        btn.removeAttribute('disabled');
+        btn.setAttribute('href', url);
+        btn.setAttribute('download', filename);
+      }
+
+      const parts = [];
+      if (version) parts.push(`v${version}`);
+      if (size) parts.push(`${(size / (1024 * 1024)).toFixed(1)} MB`);
+      const ts = fmtTimestamp(updatedAt);
+      if (ts) parts.push(`Updated ${ts}`);
+      if (meta) meta.textContent = parts.join(' • ');
+
+      if (status) {
+        status.classList.add('success');
+        status.textContent = 'Ready to download.';
+      }
+    } catch (e) {
+      if (status) {
+        status.classList.add('error');
+        status.textContent = e?.message || 'Failed to load download info.';
+      }
+    }
+  }
+
   async function refreshSignedInDashboard() {
     const summariesWrap = $('#svx-live-summaries');
     const apptsWrap = $('#svx-appointments');
     const errWrap = $('#svx-dashboard-status');
 
-    if (errWrap) errWrap.textContent = '';
+    if (errWrap) {
+      errWrap.classList.remove('error', 'success');
+      errWrap.textContent = '';
+    }
+
+    renderSkeletonList(summariesWrap, 3);
+    renderSkeletonList(apptsWrap, 3);
 
     let auth, db;
     try {
       ({ auth, db } = ensureFirebase());
     } catch (e) {
-      if (errWrap) errWrap.textContent = 'Firebase not available.';
+      if (errWrap) {
+        errWrap.classList.add('error');
+        errWrap.textContent = 'Firebase not available.';
+      }
       return;
     }
 
     const user = auth.currentUser;
     if (!user) return;
+
+    // Profile header
+    try {
+      const profile = await loadProfile(db, user.uid);
+      const username = profile?.username || user.displayName || (user.email ? user.email.split('@')[0] : 'Account');
+      setText('svx-profile-name', username ? `@${username}`.replace('@@', '@') : 'Account');
+      setText('svx-profile-email', user.email || profile?.email || '');
+    } catch (_) {
+      setText('svx-profile-name', user.email ? user.email.split('@')[0] : 'Account');
+      setText('svx-profile-email', user.email || '');
+    }
+
+    // Latest Windows download
+    await refreshLatestWindowsDownload();
 
     // Live summaries: best-effort read. Collection names can differ by backend.
     try {
@@ -242,10 +351,9 @@
         };
       });
 
-      renderList(summariesWrap, items, 'Summaries will appear here after your agent goes live.');
-    } catch (e) {
-      // Swallow; some projects may not have this collection yet.
-      renderList(summariesWrap, [], 'Summaries will appear here after your agent goes live.');
+      renderList(summariesWrap, items, 'No summaries yet. Once your agent goes live, recent calls will show up here.');
+    } catch (_) {
+      renderList(summariesWrap, [], 'No summaries yet. Once your agent goes live, recent calls will show up here.');
     }
 
     // Appointments: best-effort read.
@@ -269,9 +377,9 @@
         };
       });
 
-      renderList(apptsWrap, items, 'Upcoming bookings will appear here (when connected).');
+      renderList(apptsWrap, items, 'No upcoming appointments yet. When your calendar/CRM is connected, they’ll appear here.');
     } catch (_) {
-      renderList(apptsWrap, [], 'Upcoming bookings will appear here (when connected).');
+      renderList(apptsWrap, [], 'No upcoming appointments yet. When your calendar/CRM is connected, they’ll appear here.');
     }
   }
 
@@ -347,36 +455,62 @@
     document.body.appendChild(backdrop);
     document.body.appendChild(modal);
 
-    // Signed-in modal shell
+    // Signed-in modal shell (dashboard)
     const signedInModal = el('div', { id: 'svx-signedin-modal', role: 'dialog', 'aria-modal': 'true' }, [
-      el('div', { class: 'svx-modal' }, [
-        el('div', { class: 'svx-modal-header' }, [
-          el('div', {}, [
+      el('div', { class: 'svx-modal svx-dashboard' }, [
+        el('div', { class: 'svx-modal-header svx-dashboard-header' }, [
+          el('div', { class: 'svx-dashboard-head-left' }, [
             el('div', { class: 'svx-modal-title', text: 'SmartVoiceX' }),
-            el('div', { class: 'svx-modal-sub', text: 'Your phone operations dashboard' }),
+            el('div', { class: 'svx-dashboard-profile' }, [
+              el('div', { class: 'svx-profile-name', id: 'svx-profile-name', text: 'Account' }),
+              el('div', { class: 'svx-profile-email', id: 'svx-profile-email', text: '' }),
+            ]),
           ]),
-          el('button', { class: 'svx-close', type: 'button', text: '×', id: 'svx-signedin-close' }),
+          el('div', { class: 'svx-dashboard-head-actions' }, [
+            el('button', { class: 'svx-secondary svx-compact', type: 'button', text: 'Refresh', id: 'svx-dashboard-refresh' }),
+            el('button', { class: 'svx-secondary svx-compact', type: 'button', text: 'Sign out', id: 'svx-dashboard-signout' }),
+            el('button', { class: 'svx-close', type: 'button', text: '×', id: 'svx-signedin-close' }),
+          ]),
         ]),
 
-        el('div', { class: 'svx-section-title', text: 'Quick actions' }),
-        el('div', { class: 'svx-card' }, [
-          el('div', { class: 'svx-actions' }, [
-            el('button', { class: 'svx-primary', type: 'button', text: 'Create / deploy an agent', id: 'svx-dashboard-create-agent' }),
-            el('button', { class: 'svx-secondary', type: 'button', text: 'Refresh', id: 'svx-dashboard-refresh' }),
+        el('div', { class: 'svx-hero' }, [
+          el('div', { class: 'svx-hero-copy' }, [
+            el('div', { class: 'svx-hero-title', text: 'Deploy your next phone agent' }),
+            el('div', { class: 'svx-hero-sub', text: 'Answer a few questions and we’ll generate a deployable workflow. You can iterate after launch.' }),
+          ]),
+          el('div', { class: 'svx-hero-actions' }, [
+            el('button', { class: 'svx-primary', type: 'button', text: 'Create / deploy agent', id: 'svx-dashboard-create-agent' }),
           ]),
           el('div', { id: 'svx-dashboard-status', class: 'svx-status' }),
         ]),
 
-        el('div', { class: 'svx-section-title', text: 'Live summaries' }),
-        el('div', { class: 'svx-card' }, [
-          el('div', { class: 'svx-card-sub', text: 'Recent calls handled by your agent(s). (Visible once events are connected.)' }),
-          el('div', { id: 'svx-live-summaries' }),
-        ]),
+        el('div', { class: 'svx-dashboard-grid' }, [
+          el('div', { class: 'svx-card' }, [
+            el('div', { class: 'svx-card-head' }, [
+              el('div', { class: 'svx-card-title', text: 'Latest Windows download' }),
+              el('a', { class: 'svx-primary svx-linkbtn', id: 'svx-download-btn', href: '#', text: 'Download .exe' }),
+            ]),
+            el('div', { id: 'svx-download-meta', class: 'svx-card-sub' }),
+            el('div', { id: 'svx-download-status', class: 'svx-status' }),
+          ]),
 
-        el('div', { class: 'svx-section-title', text: 'Appointments' }),
-        el('div', { class: 'svx-card' }, [
-          el('div', { class: 'svx-card-sub', text: 'Upcoming bookings and confirmations. (Visible once calendar/CRM sync is configured.)' }),
-          el('div', { id: 'svx-appointments' }),
+          el('div', { class: 'svx-card' }, [
+            el('div', { class: 'svx-card-head' }, [
+              el('div', { class: 'svx-card-title', text: 'Live summaries' }),
+              el('div', { class: 'svx-card-pill', text: 'last 5' }),
+            ]),
+            el('div', { class: 'svx-card-sub', text: 'Recent calls handled by your agent(s).' }),
+            el('div', { id: 'svx-live-summaries' }),
+          ]),
+
+          el('div', { class: 'svx-card svx-span-2' }, [
+            el('div', { class: 'svx-card-head' }, [
+              el('div', { class: 'svx-card-title', text: 'Appointments' }),
+              el('div', { class: 'svx-card-pill', text: 'next 5' }),
+            ]),
+            el('div', { class: 'svx-card-sub', text: 'Upcoming bookings and confirmations.' }),
+            el('div', { id: 'svx-appointments' }),
+          ]),
         ]),
       ]),
     ]);
@@ -413,16 +547,41 @@
     $('#svx-signedin-close')?.addEventListener('click', closeSignedInModal);
 
     $('#svx-dashboard-refresh')?.addEventListener('click', async () => {
+      const btn = $('#svx-dashboard-refresh');
       const s = $('#svx-dashboard-status');
+      if (btn) btn.setAttribute('disabled', 'disabled');
       if (s) s.textContent = 'Refreshing…';
       await refreshSignedInDashboard();
       if (s) s.textContent = '';
+      if (btn) btn.removeAttribute('disabled');
+    });
+
+    $('#svx-dashboard-signout')?.addEventListener('click', async () => {
+      try {
+        const { auth } = ensureFirebase();
+        await auth.signOut();
+        closeSignedInModal();
+      } catch (e) {
+        const s = $('#svx-dashboard-status');
+        if (s) {
+          s.classList.add('error');
+          s.textContent = e?.message || 'Sign out failed.';
+        }
+      }
     });
 
     $('#svx-dashboard-create-agent')?.addEventListener('click', () => {
       try {
         window.SVXAuth?.openAgentCreator?.();
       } catch (_) {}
+    });
+
+    // Download button is an <a>; block clicks until we have a real URL.
+    $('#svx-download-btn')?.addEventListener('click', (ev) => {
+      const a = ev.currentTarget;
+      if (!a || a.getAttribute('href') === '#' || a.hasAttribute('disabled')) {
+        ev.preventDefault();
+      }
     });
 
     // refresh when opening account modal
