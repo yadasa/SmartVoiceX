@@ -451,25 +451,7 @@
 
     .final-cta{padding: 32px 0 10px 0; position:relative; z-index:2}
 
-    /* Pricing horizontal black → transparent gradient */
-    #pricing{position:relative}
-    #pricing::before{
-      content:"";
-      position:absolute;
-      top:0;
-      bottom:0;
-      left:-99vw;
-      right:-99vw;
-      pointer-events:none;
-      background: linear-gradient(
-        90deg,
-        rgb(var(--c-black) / 1) 0%,
-        rgb(var(--c-black) / 1) 85%,
-        rgb(var(--c-black) / 0) 96%
-      );
-      z-index:0;
-    }
-    #pricing > *{position:relative; z-index:1}
+    /* (removed) pricing horizontal gradient */
     .cta-panel{
       border:1px solid rgb(var(--c-white) / 0.12);
       background: linear-gradient(135deg, rgb(var(--c-purple) / 0.20), rgb(var(--c-blue) / 0.14));
