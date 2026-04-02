@@ -115,6 +115,19 @@
     .topbar .container{max-width:1200px}
 
     /* Navbar (match /pages/contact.html vibe: pill, blur, subtle border) */
+    /* Static top strip background (does NOT follow scroll) */
+    .topbar-bg{
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 96px;
+      background: #000;
+      z-index: 1;
+      pointer-events:none;
+    }
+
+    /* Fixed navbar (does follow scroll) */
     .topbar{
       position: fixed;
       top: 0;
@@ -383,6 +396,8 @@
   </style>
 </head>
 <body>
+  <div class="topbar-bg" aria-hidden="true"></div>
+
   <div id="bg-blobs" aria-hidden="true">
     <div class="blob b1"><div class="inner"></div></div>
     <div class="blob b2"><div class="inner"></div></div>
