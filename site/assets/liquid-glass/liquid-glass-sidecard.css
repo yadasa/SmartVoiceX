@@ -1,0 +1,43 @@
+/* Liquid Glass — sticky side-card (WebGL refraction)
+   Isolated to .side-card[data-liquid-glass]
+*/
+
+.side-card[data-liquid-glass]{
+  position: sticky;
+  top: 88px;
+  overflow: hidden;
+  /* Match shader radius preset */
+  border-radius: 51px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+/* keep existing card padding/shadow from .card; add slight inner highlight */
+.side-card[data-liquid-glass]{
+  box-shadow:
+    0 20px 70px rgba(0,0,0,0.40),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+}
+
+.side-card[data-liquid-glass] .liquid-glass-layer{
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.side-card[data-liquid-glass] .liquid-glass-layer canvas{
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ensure side-card content sits above canvas */
+.side-card[data-liquid-glass] > *{
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .side-card[data-liquid-glass] .liquid-glass-layer{opacity: 0.85;}
+}

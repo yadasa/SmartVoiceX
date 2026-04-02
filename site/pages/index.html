@@ -20,6 +20,7 @@
   <meta name="twitter:description" content="Deploy a custom AI voice agent for inbound and outbound calls, appointment workflows, transfers, multilingual support, and integrations.">
 
   <link rel="stylesheet" href="/assets/svx-auth.css">
+  <link rel="stylesheet" href="/assets/liquid-glass/liquid-glass-sidecard.css">
 
   <!-- Firebase (compat builds for static hosting) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -517,7 +518,7 @@
       </div>
 
       <!-- (2 + 5) Top bar / Live demo prompt (sticky) -->
-      <aside class="card side-card" aria-label="Try SmartVoiceX live">
+      <aside class="card side-card" data-liquid-glass data-liquid-glass-bg="/assets/liquid-glass/backgrounds/image2.jpg" aria-label="Try SmartVoiceX live">
         <div class="side-title">Talk to a live SmartVoiceX agent right on this page.</div>
         <div class="side-sub">Test SmartVoiceX live before you book a call.</div>
 
@@ -830,5 +831,7 @@
       tick();
     })();
   </script>
+
+  <script type="module" src="/assets/liquid-glass/liquid-glass-sidecard-init.js"></script>
 </body>
 </html>
