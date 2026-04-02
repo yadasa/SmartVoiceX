@@ -78,28 +78,63 @@
       vec2 c5 = (c1 + c2 + c3 + c4) * 0.25;
       c5 += vec2(0.06*sin(t*0.11), 0.05*cos(t*0.15));
 
-      float b = 0.0;
       // Slightly shrink radii in sharp mode so overlaps are easier to see.
       float k = mix(1.0, 0.72, clamp(u_sharp, 0.0, 1.0));
-      b += 1.15 * blob(uv, c1, 0.32 * k, aspect);
-      b += 1.00 * blob(uv, c2, 0.38 * k, aspect);
-      b += 0.95 * blob(uv, c3, 0.46 * k, aspect);
-      b += 0.90 * blob(uv, c4, 0.42 * k, aspect);
-      b += 0.70 * blob(uv, c5, 0.50 * k, aspect);
+
+      float w1 = 1.15 * blob(uv, c1, 0.32 * k, aspect);
+      float w2 = 1.00 * blob(uv, c2, 0.38 * k, aspect);
+      float w3 = 0.95 * blob(uv, c3, 0.46 * k, aspect);
+      float w4 = 0.90 * blob(uv, c4, 0.42 * k, aspect);
+      float w5 = 0.70 * blob(uv, c5, 0.50 * k, aspect);
+
+      float b = w1 + w2 + w3 + w4 + w5;
 
       // Color palette
       vec3 base = vec3(0.0, 0.0, 0.0);
       vec3 purple = vec3(0.38, 0.10, 0.85);
       vec3 blue   = vec3(0.25, 0.48, 1.00);
 
+      // Per-blob tint phase (independent of movement): sinusoidal, eased.
+      // Black is least frequent via a high power on a separate oscillator.
+      float tcol = t;
+      float s1 = 0.5 + 0.5*sin(tcol*0.37 + 1.1);
+      float s2 = 0.5 + 0.5*sin(tcol*0.33 + 2.7);
+      float s3 = 0.5 + 0.5*sin(tcol*0.29 + 4.2);
+      float s4 = 0.5 + 0.5*sin(tcol*0.41 + 0.4);
+      float s5 = 0.5 + 0.5*sin(tcol*0.26 + 5.3);
+
+      // quadratic ease in/out
+      float e1 = mix(2.0*s1*s1, 1.0 - 2.0*(1.0-s1)*(1.0-s1), step(0.5, s1));
+      float e2 = mix(2.0*s2*s2, 1.0 - 2.0*(1.0-s2)*(1.0-s2), step(0.5, s2));
+      float e3 = mix(2.0*s3*s3, 1.0 - 2.0*(1.0-s3)*(1.0-s3), step(0.5, s3));
+      float e4 = mix(2.0*s4*s4, 1.0 - 2.0*(1.0-s4)*(1.0-s4), step(0.5, s4));
+      float e5 = mix(2.0*s5*s5, 1.0 - 2.0*(1.0-s5)*(1.0-s5), step(0.5, s5));
+
+      vec3 c1c = mix(purple, blue, clamp(e1, 0.0, 1.0));
+      vec3 c2c = mix(purple, blue, clamp(e2, 0.0, 1.0));
+      vec3 c3c = mix(purple, blue, clamp(e3, 0.0, 1.0));
+      vec3 c4c = mix(purple, blue, clamp(e4, 0.0, 1.0));
+      vec3 c5c = mix(purple, blue, clamp(e5, 0.0, 1.0));
+
+      float bk1 = pow(0.5 + 0.5*sin(tcol*0.21 + 0.8), 7.0);
+      float bk2 = pow(0.5 + 0.5*sin(tcol*0.19 + 3.1), 7.0);
+      float bk3 = pow(0.5 + 0.5*sin(tcol*0.17 + 5.2), 7.0);
+      float bk4 = pow(0.5 + 0.5*sin(tcol*0.23 + 1.9), 7.0);
+      float bk5 = pow(0.5 + 0.5*sin(tcol*0.16 + 4.6), 7.0);
+
+      c1c = mix(c1c, vec3(0.0), bk1 * 0.55);
+      c2c = mix(c2c, vec3(0.0), bk2 * 0.55);
+      c3c = mix(c3c, vec3(0.0), bk3 * 0.55);
+      c4c = mix(c4c, vec3(0.0), bk4 * 0.55);
+      c5c = mix(c5c, vec3(0.0), bk5 * 0.55);
+
+      vec3 ink = (w1*c1c + w2*c2c + w3*c3c + w4*c4c + w5*c5c) / max(0.0001, b);
+
       float v = clamp(b, 0.0, 2.5);
       float glow = smoothstep(0.15, 1.9, v);
       float soft = smoothstep(0.05, 1.20, v);
       soft = sharpStep(soft);
       glow = sharpStep(glow);
-
-      float mixAB = 0.5 + 0.5*sin(t*0.22 + (uv.x-0.5)*1.8 - (uv.y-0.5)*1.5);
-      vec3 ink = mix(purple, blue, clamp(mixAB, 0.0, 1.0));
 
       vec3 col = base + ink * soft * 0.88;
       col += ink * glow * 0.30;
