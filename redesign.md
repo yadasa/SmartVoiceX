@@ -72,6 +72,7 @@ Example pattern:
 Notes:
 - Keep existing semantic classes (e.g., `.section`, `.hero`) and add `.glass-section`.
 - `data-glass-bg` is required per section. During rollout, we can reuse existing background imagery or add new dedicated bgs.
+- **Padding note:** any element styled as a liquid-glass card will generally need ~**+7% padding** vs the non-glass version, to keep content away from the refractive edge/bezel and preserve readability.
 
 ### 2.2 Card marker
 Add `.liquid-card` to each DOM card that should receive the glass treatment.

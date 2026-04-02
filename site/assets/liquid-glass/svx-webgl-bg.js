@@ -36,11 +36,18 @@
     uniform float u_time;
     // pointer offset in UV units (roughly +/-0.15)
     uniform vec2 u_ptr;
+    // 0 = normal (soft/blurred blobs), 1 = sharper blobs for refraction debugging
+    uniform float u_sharp;
 
     float blob(vec2 uv, vec2 c, float r, float aspect){
       vec2 d = (uv - c) * vec2(aspect, 1.0);
       float dd = dot(d,d);
       return exp(-dd / (r*r));
+    }
+
+    float sharpStep(float x){
+      // When u_sharp=1, increase edge contrast.
+      return mix(x, pow(clamp(x, 0.0, 1.0), 2.25), clamp(u_sharp, 0.0, 1.0));
     }
 
     void main(){
@@ -71,11 +78,13 @@
       c5 += vec2(0.06*sin(t*0.11), 0.05*cos(t*0.15));
 
       float b = 0.0;
-      b += 1.15 * blob(uv, c1, 0.32, aspect);
-      b += 1.00 * blob(uv, c2, 0.38, aspect);
-      b += 0.95 * blob(uv, c3, 0.46, aspect);
-      b += 0.90 * blob(uv, c4, 0.42, aspect);
-      b += 0.70 * blob(uv, c5, 0.50, aspect);
+      // Slightly shrink radii in sharp mode so overlaps are easier to see.
+      float k = mix(1.0, 0.72, clamp(u_sharp, 0.0, 1.0));
+      b += 1.15 * blob(uv, c1, 0.32 * k, aspect);
+      b += 1.00 * blob(uv, c2, 0.38 * k, aspect);
+      b += 0.95 * blob(uv, c3, 0.46 * k, aspect);
+      b += 0.90 * blob(uv, c4, 0.42 * k, aspect);
+      b += 0.70 * blob(uv, c5, 0.50 * k, aspect);
 
       // Color palette
       vec3 base = vec3(0.0, 0.0, 0.0);
@@ -85,6 +94,8 @@
       float v = clamp(b, 0.0, 2.5);
       float glow = smoothstep(0.15, 1.9, v);
       float soft = smoothstep(0.05, 1.20, v);
+      soft = sharpStep(soft);
+      glow = sharpStep(glow);
 
       float mixAB = 0.5 + 0.5*sin(t*0.22 + (uv.x-0.5)*1.8 - (uv.y-0.5)*1.5);
       vec3 ink = mix(purple, blue, clamp(mixAB, 0.0, 1.0));
@@ -402,6 +413,12 @@
       if (t) setTarget(t.clientX, t.clientY);
     }, { passive: true });
 
+    // Binary toggle: make blobs sharper (easier to see refraction).
+    // - URL param: ?svxSharp=1
+    // - localStorage: svx_webgl_sharp_bg = "1"
+    const params = new URLSearchParams(location.search);
+    const sharpBg = (params.get('svxSharp') === '1') || (localStorage.getItem('svx_webgl_sharp_bg') === '1');
+
     // Observe layout shifts of the side-card.
     const sideCard = document.querySelector('.side-card[data-liquid-glass]');
     if(sideCard && 'ResizeObserver' in window){
@@ -415,6 +432,7 @@
       res: gl.getUniformLocation(bgProg, 'u_resolution'),
       time: gl.getUniformLocation(bgProg, 'u_time'),
       ptr: gl.getUniformLocation(bgProg, 'u_ptr'),
+      sharp: gl.getUniformLocation(bgProg, 'u_sharp'),
     };
 
     const u_c = {
@@ -449,6 +467,7 @@
       bindQuad(bgProg);
       gl.uniform2f(u_bg.res, w, h);
       gl.uniform1f(u_bg.time, t);
+      gl.uniform1f(u_bg.sharp, sharpBg ? 1.0 : 0.0);
 
       // pointer smoothing; convert px -> uv offset (~ +/-0.15)
       cx += (tx - cx) * 0.14;
