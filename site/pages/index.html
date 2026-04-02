@@ -349,11 +349,12 @@
     summary{cursor:pointer;font-weight:950;list-style:none}
     summary::-webkit-details-marker{display:none}
 
-    /* FAQ slide-open animation */
-    details .faq-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows 240ms cubic-bezier(.22,.61,.36,1)}
-    details .faq-body > div{overflow:hidden}
-    details[open] .faq-body{grid-template-rows:1fr}
+    /* FAQ slide-open animation (JS-assisted height transition for reliability) */
+    details .faq-body{height:0;overflow:hidden;transition:height 260ms cubic-bezier(.22,.61,.36,1)}
     details p{margin:10px 0 0 0;color:var(--muted);font-weight:700;font-size:12px;line-height:1.6}
+    @media (prefers-reduced-motion: reduce){
+      details .faq-body{transition:none}
+    }
 
     .final-cta{padding: 32px 0 10px 0}
     .cta-panel{
@@ -728,6 +729,52 @@
 
   <script>
     document.getElementById('y').textContent = String(new Date().getFullYear());
+
+    // FAQ slide animation (details/summary doesn't animate height reliably cross-browser).
+    (function(){
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(reduce) return;
+
+      const detailsList = Array.from(document.querySelectorAll('#faq details'));
+      for(const d of detailsList){
+        const body = d.querySelector('.faq-body');
+        const summary = d.querySelector('summary');
+        if(!body || !summary) continue;
+
+        // Ensure closed starts at height 0.
+        if(!d.hasAttribute('open')) body.style.height = '0px';
+
+        summary.addEventListener('click', (e) => {
+          e.preventDefault();
+
+          const isOpen = d.hasAttribute('open');
+          if(!isOpen){
+            d.setAttribute('open', '');
+            // From 0 -> content height
+            body.style.height = '0px';
+            const target = body.scrollHeight;
+            body.style.height = target + 'px';
+            const onEnd = () => {
+              body.style.height = 'auto';
+              body.removeEventListener('transitionend', onEnd);
+            };
+            body.addEventListener('transitionend', onEnd);
+          } else {
+            // From current height -> 0, then remove open
+            const start = body.scrollHeight;
+            body.style.height = start + 'px';
+            requestAnimationFrame(() => {
+              body.style.height = '0px';
+            });
+            const onEnd = () => {
+              d.removeAttribute('open');
+              body.removeEventListener('transitionend', onEnd);
+            };
+            body.addEventListener('transitionend', onEnd);
+          }
+        });
+      }
+    })();
   </script>
   <script src="/assets/liquid-glass/svx-webgl-bg.js?v=20260402" defer></script>
 </body>
