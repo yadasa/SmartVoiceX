@@ -36,8 +36,14 @@
       --text: rgba(255,255,255,0.92);
       --muted: rgba(255,255,255,0.68);
       --muted2: rgba(255,255,255,0.55);
-      --accent:#6214d9;   /* purple */
-      --accent2:#4f7bff;  /* blue */
+      /* Brand colors (standardize usage) */
+      --svx-purple: #6214d9;
+      --svx-blue: #4f7bff;
+      --svx-blueText: #7aa6ff;
+      --svx-white: rgba(255,255,255,0.95);
+
+      --accent: var(--svx-purple);
+      --accent2: var(--svx-blue);
       --ring: rgba(98,20,217,0.35);
       --shadow: rgba(0,0,0,0.40);
     }
@@ -251,7 +257,7 @@
         rgba(0,0,0,0) 90%
       );
 
-      color: rgba(120,54,255,0.92);
+      color: var(--svx-blueText);
       font-weight:950;
       font-size:12px;
       letter-spacing:0.08em;
@@ -285,40 +291,56 @@
 
     .how{margin-top:16px;display:grid;grid-template-columns: repeat(4, 1fr);gap:10px}
     .step{border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.05);border-radius:16px;padding:12px}
-    .step .n{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:10px;background:rgba(98,20,217,0.30);border:1px solid rgba(98,20,217,0.55);font-weight:1000}
+    .step .n{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:10px;background: rgba(79,123,255,0.24);border:1px solid rgba(79,123,255,0.52);color: var(--svx-blueText);font-weight:1000}
     .step b{display:block;margin-top:10px;font-size:13px}
     .step p{margin:7px 0 0 0;color:var(--muted);font-weight:700;font-size:12px;line-height:1.55}
 
     .checklist{margin-top:12px;display:grid;gap:8px}
     .check{display:flex;gap:10px;align-items:flex-start}
     .dot{
+      position: relative;
       width:10px;
       height:10px;
       border-radius:999px;
-      background: rgba(79,123,255,0.90);
+      background: rgba(79,123,255,0.92);
       box-shadow:
-        0 0 0 6px rgba(79,123,255,0.14),
-        0 0 14px rgba(79,123,255,0.55),
-        0 0 30px rgba(98,20,217,0.22);
-      animation: dotPulse 1.9s ease-in-out infinite;
+        0 0 0 6px rgba(79,123,255,0.12),
+        0 0 18px rgba(79,123,255,0.60),
+        0 0 38px rgba(79,123,255,0.26);
+      animation: dotPulse 2.2s ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    /* inner highlight */
+    .dot::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:5px;
+      height:5px;
+      transform: translate(-50%,-50%);
+      border-radius:999px;
+      background: rgba(255,255,255,0.92);
+      filter: blur(0.6px);
+      opacity: 0.85;
+      pointer-events:none;
     }
 
     @keyframes dotPulse{
       0%, 100%{
         transform: scale(1);
-        opacity: 0.92;
         box-shadow:
-          0 0 0 6px rgba(79,123,255,0.14),
-          0 0 14px rgba(79,123,255,0.55),
-          0 0 30px rgba(98,20,217,0.22);
+          0 0 0 6px rgba(79,123,255,0.12),
+          0 0 18px rgba(79,123,255,0.60),
+          0 0 38px rgba(79,123,255,0.26);
       }
       50%{
-        transform: scale(1.22);
-        opacity: 1;
+        transform: scale(1.10);
         box-shadow:
-          0 0 0 10px rgba(79,123,255,0.10),
-          0 0 22px rgba(79,123,255,0.75),
-          0 0 46px rgba(98,20,217,0.28);
+          0 0 0 8px rgba(79,123,255,0.10),
+          0 0 26px rgba(79,123,255,0.78),
+          0 0 50px rgba(79,123,255,0.32);
       }
     }
 
