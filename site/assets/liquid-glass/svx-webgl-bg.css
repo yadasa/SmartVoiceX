@@ -1,0 +1,38 @@
+/* SmartVoiceX WebGL background + liquid-glass side-card
+   Single full-screen canvas (behind DOM) that renders:
+   - animated blue/purple blob field
+   - liquid-glass rounded-rect effect aligned to .side-card[data-liquid-glass]
+*/
+
+:root{
+  --svx-bg-fallback: #07070a;
+}
+
+html{
+  background: var(--svx-bg-fallback);
+}
+
+body{
+  /* Let the WebGL canvas be the visible background.
+     (Fallback remains on html for very old browsers / WebGL failure.)
+     index.html includes a large inline <style> that sets body{background: var(--bg)};
+     we override it here on purpose.
+  */
+  background: transparent !important;
+}
+
+#svx-webgl-bg{
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+  display: block;
+}
+
+/* Ensure anything that relies on stacking stays above the background canvas */
+main, .topbar, .topbar-bg{
+  position: relative;
+  z-index: 1;
+}
