@@ -20,14 +20,12 @@
   <meta name="twitter:description" content="Deploy a custom AI voice agent for inbound and outbound calls, appointment workflows, transfers, multilingual support, and integrations.">
 
   <link rel="stylesheet" href="/assets/svx-auth.css">
-  <link rel="stylesheet" href="/assets/liquid-glass/liquid-glass.css">
 
   <!-- Firebase (compat builds for static hosting) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="/assets/svx-auth.js" defer></script>
-  <script type="module" src="/assets/liquid-glass/liquid-glass-init.js" defer></script>
 
   <style>
     :root{
@@ -519,8 +517,7 @@
       </div>
 
       <!-- (2 + 5) Top bar / Live demo prompt (sticky) -->
-      <aside class="card side-card glass-section liquid-card" aria-label="Try SmartVoiceX live">
-        <div class="liquid-glass-layer" aria-hidden="true"><canvas></canvas></div>
+      <aside class="card side-card" aria-label="Try SmartVoiceX live">
         <div class="side-title">Talk to a live SmartVoiceX agent right on this page.</div>
         <div class="side-sub">Test SmartVoiceX live before you book a call.</div>
 
