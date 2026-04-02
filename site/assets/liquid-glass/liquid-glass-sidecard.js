@@ -154,7 +154,8 @@ void main(){
 
   color = mix(color, vec3(1.0), uTint);
 
-  float alpha = smoothstep(0.0, 1.5, distFromEdge);
+  // Keep the glass partially transparent so the site's moving blobs show through.
+  float alpha = smoothstep(0.0, 1.5, distFromEdge) * 0.65;
   gl_FragColor = vec4(color, alpha);
 }
 `;
@@ -188,7 +189,8 @@ function createTexture(gl){
   const tex = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, tex);
   // placeholder 1x1
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0,0,0,255]));
+  // Neutral dark placeholder so "no bg image" doesn't render as pure black.
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([18,18,24,255]));
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
