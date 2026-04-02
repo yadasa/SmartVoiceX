@@ -78,8 +78,8 @@
       vec2 c5 = (c1 + c2 + c3 + c4) * 0.25;
       c5 += vec2(0.06*sin(t*0.11), 0.05*cos(t*0.15));
 
-      // Slightly shrink radii in sharp mode so overlaps are easier to see.
-      float k = mix(1.0, 0.72, clamp(u_sharp, 0.0, 1.0));
+      // Slightly shrink radii overall so more black peeks through; shrink further in sharp mode.
+      float k = mix(0.88, 0.72, clamp(u_sharp, 0.0, 1.0));
 
       float w1 = 1.15 * blob(uv, c1, 0.32 * k, aspect);
       float w2 = 1.00 * blob(uv, c2, 0.38 * k, aspect);
