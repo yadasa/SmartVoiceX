@@ -62,10 +62,11 @@
     }
     #bg-blobs .blob{
       position:absolute;
-      width: 520px;
-      height: 520px;
-      filter: blur(60px);
-      opacity: 0.55;
+      width: 920px;
+      height: 920px;
+      filter: blur(90px);
+      opacity: 0.60;
+      /* pointer influence (base) */
       transform: translate3d(var(--px), var(--py), 0);
       will-change: transform;
     }
@@ -74,24 +75,25 @@
       inset:0;
       border-radius: 999px;
       will-change: transform;
-      animation: drift 18s ease-in-out infinite alternate;
+      animation: drift 10s ease-in-out infinite alternate;
     }
-    #bg-blobs .blob.b1{left:-160px; top:-140px}
-    #bg-blobs .blob.b1 .inner{background: radial-gradient(circle at 30% 30%, rgba(98,20,217,0.95), rgba(98,20,217,0.00) 65%)}
 
-    #bg-blobs .blob.b2{right:-200px; top:-120px; width: 620px; height: 620px; opacity:0.50}
-    #bg-blobs .blob.b2 .inner{background: radial-gradient(circle at 60% 35%, rgba(120,54,255,0.85), rgba(120,54,255,0.00) 65%); animation-duration: 22s}
+    #bg-blobs .blob.b1{left:-340px; top:-320px}
+    #bg-blobs .blob.b1 .inner{background: radial-gradient(circle at 30% 30%, rgba(98,20,217,0.98), rgba(98,20,217,0.00) 68%)}
 
-    #bg-blobs .blob.b3{left:-120px; bottom:-240px; width: 720px; height: 720px; opacity:0.42}
-    #bg-blobs .blob.b3 .inner{background: radial-gradient(circle at 40% 60%, rgba(26,255,117,0.25), rgba(98,20,217,0.65), rgba(98,20,217,0.00) 70%); animation-duration: 28s}
+    #bg-blobs .blob.b2{right:-420px; top:-320px; width: 1100px; height: 1100px; opacity:0.55}
+    #bg-blobs .blob.b2 .inner{background: radial-gradient(circle at 60% 35%, rgba(120,54,255,0.90), rgba(120,54,255,0.00) 70%); animation-duration: 12s}
 
-    #bg-blobs .blob.b4{right:-160px; bottom:-220px; width: 560px; height: 560px; opacity:0.46}
-    #bg-blobs .blob.b4 .inner{background: radial-gradient(circle at 50% 55%, rgba(70,130,255,0.65), rgba(70,130,255,0.00) 65%); animation-duration: 20s}
+    #bg-blobs .blob.b3{left:-360px; bottom:-520px; width: 1300px; height: 1300px; opacity:0.48}
+    #bg-blobs .blob.b3 .inner{background: radial-gradient(circle at 40% 60%, rgba(26,255,117,0.18), rgba(98,20,217,0.78), rgba(98,20,217,0.00) 72%); animation-duration: 14s}
+
+    #bg-blobs .blob.b4{right:-360px; bottom:-500px; width: 1000px; height: 1000px; opacity:0.52}
+    #bg-blobs .blob.b4 .inner{background: radial-gradient(circle at 50% 55%, rgba(70,130,255,0.78), rgba(70,130,255,0.00) 70%); animation-duration: 11s}
 
     @keyframes drift{
       0%{transform: translate3d(0px,0px,0) scale(1)}
-      50%{transform: translate3d(70px,-40px,0) scale(1.05)}
-      100%{transform: translate3d(-50px,60px,0) scale(0.98)}
+      50%{transform: translate3d(220px,-140px,0) scale(1.10)}
+      100%{transform: translate3d(-180px,240px,0) scale(0.96)}
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -428,9 +430,9 @@
       function setTarget(x, y) {
         const nx = (x / window.innerWidth) - 0.5;
         const ny = (y / window.innerHeight) - 0.5;
-        // keep very light: max ~24px shift
-        tx = Math.max(-24, Math.min(24, nx * 48));
-        ty = Math.max(-24, Math.min(24, ny * 48));
+        // noticeable but not obnoxious: max ~140px shift
+        tx = Math.max(-140, Math.min(140, nx * 280));
+        ty = Math.max(-140, Math.min(140, ny * 280));
       }
 
       window.addEventListener('pointermove', (e) => setTarget(e.clientX, e.clientY), { passive: true });
@@ -443,8 +445,9 @@
       if (reduce) return;
 
       function tick() {
-        cx += (tx - cx) * 0.06;
-        cy += (ty - cy) * 0.06;
+        // faster catch-up so it feels responsive
+        cx += (tx - cx) * 0.14;
+        cy += (ty - cy) * 0.14;
         el.style.setProperty('--px', cx.toFixed(2) + 'px');
         el.style.setProperty('--py', cy.toFixed(2) + 'px');
         requestAnimationFrame(tick);
