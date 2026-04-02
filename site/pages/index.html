@@ -187,7 +187,7 @@
     .hero > *:not(.hero-bg){position:relative; z-index:1}
 
     /* Solid black band w/ hero-matching falloff (used for capabilities → integrations) */
-    .solid-band{position:relative}
+    .solid-band{position:relative; z-index:0}
     .solid-band-bg{
       position:absolute;
       top:0;
@@ -202,14 +202,14 @@
         rgb(var(--c-black) / 1) 82%,
         rgb(var(--c-black) / 0) 100%
       );
-      z-index:0;
+      z-index:-1;
     }
     .solid-band > *:not(.solid-band-bg){position:relative; z-index:1}
 
     /* Footer variant: no bottom gradient; fade extends upward into the section above. */
     .solid-band--footer{
       /* Pull the band upward so the top fade overlaps the section above */
-      --footer-fade: 240px;
+      --footer-fade: 150px;
       margin-top: calc(var(--footer-fade) * -1);
       padding-top: var(--footer-fade);
     }
