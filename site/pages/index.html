@@ -270,7 +270,40 @@
 
     .checklist{margin-top:12px;display:grid;gap:8px}
     .check{display:flex;gap:10px;align-items:flex-start}
-    .dot{width:10px;height:10px;border-radius:999px;background:rgba(79,123,255,0.85);box-shadow: 0 0 0 6px rgba(79,123,255,0.14)}
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background: rgba(79,123,255,0.90);
+      box-shadow:
+        0 0 0 6px rgba(79,123,255,0.14),
+        0 0 14px rgba(79,123,255,0.55),
+        0 0 30px rgba(98,20,217,0.22);
+      animation: dotPulse 1.9s ease-in-out infinite;
+    }
+
+    @keyframes dotPulse{
+      0%, 100%{
+        transform: scale(1);
+        opacity: 0.92;
+        box-shadow:
+          0 0 0 6px rgba(79,123,255,0.14),
+          0 0 14px rgba(79,123,255,0.55),
+          0 0 30px rgba(98,20,217,0.22);
+      }
+      50%{
+        transform: scale(1.22);
+        opacity: 1;
+        box-shadow:
+          0 0 0 10px rgba(79,123,255,0.10),
+          0 0 22px rgba(79,123,255,0.75),
+          0 0 46px rgba(98,20,217,0.28);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .dot{animation:none}
+    }
     .check b{display:block;font-size:12px}
     .check span{display:block;margin-top:3px;color:var(--muted2);font-weight:750;font-size:11px;line-height:1.4}
 
