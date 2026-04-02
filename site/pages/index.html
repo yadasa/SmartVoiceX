@@ -175,17 +175,16 @@
 
     .topbar .btn{border-radius:999px; padding:10px 14px}
 
-    .hero{position:relative; padding:74px 0 26px 0}
+    .hero{position:relative; padding:74px 0 26px 0; overflow: visible}
 
     .hero-bg{
       position:absolute;
       top:0;
       bottom:0;
-      left: 0;
-      right: 0;
-      /* full-bleed background from inside a centered container */
-      margin-left: calc(50% - 50vw);
-      margin-right: calc(50% - 50vw);
+
+      /* Obscenely wide full-bleed overlay (avoid container/scrollbar math gaps) */
+      left: -150vw;
+      right: -150vw;
 
       pointer-events:none;
       border-radius: 0;
