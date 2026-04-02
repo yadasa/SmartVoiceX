@@ -346,7 +346,13 @@
 
     .faq{margin-top:16px;display:grid;gap:10px}
     details{border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.05);border-radius:16px;padding:12px}
-    summary{cursor:pointer;font-weight:950}
+    summary{cursor:pointer;font-weight:950;list-style:none}
+    summary::-webkit-details-marker{display:none}
+
+    /* FAQ slide-open animation */
+    details .faq-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows 240ms cubic-bezier(.22,.61,.36,1)}
+    details .faq-body > div{overflow:hidden}
+    details[open] .faq-body{grid-template-rows:1fr}
     details p{margin:10px 0 0 0;color:var(--muted);font-weight:700;font-size:12px;line-height:1.6}
 
     .final-cta{padding: 32px 0 10px 0}
@@ -647,35 +653,51 @@
       <div class="faq">
         <details>
           <summary>What is SmartVoiceX?</summary>
-          <p>SmartVoiceX is an AI phone operations platform that deploys custom voice agents to make and take calls, book appointments, answer questions, route conversations, and automate repetitive phone workflows.</p>
+          <div class="faq-body"><div>
+            <p>SmartVoiceX is an AI phone operations platform that deploys custom voice agents to make and take calls, book appointments, answer questions, route conversations, and automate repetitive phone workflows.</p>
+          </div></div>
         </details>
         <details>
           <summary>Does it sound human?</summary>
-          <p>SmartVoiceX is designed for natural, professional conversations. The best proof is to use the live demo and hear it yourself.</p>
+          <div class="faq-body"><div>
+            <p>SmartVoiceX is designed for natural, professional conversations. The best proof is to use the live demo and hear it yourself.</p>
+          </div></div>
         </details>
         <details>
           <summary>Is it only for medical offices or call centers?</summary>
-          <p>No. SmartVoiceX is used across industries including healthcare, dental, legal, restaurants, construction, service businesses, and outbound sales teams. Any business with meaningful phone volume can benefit from a well‑configured workflow.</p>
+          <div class="faq-body"><div>
+            <p>No. SmartVoiceX is used across industries including healthcare, dental, legal, restaurants, construction, service businesses, and outbound sales teams. Any business with meaningful phone volume can benefit from a well‑configured workflow.</p>
+          </div></div>
         </details>
         <details>
           <summary>How long does setup take?</summary>
-          <p>Simple workflows can move quickly. More complex workflows and integrations can take up to about two weeks.</p>
+          <div class="faq-body"><div>
+            <p>Simple workflows can move quickly. More complex workflows and integrations can take up to about two weeks.</p>
+          </div></div>
         </details>
         <details>
           <summary>Can it integrate with our systems?</summary>
-          <p>Yes. Calendar sync, CRM connections, and custom integrations are available when your systems support the required access.</p>
+          <div class="faq-body"><div>
+            <p>Yes. Calendar sync, CRM connections, and custom integrations are available when your systems support the required access.</p>
+          </div></div>
         </details>
         <details>
           <summary>What happens when a human is needed?</summary>
-          <p>You define transfer rules and escalation paths. The agent can route the call to the right person or team when needed.</p>
+          <div class="faq-body"><div>
+            <p>You define transfer rules and escalation paths. The agent can route the call to the right person or team when needed.</p>
+          </div></div>
         </details>
         <details>
           <summary>Can we edit the workflow later?</summary>
-          <p>Yes. After deployment, workflows can be refined over time so the system stays aligned with your business process.</p>
+          <div class="faq-body"><div>
+            <p>Yes. After deployment, workflows can be refined over time so the system stays aligned with your business process.</p>
+          </div></div>
         </details>
         <details>
           <summary>Does it support multiple languages?</summary>
-          <p>Yes. SmartVoiceX supports multilingual conversations and can auto‑detect language in supported workflows.</p>
+          <div class="faq-body"><div>
+            <p>Yes. SmartVoiceX supports multilingual conversations and can auto‑detect language in supported workflows.</p>
+          </div></div>
         </details>
       </div>
     </section>
