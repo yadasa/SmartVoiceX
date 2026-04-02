@@ -173,6 +173,17 @@
     .navlinks a{padding:8px 10px;border-radius:8px}
     .navlinks a:hover{background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.92)}
 
+    .navutil{
+      font-weight:850;
+      font-size:13px;
+      color: rgba(255,255,255,0.78);
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0);
+      background: rgba(255,255,255,0);
+    }
+    .navutil:hover{background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.92)}
+
     .topbar .btn{border-radius:999px; padding:10px 14px}
 
     .hero{position:relative; padding:74px 0 26px 0; overflow: visible}
@@ -416,18 +427,15 @@
         </a>
 
         <div class="navlinks" aria-label="Primary">
-          <a href="#proof">Proof</a>
           <a href="#use-cases">Use cases</a>
-          <a href="#capabilities">Capabilities</a>
+          <a href="#how-it-works">How it works</a>
           <a href="#integrations">Integrations</a>
-          <a href="#security">Trust</a>
           <a href="#pricing">Pricing</a>
           <a href="#faq">FAQ</a>
-          <a href="/pages/contact.html">Contact</a>
         </div>
 
-        <div style="display:flex;gap:10px;align-items:center">
-          <button class="btn secondary" type="button" onclick="window.SVXAuth?.openSignIn?.()">Sign in</button>
+        <div style="display:flex;gap:12px;align-items:center">
+          <a class="navutil" href="#" onclick="window.SVXAuth?.openSignIn?.(); return false;">Sign in</a>
           <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
         </div>
       </div>
@@ -442,20 +450,20 @@
 
           <div>
             <div class="kicker">AI employee for phone operations</div>
-            <h1>Deploy an AI employee
-              <br>that runs your phone workflows.</h1>
+            <h1>Deploy an AI employee that answers calls,
+              <br>books appointments, and follows up automatically.</h1>
 
             <div class="sub">
-              SmartVoiceX deploys custom voice agents that <b>make and take calls</b>, <b>book and confirm appointments</b>, and <b>run outbound follow‑up</b>—with multilingual support, transfer logic, and integrations.
+              SmartVoiceX gives your business a custom AI voice agent that handles inbound and outbound calls, books and confirms appointments, routes escalations, and works inside your existing systems.
             </div>
 
             <div class="cta-row">
               <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
-              <button class="btn secondary" type="button" onclick="window.SVXAuth?.openAgentCreator?.()">Create / deploy an agent</button>
-              <button class="btn ghost" type="button" onclick="window.location.href='/pages/contact.html'">Get a workflow quote</button>
+              <button class="btn secondary" type="button" onclick="window.location.href='/pages/contact.html'">Book a strategy call</button>
+              <button class="btn ghost" type="button" onclick="window.location.href='#how-it-works'">See how it works</button>
             </div>
 
-            <div class="note">Best fit: medical & dental front offices, patient access teams, and outbound calling teams that need throughput without hiring linearly.</div>
+            <div class="note">Built for phone-heavy businesses across healthcare, legal, restaurants, construction, home services, and outbound sales teams.</div>
 
             <div class="proof" aria-label="Proof strip">
               <span class="pill">Inbound + outbound</span>
@@ -469,30 +477,32 @@
         </section>
 
         <section class="section" id="proof" aria-label="Social proof">
-      <div class="kicker">Social proof (built for your category)</div>
-      <div class="h2">Premium by design — not vague “AI for everyone”</div>
-      <div class="lead">SmartVoiceX is positioned for teams that live on the phone: medical & dental workflows and outbound call teams. You’re buying a deployed capability, not just software.</div>
+      <div class="kicker">Built for real phone operations</div>
+      <div class="h2">For businesses where missed calls, delayed follow‑up, and repetitive phone work cost real money.</div>
+      <div class="lead">SmartVoiceX helps teams handle more conversations with more consistency, without hiring linearly. Whether you run a clinic, law firm, restaurant group, construction company, service business, or outbound calling team, the goal is the same: faster response, better coverage, and less time lost to repetitive phone work.</div>
 
       <div class="logo-cloud" aria-label="Industries">
-        <span class="logo">Medical groups</span>
-        <span class="logo">Dental practices</span>
-        <span class="logo">Patient access</span>
-        <span class="logo">Outreach teams</span>
-        <span class="logo">Service businesses</span>
-        <span class="logo">Multi‑location ops</span>
+        <span class="logo">Healthcare</span>
+        <span class="logo">Dental</span>
+        <span class="logo">Legal</span>
+        <span class="logo">Restaurants</span>
+        <span class="logo">Construction</span>
+        <span class="logo">Home services</span>
+        <span class="logo">Multi‑location businesses</span>
+        <span class="logo">Outbound sales teams</span>
       </div>
 
       <div class="metrics" aria-label="Value metrics">
-        <div class="metric"><b>24/7</b><span>Overflow + after‑hours coverage without missed rings.</span></div>
-        <div class="metric"><b>1 → many</b><span>Handle multiple calls at once (no busy signals).</span></div>
-        <div class="metric"><b>Faster follow‑up</b><span>Outbound reminders and lead re‑engagement while intent is high.</span></div>
+        <div class="metric"><b>24/7 coverage</b><span>Never miss calls after hours, during peak volume, or when staff is tied up.</span></div>
+        <div class="metric"><b>More capacity</b><span>Handle multiple conversations at once without busy signals or voicemail bottlenecks.</span></div>
+        <div class="metric"><b>Faster follow‑up</b><span>Reach leads, patients, customers, or prospects while intent is still high.</span></div>
       </div>
         </section>
       </div>
 
       <aside class="card side-card" aria-label="Live product proof">
-        <div class="side-title">What “live demo” means</div>
-        <div class="side-sub">The site should sell with demonstrability. Use the CTA and hear the agent handle real workflows.</div>
+        <div class="side-title">Talk to a live SmartVoiceX agent right on this page.</div>
+        <div class="side-sub">Test SmartVoiceX live before you book a call.</div>
 
         <div class="side-list" role="list">
           <div class="side-item" role="listitem"><b>Calls that sound professional</b><span>Natural conversation, consistent tone, and script control.</span></div>
@@ -526,7 +536,7 @@
       </div>
     </section>
 
-    <section class="section" aria-label="Problem and solution">
+    <section class="section" id="how-it-works" aria-label="How it works">
       <div class="kicker">Problem → solution</div>
       <div class="h2">Phone ops breaks when volume rises (and staffing can’t scale)</div>
       <div class="lead">SmartVoiceX exists for the buying triggers that actually close: missed calls, delayed callbacks, staff time trapped in repetitive phone work, and the need to contact more leads or patients without hiring linearly.</div>
