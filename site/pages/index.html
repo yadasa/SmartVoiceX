@@ -206,6 +206,16 @@
     }
     .solid-band > *:not(.solid-band-bg){position:relative; z-index:1}
 
+    /* Footer variant: no bottom gradient; extend top gradient upward more */
+    .solid-band--footer .solid-band-bg{
+      background: linear-gradient(
+        180deg,
+        rgb(var(--c-black) / 0) 0%,
+        rgb(var(--c-black) / 1) 52%,
+        rgb(var(--c-black) / 1) 100%
+      );
+    }
+
     .journey{display:grid;grid-template-columns: 1.25fr 0.75fr;gap:18px;align-items:start}
     .journey-main{min-width:0}
 
@@ -761,7 +771,7 @@
       </div>
     </section>
 
-    <div class="solid-band" aria-label="Footer solid band">
+    <div class="solid-band solid-band--footer" aria-label="Footer solid band">
       <div class="solid-band-bg" aria-hidden="true"></div>
       <footer class="footer">
       <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between">
