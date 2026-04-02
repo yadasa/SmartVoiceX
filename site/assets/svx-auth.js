@@ -1,7 +1,7 @@
 /* SmartVoiceX Firebase Auth + Firestore profile (static site)
  * - Sign in / sign up modal
  * - Sign up requires: email, desired username (unique), phone number
- * - Stores profile in Firestore (same project as DentAI)
+ * - Stores profile in Firestore
  *
  * Notes:
  * - Phone verification / reCAPTCHA is intentionally NOT implemented (data capture only)
@@ -45,8 +45,7 @@
   }
 
   function normalizeUsername(input) {
-    const u = String(input || '').trim().toLowerCase();
-    return u;
+    return String(input || '').trim().toLowerCase();
   }
 
   function validateUsername(usernameLower) {
@@ -78,7 +77,7 @@
     setStatus('');
   }
 
-  // Signed-in "dashboard" modal
+  // Signed-in dashboard modal
   function openSignedInModal() {
     $('#svx-auth-backdrop')?.classList.add('open');
     $('#svx-signedin-modal')?.classList.add('open');
@@ -123,8 +122,8 @@
     if (menu) {
       menu.innerHTML = '';
 
-      const signedInBtn = el('button', { class: 'svx-menu-item', text: 'Account' });
-      signedInBtn.addEventListener('click', () => {
+      const accountBtn = el('button', { class: 'svx-menu-item', text: 'Account' });
+      accountBtn.addEventListener('click', () => {
         menu.classList.remove('open');
         try { openSignedInModal(); } catch (_) {}
       });
@@ -140,8 +139,8 @@
         }
       });
 
-      menu.appendChild(signedInBtn);
-      // Agent creator menu item is injected later (kept).
+      menu.appendChild(accountBtn);
+      // Agent creator menu item is injected later.
       menu.appendChild(signOutBtn);
     }
   }
@@ -172,6 +171,110 @@
     return minimal;
   }
 
+  function fmtTimestamp(ts) {
+    try {
+      if (!ts) return '';
+      const d = ts.toDate ? ts.toDate() : (ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts));
+      return d.toLocaleString();
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function renderList(container, items, emptyText) {
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (!items || !items.length) {
+      container.appendChild(el('div', { class: 'svx-card-sub', text: emptyText || 'No items yet.' }));
+      return;
+    }
+
+    const ul = el('ul', { class: 'svx-list' });
+    for (const it of items) {
+      const title = it.title || it.summary || it.name || it.id || 'Item';
+      const sub = it.sub || it.createdAt || it.when || '';
+
+      ul.appendChild(el('li', { class: 'svx-list-item' }, [
+        el('div', { class: 'svx-list-title', text: title }),
+        sub ? el('div', { class: 'svx-list-sub', text: sub }) : el('div', { class: 'svx-list-sub', text: '' }),
+      ]));
+    }
+
+    container.appendChild(ul);
+  }
+
+  async function refreshSignedInDashboard() {
+    const summariesWrap = $('#svx-live-summaries');
+    const apptsWrap = $('#svx-appointments');
+    const errWrap = $('#svx-dashboard-status');
+
+    if (errWrap) errWrap.textContent = '';
+
+    let auth, db;
+    try {
+      ({ auth, db } = ensureFirebase());
+    } catch (e) {
+      if (errWrap) errWrap.textContent = 'Firebase not available.';
+      return;
+    }
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    // Live summaries: best-effort read. Collection names can differ by backend.
+    try {
+      const qs = await db
+        .collection('users').doc(user.uid)
+        .collection('callSummaries')
+        .orderBy('createdAt', 'desc')
+        .limit(5)
+        .get();
+
+      const items = qs.docs.map((d) => {
+        const data = d.data() || {};
+        const who = data.callerName || data.caller || data.from || '';
+        const head = data.headline || data.title || data.summary || data.intent || 'Call summary';
+        return {
+          id: d.id,
+          title: who ? `${who} — ${head}` : head,
+          sub: fmtTimestamp(data.createdAt || data.timestamp || data.startedAt),
+        };
+      });
+
+      renderList(summariesWrap, items, 'Summaries will appear here after your agent goes live.');
+    } catch (e) {
+      // Swallow; some projects may not have this collection yet.
+      renderList(summariesWrap, [], 'Summaries will appear here after your agent goes live.');
+    }
+
+    // Appointments: best-effort read.
+    try {
+      const qs = await db
+        .collection('users').doc(user.uid)
+        .collection('appointments')
+        .orderBy('startAt', 'asc')
+        .limit(5)
+        .get();
+
+      const items = qs.docs.map((d) => {
+        const data = d.data() || {};
+        const name = data.patientName || data.customerName || data.name || 'Appointment';
+        const when = fmtTimestamp(data.startAt || data.when || data.createdAt);
+        const note = data.reason || data.type || data.location || '';
+        return {
+          id: d.id,
+          title: note ? `${name} — ${note}` : name,
+          sub: when,
+        };
+      });
+
+      renderList(apptsWrap, items, 'Upcoming bookings will appear here (when connected).');
+    } catch (_) {
+      renderList(apptsWrap, [], 'Upcoming bookings will appear here (when connected).');
+    }
+  }
+
   function mountUI() {
     if ($('#svx-auth-fab')) return;
 
@@ -187,7 +290,7 @@
         el('div', { class: 'svx-modal-header' }, [
           el('div', {}, [
             el('div', { class: 'svx-modal-title', text: 'SmartVoiceX account' }),
-            el('div', { class: 'svx-modal-sub', text: 'Sign in, or create an account to access the SmartVoiceX + DentAI experience.' }),
+            el('div', { class: 'svx-modal-sub', text: 'Sign in to manage your AI phone agents — or create an account to deploy your first workflow.' }),
           ]),
           el('button', { class: 'svx-close', type: 'button', text: '×' }),
         ]),
@@ -221,7 +324,7 @@
           ]),
           el('label', {}, [
             el('span', { text: 'Desired username' }),
-            el('input', { id: 'svx-signup-username', type: 'text', autocomplete: 'username', placeholder: 'e.g. acme_dental' }),
+            el('input', { id: 'svx-signup-username', type: 'text', autocomplete: 'username', placeholder: 'e.g. lakeside_clinic' }),
           ]),
           el('label', {}, [
             el('span', { text: 'Phone number' }),
@@ -250,33 +353,45 @@
         el('div', { class: 'svx-modal-header' }, [
           el('div', {}, [
             el('div', { class: 'svx-modal-title', text: 'SmartVoiceX' }),
-            el('div', { class: 'svx-modal-sub', text: 'Signed in' }),
+            el('div', { class: 'svx-modal-sub', text: 'Your phone operations dashboard' }),
           ]),
           el('button', { class: 'svx-close', type: 'button', text: '×', id: 'svx-signedin-close' }),
         ]),
 
-        el('div', { class: 'svx-section-title', text: 'Latest update' }),
+        el('div', { class: 'svx-section-title', text: 'Quick actions' }),
         el('div', { class: 'svx-card' }, [
-          el('button', { class: 'svx-primary', type: 'button', text: 'Latest version here', id: 'svx-latest-version-btn' }),
-          el('div', { class: 'svx-card-sub', text: 'Always downloads the newest Windows installer from our releases folder.' }),
-          el('div', { id: 'svx-latest-version-status', class: 'svx-status' }),
+          el('div', { class: 'svx-actions' }, [
+            el('button', { class: 'svx-primary', type: 'button', text: 'Create / deploy an agent', id: 'svx-dashboard-create-agent' }),
+            el('button', { class: 'svx-secondary', type: 'button', text: 'Refresh', id: 'svx-dashboard-refresh' }),
+          ]),
+          el('div', { id: 'svx-dashboard-status', class: 'svx-status' }),
         ]),
 
         el('div', { class: 'svx-section-title', text: 'Live summaries' }),
         el('div', { class: 'svx-card' }, [
-          el('div', { class: 'svx-card-sub', text: 'This section will show real-time call summaries for your agent (coming from Firestore / ElevenLabs events).' }),
-          el('div', { class: 'svx-card-sub', text: 'For now: use the desktop app’s Live Summaries view.' }),
+          el('div', { class: 'svx-card-sub', text: 'Recent calls handled by your agent(s). (Visible once events are connected.)' }),
+          el('div', { id: 'svx-live-summaries' }),
         ]),
 
         el('div', { class: 'svx-section-title', text: 'Appointments' }),
         el('div', { class: 'svx-card' }, [
-          el('div', { class: 'svx-card-sub', text: 'This section will show upcoming appointments and bookings (coming soon).' }),
+          el('div', { class: 'svx-card-sub', text: 'Upcoming bookings and confirmations. (Visible once calendar/CRM sync is configured.)' }),
+          el('div', { id: 'svx-appointments' }),
         ]),
       ]),
     ]);
 
     document.body.appendChild(signedInModal);
     document.body.appendChild(fab);
+
+    // Expose minimal programmatic API for on-page CTAs.
+    window.SVXAuth = Object.assign(window.SVXAuth || {}, {
+      openSignIn: () => openModal('signin'),
+      openSignUp: () => openModal('signup'),
+      openAccount: () => openSignedInModal(),
+      close: () => { closeModal(); closeSignedInModal(); },
+      refreshDashboard: () => refreshSignedInDashboard(),
+    });
 
     // Events
     $('#svx-auth-btn')?.addEventListener('click', async () => {
@@ -295,44 +410,28 @@
     });
 
     $('.svx-close', modal)?.addEventListener('click', closeModal);
-
     $('#svx-signedin-close')?.addEventListener('click', closeSignedInModal);
+
+    $('#svx-dashboard-refresh')?.addEventListener('click', async () => {
+      const s = $('#svx-dashboard-status');
+      if (s) s.textContent = 'Refreshing…';
+      await refreshSignedInDashboard();
+      if (s) s.textContent = '';
+    });
+
+    $('#svx-dashboard-create-agent')?.addEventListener('click', () => {
+      try {
+        window.SVXAuth?.openAgentCreator?.();
+      } catch (_) {}
+    });
+
+    // refresh when opening account modal
+    $('#svx-auth-menu')?.addEventListener('transitionend', () => {});
 
     backdrop.addEventListener('click', () => {
       $('#svx-auth-menu')?.classList.remove('open');
       closeModal();
       closeSignedInModal();
-    });
-
-    $('#svx-latest-version-btn')?.addEventListener('click', async () => {
-      const st = $('#svx-latest-version-status');
-      if (st) st.textContent = 'Checking latest version…';
-
-      try {
-        const { auth } = ensureFirebase();
-        const user = auth.currentUser;
-        if (!user) {
-          if (st) st.textContent = 'Please sign in first.';
-          return;
-        }
-
-        const token = await user.getIdToken();
-        const resp = await fetch('/api/svx/app/latest-exe', {
-          method: 'GET',
-          headers: { authorization: `Bearer ${token}` },
-        });
-
-        const data = await resp.json().catch(() => ({}));
-        if (!resp.ok || !data.ok || !data.url) {
-          if (st) st.textContent = data.error || 'No release found yet.';
-          return;
-        }
-
-        if (st) st.textContent = `Downloading: ${data.name || 'latest.exe'}`;
-        window.open(data.url, '_blank', 'noopener');
-      } catch (e) {
-        if (st) st.textContent = e?.message || 'Failed to load latest version.';
-      }
     });
 
     $('#svx-tab-signin')?.addEventListener('click', () => setMode('signin'));
@@ -450,6 +549,14 @@
       if (fab.contains(ev.target)) return;
       menu.classList.remove('open');
     });
+
+    // refresh dashboard whenever it becomes visible
+    const observer = new MutationObserver(() => {
+      if ($('#svx-signedin-modal')?.classList.contains('open')) {
+        refreshSignedInDashboard();
+      }
+    });
+    observer.observe($('#svx-signedin-modal'), { attributes: true, attributeFilter: ['class'] });
   }
 
   async function init() {
@@ -480,7 +587,7 @@
     });
   }
 
-  // Some Framer pages may load scripts at end; ensure DOM ready.
+  // Some pages may load scripts at end; ensure DOM ready.
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
@@ -524,7 +631,7 @@
   function closeAgentModal() {
     $('#svx-agent-modal')?.classList.remove('open');
     // Keep backdrop open only if auth modal is open
-    if (!$('#svx-auth-modal')?.classList.contains('open')) {
+    if (!$('#svx-auth-modal')?.classList.contains('open') && !$('#svx-signedin-modal')?.classList.contains('open')) {
       $('#svx-auth-backdrop')?.classList.remove('open');
     }
     setAgentStatus('');
@@ -538,19 +645,19 @@
         el('div', { class: 'svx-modal-header' }, [
           el('div', {}, [
             el('div', { class: 'svx-modal-title', text: 'Create a SmartVoiceX agent' }),
-            el('div', { class: 'svx-modal-sub', text: 'Answer a few questions so we can tailor your voice agent.' }),
+            el('div', { class: 'svx-modal-sub', text: 'Answer a few questions so we can deploy a voice workflow tailored to your operations.' }),
           ]),
           el('button', { class: 'svx-close', type: 'button', text: '×', id: 'svx-agent-close' }),
         ]),
 
         el('form', { id: 'svx-agent-form', class: 'svx-form' }, [
-          el('label', {}, [el('span', { text: 'Business name' }), el('input', { id: 'svx-agent-business', type: 'text', placeholder: 'e.g. Acme Dental' })]),
-          el('label', {}, [el('span', { text: 'Industry' }), el('input', { id: 'svx-agent-industry', type: 'text', placeholder: 'e.g. Dental, Real Estate, Home Services' })]),
-          el('label', {}, [el('span', { text: 'Goals (what should this agent achieve?)' }), el('input', { id: 'svx-agent-goals', type: 'text', placeholder: 'e.g. book appointments, qualify leads, answer FAQs' })]),
+          el('label', {}, [el('span', { text: 'Business name' }), el('input', { id: 'svx-agent-business', type: 'text', placeholder: 'e.g. Lakeside Dental' })]),
+          el('label', {}, [el('span', { text: 'Industry' }), el('input', { id: 'svx-agent-industry', type: 'text', placeholder: 'e.g. Dental, Oncology, Call Center, Home Services' })]),
+          el('label', {}, [el('span', { text: 'Primary workflows (what should it do?)' }), el('input', { id: 'svx-agent-goals', type: 'text', placeholder: 'e.g. book appointments, confirm visits, follow up leads, outbound list calls' })]),
           el('label', {}, [el('span', { text: 'Must-do’s (rules it must follow)' }), el('input', { id: 'svx-agent-mustdos', type: 'text', placeholder: 'e.g. always confirm phone number; always offer next available slot' })]),
-          el('label', {}, [el('span', { text: 'Never-do’s (hard prohibitions)' }), el('input', { id: 'svx-agent-neverdos', type: 'text', placeholder: 'e.g. never quote prices; never give medical advice' })]),
+          el('label', {}, [el('span', { text: 'Never-do’s (hard prohibitions)' }), el('input', { id: 'svx-agent-neverdos', type: 'text', placeholder: 'e.g. never give medical advice; never quote pricing without approval' })]),
           el('label', {}, [el('span', { text: 'Scripts / talk tracks (optional)' }), el('input', { id: 'svx-agent-scripts', type: 'text', placeholder: 'Paste short scripts or guidelines' })]),
-          el('label', {}, [el('span', { text: 'First message (exact first line when the call connects)' }), el('input', { id: 'svx-agent-firstmessage', type: 'text', placeholder: 'Hi, thanks for calling Acme Dental. How can I help?' })]),
+          el('label', {}, [el('span', { text: 'First message (exact first line when the call connects)' }), el('input', { id: 'svx-agent-firstmessage', type: 'text', placeholder: 'Hi, thanks for calling Lakeside Dental—how can I help today?' })]),
           el('label', {}, [el('span', { text: 'Personality' }), el('input', { id: 'svx-agent-personality', type: 'text', placeholder: 'Warm, confident, concise, professional' })]),
           el('label', {}, [el('span', { text: 'Seniority / role style' }), el('input', { id: 'svx-agent-seniority', type: 'text', placeholder: 'e.g. receptionist, office manager, sales rep' })]),
 
@@ -568,7 +675,7 @@
             el('input', { id: 'svx-agent-transfer-to', type: 'text', placeholder: 'e.g. +1 312 555 0100 or “front desk”' }),
           ]),
 
-          el('label', {}, [el('span', { text: 'How should the initial greeting sound?' }), el('input', { id: 'svx-agent-greeting-sound', type: 'text', placeholder: 'e.g. upbeat + calm, slight smile in voice, no jargon' })]),
+          el('label', {}, [el('span', { text: 'Greeting style (tone, pace, language)' }), el('input', { id: 'svx-agent-greeting-sound', type: 'text', placeholder: 'e.g. calm + reassuring, clear, no jargon; auto-detect Spanish' })]),
 
           el('div', { class: 'svx-actions' }, [
             el('button', { class: 'svx-primary', type: 'submit', text: 'Create agent' }),
@@ -641,6 +748,11 @@
         setAgentStatus(e?.message || 'Failed to create agent.', 'error');
       }
     });
+
+    // Make it available to on-page CTAs.
+    window.SVXAuth = Object.assign(window.SVXAuth || {}, {
+      openAgentCreator: () => openAgentModal(),
+    });
   }
 
   function injectMenuItem() {
@@ -652,7 +764,7 @@
       class: 'svx-menu-item',
       id: 'svx-menu-create-agent',
       type: 'button',
-      text: 'Create SmartVoiceX agent',
+      text: 'Create / deploy agent',
     });
 
     btn.addEventListener('click', () => {

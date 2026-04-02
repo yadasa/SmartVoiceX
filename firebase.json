@@ -3,7 +3,7 @@
     "source": "functions"
   }],
   "hosting": {
-    "public": "site",
+    "public": "site/pages",
     "ignore": [
       "firebase.json",
       "**/.*",

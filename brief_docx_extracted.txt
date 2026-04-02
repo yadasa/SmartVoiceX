@@ -1,0 +1,123 @@
+SMARTVOICEX
+Site Team Brief
+Unified product, positioning, website, ad, content, and implementation handoff
+
+How to use this document. This brief is the working source of truth for the web designer, ad manager, social media lead, and solutions / implementation lead. It converts founder discovery and homepage review into one aligned operating document.
+
+Primary product frame
+AI employee for phone operations
+
+Main entry markets
+Medical teams + outbound call teams
+
+Primary CTA
+Talk to the AI live
+
+Executive summary
+SmartVoiceX should be presented as a premium AI phone operations platform that deploys configured AI agents for businesses that rely on calls. The product is wider than an “AI receptionist”: it makes and takes calls, books appointments, handles follow-up outreach, supports transfers, works across languages, connects into business systems, and scales call throughput beyond what a single human can do.
+
+• The strongest near-term positioning is around medical / dental workflows and outbound call teams.
+• The new site should lead with live product proof, operational specificity, and premium design rather than vague AI language.
+• Every team should use the same product definition, buying trigger set, and messaging hierarchy.
+
+1. Product definition
+• One-line definition: SmartVoiceX is your AI employee for phone operations.
+• Expanded definition: SmartVoiceX deploys custom AI agents that make and take calls, answer questions, book appointments, route conversations, handle follow-up, and automate recurring phone-based work.
+• What the customer buys: A live deployed agent, workflow setup, support, infrastructure, application access, and integration help where needed.
+• What it is not: Not just dashboard software, not just a receptionist pitch, and not a low-end generic voice bot.
+
+Core capabilities
+Call handling
+• Answer inbound calls
+• Place outbound calls
+• Book and confirm appointments
+• Navigate IVR systems
+• Detect voicemail and leave messages
+• View recordings, transcripts, and summaries
+• Transfer to humans when needed
+
+Control + scale
+• Run multiple calls at once
+• Edit workflows after setup
+• Change voice, tone, speed, and language behavior
+• Support multiple languages with auto-detection
+• Upload and work through contact lists
+
+Commercial model
+• The application itself is not the core product; deployed capability is.
+• Founder-described pricing model: low monthly floor, roughly $300/month, plus usage at about $0.40 per minute, with custom scoping for more complex accounts.
+• The website should reflect flexible “starting at” and “custom” pricing rather than force one flat public package.
+
+2. Customers, use cases, and buying triggers
+Best current markets:
+• Primary fit: Medical, dental, hospital, oncology, cosmetic centers
+• Secondary fit: Outbound call teams, service businesses, construction, restaurants
+• Typical buyers: CEO, owner, founder, operations director, front-office leader
+
+Top use cases
+• Front desk overflow reduction and after-hours coverage
+• Appointment booking and confirmations
+• Lead follow-up, reminders, warm outreach, and cold outreach
+• Insurance verification and repetitive operational calls
+• List-based outbound calling for teams that need throughput
+
+Buying triggers and pain points
+• Missed calls and delayed callbacks
+• Staff time trapped in repetitive phone work
+• Human inconsistency, absenteeism, and variable script quality
+• Need to contact more leads or patients without hiring proportionally more staff
+• Need for tighter control over transfers, scripts, and follow-up behavior
+
+Positioning hierarchy
+• Primary position: AI employee for phone operations.
+• Secondary position: Custom-deployed AI calling system for real business workflows.
+• Avoid leading with: generic “for everyone” language or receptionist-only framing that hides outbound and workflow depth.
+
+3. Website strategy
+Main job of the homepage:
+Make visitors understand, quickly and credibly, that SmartVoiceX can operate inside a real business workflow, sound convincing, fit existing systems, and be tried immediately through a live voice interaction.
+
+Problems with the current site
+• It still contains template residue and mismatched placeholder copy.
+• It frames the product too narrowly as an AI receptionist.
+• It underexplains what the customer is actually buying and how deployment works.
+• It does not fully surface the strongest differentiators: concurrency, custom workflows, live summaries, recordings, multilingual handling, and integrations.
+
+Recommended homepage architecture
+• Hero with strong headline, one-sentence subheadline, and live AI demo CTA
+• Instant proof strip: inbound, outbound, multilingual, concurrent calls, integrations
+• Problem section focused on broken human phone operations
+• Solution section that explains SmartVoiceX as a deployed AI employee
+• Capability grid
+• Use-case blocks for medical and outbound teams
+• How-it-works section with timeline and implementation steps
+• Pricing section with starting-at and custom-scope language
+• FAQ and objection handling
+• Final live-demo CTA
+
+Copy and messaging rules
+• Clarity before cleverness
+• Specificity before abstraction
+• Demonstrability before unsourced ROI claims
+• Premium technical tone without sounding cold or robotic
+
+4. Design and growth guidance
+Design direction for the web team
+• Premium, technical, modern, operator-grade visual language
+• Use real product visuals and workflows, not generic stock-heavy sections
+• Keep spacing generous; avoid template clutter
+• Make the live demo entry point feel central, not secondary
+• Use UI screenshots, workflow diagrams, and concise trust modules
+
+5. Solutions and implementation guidance
+Implementation principles
+• Implementation quality is part of the product.
+• The first deployment is team-assisted; clients can edit many workflow elements afterward.
+• Simple workflows can move quickly; complex workflows can take up to about two weeks.
+• Integrations can be custom-built where workable endpoints exist.
+
+Trust and FAQ priorities
+• The site and sales flow must answer: Does it sound human? How long does setup take? Can it integrate with our systems? What happens when a human is needed?
+
+Closing note
+The most important discipline for the site team is consistency. Every person working on SmartVoiceX should describe the same product the same way: a serious, customizable AI employee for phone operations that is deployed around real business workflows.
