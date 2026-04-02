@@ -469,6 +469,11 @@
         await ensureProfileExists(db, cred.user);
         setStatus('Signed in.', 'success');
         closeModal();
+        // After successful sign-in, take the user to the signed-in dashboard (commit 0357404 modal).
+        try {
+          openSignedInModal();
+          refreshSignedInDashboard();
+        } catch (_) {}
       } catch (e) {
         setStatus(e?.message || 'Sign in failed.', 'error');
       }
@@ -532,6 +537,11 @@
 
         setStatus('Account created.', 'success');
         closeModal();
+        // After successful sign-up, take the user to the signed-in dashboard (commit 0357404 modal).
+        try {
+          openSignedInModal();
+          refreshSignedInDashboard();
+        } catch (_) {}
       } catch (e) {
         if (e?.code === 'username_taken' || e?.message === 'USERNAME_TAKEN') {
           setStatus('That username is taken. Try another.', 'error');
