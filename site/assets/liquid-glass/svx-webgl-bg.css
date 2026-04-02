@@ -12,6 +12,11 @@ html{
   background: var(--svx-bg-fallback);
 }
 
+/* If WebGL fails, ensure we keep a visible background */
+.no-webgl body{
+  background: var(--svx-bg-fallback) !important;
+}
+
 body{
   /* Let the WebGL canvas be the visible background.
      (Fallback remains on html for very old browsers / WebGL failure.)

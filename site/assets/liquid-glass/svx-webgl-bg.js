@@ -359,8 +359,15 @@
     canvas.setAttribute('aria-hidden', 'true');
     document.body.prepend(canvas);
 
-    const gl = canvas.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: false });
-    if(!gl) return;
+    // Try WebGL1, then fall back to experimental-webgl.
+    const gl = canvas.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: false })
+      || canvas.getContext('experimental-webgl', { antialias: false, alpha: true, premultipliedAlpha: false });
+
+    if(!gl){
+      // WebGL unavailable: keep CSS fallback background and do not break page.
+      document.documentElement.classList.add('no-webgl');
+      return;
+    }
 
     const bgProg = link(gl, QUAD_VERT, BG_FRAG);
     const compProg = link(gl, QUAD_VERT, COMPOSE_FRAG);
