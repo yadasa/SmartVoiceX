@@ -57,8 +57,6 @@
       z-index:-1;
       overflow:hidden;
       pointer-events:none;
-      --px: 0px;
-      --py: 0px;
     }
     #bg-blobs .blob{
       position:absolute;
@@ -66,8 +64,10 @@
       height: 920px;
       filter: blur(90px);
       opacity: 0.60;
-      /* pointer influence (base) */
-      transform: translate3d(var(--px), var(--py), 0);
+      /* per-blob pointer influence (set by JS) */
+      --bpx: 0px;
+      --bpy: 0px;
+      transform: translate3d(var(--bpx), var(--bpy), 0);
       will-change: transform;
     }
     #bg-blobs .blob .inner{
@@ -422,8 +422,19 @@
 
     // Subtle pointer influence on blob drift (mouse + touch)
     (() => {
-      const el = document.getElementById('bg-blobs');
-      if (!el) return;
+      const wrap = document.getElementById('bg-blobs');
+      if (!wrap) return;
+
+      const blobs = Array.from(wrap.querySelectorAll('.blob'));
+      // Each blob reacts differently to pointer (direction + magnitude).
+      // Tuned for a "parallax / swirl" feel.
+      const factors = [
+        { x: 1.00, y: 0.65 },
+        { x: -0.85, y: 0.95 },
+        { x: 0.55, y: -1.05 },
+        { x: -0.70, y: -0.60 },
+      ];
+
       let tx = 0, ty = 0;
       let cx = 0, cy = 0;
 
@@ -448,8 +459,13 @@
         // faster catch-up so it feels responsive
         cx += (tx - cx) * 0.14;
         cy += (ty - cy) * 0.14;
-        el.style.setProperty('--px', cx.toFixed(2) + 'px');
-        el.style.setProperty('--py', cy.toFixed(2) + 'px');
+
+        blobs.forEach((b, i) => {
+          const f = factors[i % factors.length];
+          b.style.setProperty('--bpx', (cx * f.x).toFixed(2) + 'px');
+          b.style.setProperty('--bpy', (cy * f.y).toFixed(2) + 'px');
+        });
+
         requestAnimationFrame(tick);
       }
       tick();
