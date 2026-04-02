@@ -137,7 +137,7 @@
       padding: 12px 18px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(13,13,13,0.50);
+      background: rgba(0,0,0,0.72);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       box-shadow: 0px 4px 10px -2px rgba(0, 0, 0, 0.10), 0px 2px 2px -1px rgba(0, 0, 0, 0.10);
@@ -173,10 +173,11 @@
 
       pointer-events:none;
       border-radius: 0;
+      /* extended falloff (starts 13% earlier) */
       background: linear-gradient(
         180deg,
         rgba(0,0,0,1) 0%,
-        rgba(0,0,0,1) 85%,
+        rgba(0,0,0,1) 72%,
         rgba(0,0,0,0) 95%,
         rgba(0,0,0,0) 100%
       );
@@ -459,7 +460,6 @@
 
           <div class="cta-row" style="margin-top:12px">
             <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk live now</button>
-            <button class="btn secondary" type="button" onclick="window.SVXAuth?.openSignIn?.()">Sign in</button>
           </div>
         </aside>
       </div>
