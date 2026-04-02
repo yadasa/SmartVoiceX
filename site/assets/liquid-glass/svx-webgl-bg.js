@@ -56,10 +56,11 @@
       float t = u_time;
 
       // Base positions (roughly matching the old CSS layout corners)
-      vec2 c1 = vec2(0.18, 0.20);
-      vec2 c2 = vec2(0.82, 0.22);
-      vec2 c3 = vec2(0.20, 0.86);
-      vec2 c4 = vec2(0.84, 0.84);
+      // Spread out a bit more so refraction is easier to read.
+      vec2 c1 = vec2(0.12, 0.16);
+      vec2 c2 = vec2(0.88, 0.18);
+      vec2 c3 = vec2(0.14, 0.90);
+      vec2 c4 = vec2(0.90, 0.88);
 
       // Time drift (more free movement)
       c1 += vec2(0.08*sin(t*0.31), 0.08*cos(t*0.27));
@@ -68,10 +69,10 @@
       c4 += vec2(0.08*sin(t*0.17), 0.08*cos(t*0.25));
 
       // Pointer influence (similar to previous per-blob factors)
-      c1 += u_ptr * vec2( 1.00, 0.65);
-      c2 += u_ptr * vec2(-0.85, 0.95);
-      c3 += u_ptr * vec2( 0.55,-1.05);
-      c4 += u_ptr * vec2(-0.70,-0.60);
+      c1 += u_ptr * vec2( 1.10, 0.72);
+      c2 += u_ptr * vec2(-0.95, 1.05);
+      c3 += u_ptr * vec2( 0.62,-1.12);
+      c4 += u_ptr * vec2(-0.78,-0.66);
 
       // follower blob: tracks average center
       vec2 c5 = (c1 + c2 + c3 + c4) * 0.25;
@@ -110,7 +111,7 @@
     }
   `;
 
-  // Composites to the screen and applies the liquid-glass effect inside a rounded rect.
+  // Composites to the screen and applies the liquid-glass effect inside rounded rects.
   const COMPOSE_FRAG = `
     precision highp float;
     varying vec2 v_uv;
@@ -118,8 +119,11 @@
     uniform vec2 u_resolution;
     uniform sampler2D u_bgTex;
 
-    // glass rect in *pixel* space, top-left origin (matching getBoundingClientRect * dpr)
-    uniform vec4 u_glassRect; // x,y,w,h
+    // Multiple glass rects in *pixel* space, top-left origin (matching getBoundingClientRect * dpr)
+    const int MAX_RECTS = 32;
+    uniform int u_glassCount;
+    uniform vec4 u_glassRects[MAX_RECTS]; // x,y,w,h
+
     uniform float u_radius;
     uniform float u_bezel;
     uniform float u_thickness;
@@ -175,33 +179,27 @@
       return sum / 12.0;
     }
 
-    void main(){
-      // v_uv: 0..1 bottom-left? (we used a_pos mapping; in WebGL, texture coords are bottom-left in our own convention)
-      // We'll use the same uv space for sampling the bg texture (rendered with same v_uv).
-      vec2 uv = v_uv;
-      vec3 col = bg(uv);
-
-      // Convert this fragment to pixel coords with top-left origin for rect math.
-      vec2 fragPxTL = vec2(uv.x * u_resolution.x, (1.0 - uv.y) * u_resolution.y);
-
-      // Glass rect
-      vec2 rectPos = u_glassRect.xy;
-      vec2 rectSize = u_glassRect.zw;
+    vec3 applyGlass(vec3 col, vec2 uv, vec2 fragPxTL, vec4 rect){
+      vec2 rectPos = rect.xy;
+      vec2 rectSize = rect.zw;
       vec2 rectCenter = rectPos + rectSize * 0.5;
 
       vec2 p = fragPxTL - rectCenter;
       vec2 halfSize = rectSize * 0.5;
+      if(halfSize.x < 1.0 || halfSize.y < 1.0) return col;
 
       float r = min(u_radius, min(halfSize.x, halfSize.y) - 1.0);
       float sd = sdRoundedRect(p, halfSize, r);
 
-      // Outside: apply a soft drop shadow only
+      // Outside: apply a soft shadow only (local)
       if (sd > 0.0) {
-        float shadowFalloff = exp(-sd * sd / 800.0);
-        float shadow = u_shadow * shadowFalloff * 0.55;
-        col *= (1.0 - shadow);
-        gl_FragColor = vec4(col, 1.0);
-        return;
+        // only shadow near the card
+        if(sd < 90.0){
+          float shadowFalloff = exp(-sd * sd / 800.0);
+          float shadow = u_shadow * shadowFalloff * 0.55;
+          col *= (1.0 - shadow);
+        }
+        return col;
       }
 
       float distFromEdge = -sd;
@@ -219,37 +217,42 @@
       float thetaR = asin(sinR);
       float displacement = h * u_thickness * (tan(slopeAngle) - tan(thetaR));
 
-      // Approx gradient from SDF
       vec2 grad;
       float eps = 0.5;
       grad.x = sdRoundedRect(p + vec2(eps, 0.0), halfSize, r) - sd;
       grad.y = sdRoundedRect(p + vec2(0.0, eps), halfSize, r) - sd;
       grad = normalize(grad);
 
-      // convert pixel offset -> uv offset
       vec2 offset = -grad * displacement / u_resolution;
-
-      vec2 refrUV = uv + vec2(offset.x, -offset.y); // y flip (uv uses bottom-left, grad math used top-left)
+      vec2 refrUV = uv + vec2(offset.x, -offset.y);
 
       vec3 gcol = bgBlur(refrUV, u_blur);
 
-      // Specular highlight
       vec2 lightDir = normalize(vec2(0.5, -0.7));
       float rimDot = abs(dot(grad, lightDir));
       float rimFalloff = 1.0 - smoothstep(0.0, bezel * 0.4, distFromEdge);
       float spec = pow(rimDot * rimFalloff, 1.5);
       gcol += vec3(spec * u_specular);
 
-      // Inner shading
       float innerShadow = 1.0 - smoothstep(0.0, bezel * 0.6, distFromEdge);
       gcol *= mix(1.0, 0.72, innerShadow * 0.26);
 
-      // Very light tint toward white
       gcol = mix(gcol, vec3(1.0), u_tint);
 
-      // Mix with underlying background to keep it believable.
       float alpha = smoothstep(0.0, 1.5, distFromEdge) * 0.62;
-      col = mix(col, gcol, alpha);
+      return mix(col, gcol, alpha);
+    }
+
+    void main(){
+      vec2 uv = v_uv;
+      vec3 col = bg(uv);
+
+      vec2 fragPxTL = vec2(uv.x * u_resolution.x, (1.0 - uv.y) * u_resolution.y);
+
+      for(int i = 0; i < MAX_RECTS; i++){
+        if(i >= u_glassCount) break;
+        col = applyGlass(col, uv, fragPxTL, u_glassRects[i]);
+      }
 
       gl_FragColor = vec4(col, 1.0);
     }
@@ -340,25 +343,32 @@
     let bgFbo = null;
 
     const glass = {
-      rectPx: { x: -99999, y: -99999, w: 0, h: 0 },
-      radiusPx: GLASS_PRESET.radius,
-      bezelPx: GLASS_PRESET.bezel,
-      thicknessPx: GLASS_PRESET.thickness,
+      // rect list in px TL coordinates, packed for uniform upload (x,y,w,h per rect)
+      rectsPx: new Float32Array(32 * 4),
+      count: 0,
     };
 
-    function updateGlassRect(){
-      const el = document.querySelector('.side-card[data-liquid-glass]');
-      if(!el){
-        glass.rectPx = { x: -99999, y: -99999, w: 0, h: 0 };
-        return;
+    function updateGlassRects(){
+      const nodes = Array.from(document.querySelectorAll('.card'));
+      // Cap to shader MAX_RECTS (32)
+      const max = Math.min(32, nodes.length);
+      glass.count = max;
+      for(let i = 0; i < max; i++){
+        const r = nodes[i].getBoundingClientRect();
+        const j = i * 4;
+        glass.rectsPx[j + 0] = r.left * dpr;
+        glass.rectsPx[j + 1] = r.top * dpr;
+        glass.rectsPx[j + 2] = r.width * dpr;
+        glass.rectsPx[j + 3] = r.height * dpr;
       }
-      const r = el.getBoundingClientRect();
-      glass.rectPx = {
-        x: r.left * dpr,
-        y: r.top * dpr,
-        w: r.width * dpr,
-        h: r.height * dpr,
-      };
+      // if fewer than 32, zero the rest (keeps things deterministic)
+      for(let i = max; i < 32; i++){
+        const j = i * 4;
+        glass.rectsPx[j + 0] = -99999;
+        glass.rectsPx[j + 1] = -99999;
+        glass.rectsPx[j + 2] = 0;
+        glass.rectsPx[j + 3] = 0;
+      }
     }
 
     function resize(){
@@ -375,7 +385,7 @@
       bgTex = createTex(gl, w, h);
       bgFbo = createFbo(gl, bgTex);
 
-      updateGlassRect();
+      updateGlassRects();
       draw(0);
     }
 
@@ -390,7 +400,7 @@
         ticking = false;
         if(needsRect){
           needsRect = false;
-          updateGlassRect();
+          updateGlassRects();
         }
       });
     }
@@ -420,10 +430,11 @@
     const sharpBg = (params.get('svxSharp') === '1') || (localStorage.getItem('svx_webgl_sharp_bg') === '1');
 
     // Observe layout shifts of the side-card.
-    const sideCard = document.querySelector('.side-card[data-liquid-glass]');
-    if(sideCard && 'ResizeObserver' in window){
+    // Observe layout shifts of cards.
+    const cards = Array.from(document.querySelectorAll('.card'));
+    if(cards.length && 'ResizeObserver' in window){
       const ro = new ResizeObserver(() => requestRectUpdate());
-      ro.observe(sideCard);
+      cards.forEach(c => ro.observe(c));
     }
 
     // Render
@@ -439,7 +450,8 @@
       prog: compProg,
       res: gl.getUniformLocation(compProg, 'u_resolution'),
       bgTex: gl.getUniformLocation(compProg, 'u_bgTex'),
-      rect: gl.getUniformLocation(compProg, 'u_glassRect'),
+      count: gl.getUniformLocation(compProg, 'u_glassCount'),
+      rects: gl.getUniformLocation(compProg, 'u_glassRects[0]'),
       radius: gl.getUniformLocation(compProg, 'u_radius'),
       bezel: gl.getUniformLocation(compProg, 'u_bezel'),
       thickness: gl.getUniformLocation(compProg, 'u_thickness'),
@@ -458,7 +470,7 @@
 
       if(needsRect){
         needsRect = false;
-        updateGlassRect();
+        updateGlassRects();
       }
 
       // 1) Background pass into offscreen texture
@@ -486,8 +498,8 @@
       gl.bindTexture(gl.TEXTURE_2D, bgTex);
       gl.uniform1i(u_c.bgTex, 0);
 
-      const r = glass.rectPx;
-      gl.uniform4f(u_c.rect, r.x, r.y, r.w, r.h);
+      gl.uniform1i(u_c.count, glass.count);
+      gl.uniform4fv(u_c.rects, glass.rectsPx);
 
       gl.uniform1f(u_c.radius, GLASS_PRESET.radius * dpr);
       gl.uniform1f(u_c.bezel, GLASS_PRESET.bezel * dpr);
