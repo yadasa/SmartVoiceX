@@ -34,51 +34,66 @@
     varying vec2 v_uv;
     uniform vec2 u_resolution;
     uniform float u_time;
+    // pointer offset in UV units (roughly +/-0.15)
+    uniform vec2 u_ptr;
 
-    float blob(vec2 p, vec2 c, float r){
-      float d = length(p - c);
-      // Soft Gaussian-ish falloff
-      return exp(-(d*d) / (r*r));
+    float blob(vec2 uv, vec2 c, float r, float aspect){
+      vec2 d = (uv - c) * vec2(aspect, 1.0);
+      float dd = dot(d,d);
+      return exp(-dd / (r*r));
     }
 
     void main(){
       vec2 uv = v_uv;
-      // Work in a roughly aspect-corrected space
-      vec2 p = (uv - 0.5) * vec2(u_resolution.x / u_resolution.y, 1.0);
-
+      float aspect = u_resolution.x / u_resolution.y;
       float t = u_time;
-      vec2 c1 = vec2(-0.75 + 0.18*sin(t*0.31), -0.35 + 0.22*cos(t*0.27));
-      vec2 c2 = vec2( 0.85 + 0.20*cos(t*0.23), -0.28 + 0.20*sin(t*0.29));
-      vec2 c3 = vec2(-0.85 + 0.16*cos(t*0.19),  0.75 + 0.20*sin(t*0.21));
-      vec2 c4 = vec2( 0.78 + 0.18*sin(t*0.17),  0.78 + 0.18*cos(t*0.25));
-      vec2 c5 = vec2( 0.05 + 0.22*sin(t*0.11), -0.85 + 0.12*cos(t*0.15));
+
+      // Base positions (roughly matching the old CSS layout corners)
+      vec2 c1 = vec2(0.18, 0.20);
+      vec2 c2 = vec2(0.82, 0.22);
+      vec2 c3 = vec2(0.20, 0.86);
+      vec2 c4 = vec2(0.84, 0.84);
+
+      // Time drift (more free movement)
+      c1 += vec2(0.08*sin(t*0.31), 0.08*cos(t*0.27));
+      c2 += vec2(0.10*cos(t*0.23), 0.07*sin(t*0.29));
+      c3 += vec2(0.07*cos(t*0.19), 0.10*sin(t*0.21));
+      c4 += vec2(0.08*sin(t*0.17), 0.08*cos(t*0.25));
+
+      // Pointer influence (similar to previous per-blob factors)
+      c1 += u_ptr * vec2( 1.00, 0.65);
+      c2 += u_ptr * vec2(-0.85, 0.95);
+      c3 += u_ptr * vec2( 0.55,-1.05);
+      c4 += u_ptr * vec2(-0.70,-0.60);
+
+      // follower blob: tracks average center
+      vec2 c5 = (c1 + c2 + c3 + c4) * 0.25;
+      c5 += vec2(0.06*sin(t*0.11), 0.05*cos(t*0.15));
 
       float b = 0.0;
-      b += 1.15 * blob(p, c1, 0.75);
-      b += 1.00 * blob(p, c2, 0.85);
-      b += 0.95 * blob(p, c3, 1.05);
-      b += 0.90 * blob(p, c4, 0.95);
-      b += 0.70 * blob(p, c5, 1.10);
+      b += 1.15 * blob(uv, c1, 0.32, aspect);
+      b += 1.00 * blob(uv, c2, 0.38, aspect);
+      b += 0.95 * blob(uv, c3, 0.46, aspect);
+      b += 0.90 * blob(uv, c4, 0.42, aspect);
+      b += 0.70 * blob(uv, c5, 0.50, aspect);
 
-      // Subtle banding / depth
-      float v = clamp(b, 0.0, 2.5);
-      float glow = smoothstep(0.15, 1.9, v);
-
-      vec3 base = vec3(0.03, 0.03, 0.05);
+      // Color palette
+      vec3 base = vec3(0.0, 0.0, 0.0);
       vec3 purple = vec3(0.38, 0.10, 0.85);
       vec3 blue   = vec3(0.25, 0.48, 1.00);
 
-      float mixAB = 0.5 + 0.5*sin(t*0.22 + p.x*1.4 - p.y*1.1);
+      float v = clamp(b, 0.0, 2.5);
+      float glow = smoothstep(0.15, 1.9, v);
+      float soft = smoothstep(0.05, 1.20, v);
+
+      float mixAB = 0.5 + 0.5*sin(t*0.22 + (uv.x-0.5)*1.8 - (uv.y-0.5)*1.5);
       vec3 ink = mix(purple, blue, clamp(mixAB, 0.0, 1.0));
 
-      // Shape the color so it resembles the previous CSS blur blobs
-      float soft = smoothstep(0.05, 1.25, v);
-      vec3 col = base + ink * soft * 0.85;
-      col += ink * glow * 0.28;
+      vec3 col = base + ink * soft * 0.88;
+      col += ink * glow * 0.30;
 
-      // Gentle vignette
-      float vign = smoothstep(1.10, 0.20, length(uv - 0.5));
-      col *= 0.80 + 0.20 * vign;
+      float vign = smoothstep(1.12, 0.18, length(uv - 0.5));
+      col *= 0.78 + 0.22 * vign;
 
       gl_FragColor = vec4(col, 1.0);
     }
@@ -372,6 +387,21 @@
     window.addEventListener('resize', resize, { passive: true });
     window.addEventListener('scroll', requestRectUpdate, { passive: true });
 
+    // Pointer influence (mouse + touch) similar to the old CSS blob system.
+    let tx = 0, ty = 0;
+    let cx = 0, cy = 0;
+    function setTarget(x, y){
+      const nx = (x / window.innerWidth) - 0.5;
+      const ny = (y / window.innerHeight) - 0.5;
+      tx = Math.max(-140, Math.min(140, nx * 280));
+      ty = Math.max(-140, Math.min(140, ny * 280));
+    }
+    window.addEventListener('pointermove', (e) => setTarget(e.clientX, e.clientY), { passive: true });
+    window.addEventListener('touchmove', (e) => {
+      const t = e.touches && e.touches[0];
+      if (t) setTarget(t.clientX, t.clientY);
+    }, { passive: true });
+
     // Observe layout shifts of the side-card.
     const sideCard = document.querySelector('.side-card[data-liquid-glass]');
     if(sideCard && 'ResizeObserver' in window){
@@ -384,6 +414,7 @@
       prog: bgProg,
       res: gl.getUniformLocation(bgProg, 'u_resolution'),
       time: gl.getUniformLocation(bgProg, 'u_time'),
+      ptr: gl.getUniformLocation(bgProg, 'u_ptr'),
     };
 
     const u_c = {
@@ -418,6 +449,12 @@
       bindQuad(bgProg);
       gl.uniform2f(u_bg.res, w, h);
       gl.uniform1f(u_bg.time, t);
+
+      // pointer smoothing; convert px -> uv offset (~ +/-0.15)
+      cx += (tx - cx) * 0.14;
+      cy += (ty - cy) * 0.14;
+      gl.uniform2f(u_bg.ptr, (cx / w), (cy / h));
+
       gl.drawArrays(gl.TRIANGLES, 0, 6);
 
       // 2) Composite pass to screen with liquid-glass applied
