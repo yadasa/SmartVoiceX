@@ -204,7 +204,8 @@ export class LiquidGlassSideCard {
   constructor(cardEl, opts = {}){
     this.card = cardEl;
     this.opts = {
-      bgUrl: opts.bgUrl || cardEl.getAttribute('data-liquid-glass-bg') || '/assets/liquid-glass/backgrounds/image2.jpg',
+      // If not provided, we render against a neutral solid backdrop (no image).
+      bgUrl: opts.bgUrl || cardEl.getAttribute('data-liquid-glass-bg') || '',
       dprCap: opts.dprCap ?? 2,
     };
 
@@ -303,7 +304,7 @@ export class LiquidGlassSideCard {
 
     // Texture
     this.bgTex = createTexture(gl);
-    this._loadBg(this.opts.bgUrl);
+    if (this.opts.bgUrl) this._loadBg(this.opts.bgUrl);
 
     this._bind();
     this._resize();
