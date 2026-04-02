@@ -186,7 +186,7 @@
 
     .topbar .btn{border-radius:999px; padding:10px 14px}
 
-    .hero{position:relative; padding:74px 0 26px 0; overflow: visible}
+    .hero{position:relative; padding:74px 0 calc(26px * 1.09) 0; overflow: visible}
 
     .hero-bg{
       position:absolute;
@@ -500,62 +500,71 @@
         </section>
       </div>
 
-      <aside class="card side-card" aria-label="Live product proof">
-        <div class="side-title">Talk to a live SmartVoiceX agent right on this page.</div>
-        <div class="side-sub">Test SmartVoiceX live before you book a call.</div>
+      <aside class="card side-card" aria-label="Live demo">
+        <div class="side-title">Live demo: talk to a SmartVoiceX agent right on this page.</div>
+        <div class="side-sub">Hear how it sounds, then decide if it’s worth a workflow review.</div>
 
         <div class="side-list" role="list">
-          <div class="side-item" role="listitem"><b>Calls that sound professional</b><span>Natural conversation, consistent tone, and script control.</span></div>
-          <div class="side-item" role="listitem"><b>Operational specificity</b><span>Appointments, confirmations, routing, escalation, voicemail behavior.</span></div>
-          <div class="side-item" role="listitem"><b>Visibility + control</b><span>Recordings, transcripts, summaries, and workflow edits after go‑live.</span></div>
-          <div class="side-item" role="listitem"><b>Built for real buyers</b><span>Owners and ops leaders who need outcomes—not a generic voice bot.</span></div>
+          <div class="side-item" role="listitem"><b>Professional call handling</b><span>Natural voice, consistent tone, and controlled talk‑tracks.</span></div>
+          <div class="side-item" role="listitem"><b>Real workflow behavior</b><span>Booking, confirmations, routing, escalation, and voicemail rules.</span></div>
+          <div class="side-item" role="listitem"><b>Built for scale</b><span>Run concurrent calls and follow‑up sequences without bottlenecks.</span></div>
+          <div class="side-item" role="listitem"><b>Visibility after go‑live</b><span>Recordings, transcripts, summaries, and editable workflows.</span></div>
         </div>
 
         <div class="cta-row" style="margin-top:12px">
-          <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk live now</button>
+          <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
         </div>
       </aside>
     </div>
 
     <section class="section" id="use-cases" aria-label="Use cases">
       <div class="kicker">Use cases</div>
-      <div class="h2">Built for real workflows — medical and outbound teams first</div>
-      <div class="lead">SmartVoiceX is wider than an “AI receptionist.” It’s a deployed AI calling system configured around your processes, then improved over time.</div>
+      <div class="h2">Use cases teams deploy first</div>
+      <div class="lead">SmartVoiceX is wider than an “AI receptionist.” It’s a deployed AI calling system configured around your processes—then improved over time.</div>
 
-      <div class="split">
+      <div class="grid" aria-label="Use case cards">
+        <div class="card"><b>Front desk overflow + after‑hours coverage</b><p>Answer peak‑volume calls and cover nights/weekends so revenue doesn’t stop at 5pm.</p></div>
+        <div class="card"><b>Appointment booking + confirmations</b><p>Schedule, reschedule, confirm, and send reminders with consistent scripts.</p></div>
+        <div class="card"><b>Lead follow‑up</b><p>Call back new leads fast while intent is high—no more “we’ll try tomorrow.”</p></div>
+        <div class="card"><b>List‑based outbound calling</b><p>Work through contact lists with controlled talk‑tracks and reliable cadence.</p></div>
+        <div class="card"><b>Transfers + escalation</b><p>Route to the right human when needed and capture context before handoff.</p></div>
+        <div class="card"><b>Multilingual handling</b><p>Auto‑detect language and keep brand tone consistent across callers.</p></div>
+      </div>
+
+      <div class="split" style="margin-top:14px">
         <div class="card">
           <b>Medical & dental front office</b>
-          <p>New patient scheduling, appointment confirmations, after‑hours triage, insurance verification calls, and overflow handling during peak hours.</p>
+          <p>New patient scheduling, confirmations, after‑hours triage, overflow handling, and repetitive operational calls.</p>
           <p><b>Typical buyers:</b> owner/CEO, operations director, front‑office lead.</p>
         </div>
         <div class="card">
           <b>Outbound call teams</b>
-          <p>Lead follow‑up, reminders, warm outreach, cold outreach, and list‑based calling for throughput—without sacrificing script quality.</p>
+          <p>Warm outreach, reminders, cold outreach, and throughput‑driven calling without sacrificing script quality.</p>
           <p><b>Typical buyers:</b> sales leaders, call center ops, growth teams.</p>
         </div>
       </div>
     </section>
 
-    <section class="section" id="how-it-works" aria-label="How it works">
-      <div class="kicker">Problem → solution</div>
-      <div class="h2">Phone ops breaks when volume rises (and staffing can’t scale)</div>
-      <div class="lead">SmartVoiceX exists for the buying triggers that actually close: missed calls, delayed callbacks, staff time trapped in repetitive phone work, and the need to contact more leads or patients without hiring linearly.</div>
+    <section class="section" id="why-switch" aria-label="Why teams switch">
+      <div class="kicker">Why teams switch</div>
+      <div class="h2">Phone operations fail in predictable ways</div>
+      <div class="lead">When call volume rises, staffing can’t scale linearly. Missed calls, delayed callbacks, and inconsistent scripts turn into lost revenue and frustrated customers.</div>
 
       <div class="split">
         <div class="card">
-          <b>What teams experience</b>
+          <b>What breaks</b>
           <div class="checklist">
-            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Missed calls → lost revenue</b><span>Every ring that goes to voicemail is a patient or lead drifting to a competitor.</span></div></div>
-            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Inconsistency + script drift</b><span>Different reps, different outcomes—and it’s hard to tighten control.</span></div></div>
-            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Outbound bottlenecks</b><span>Follow‑up cadence slips because humans can’t run lists all day.</span></div></div>
+            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Missed calls</b><span>Overflow and after‑hours rings go to voicemail—leads and patients drift.</span></div></div>
+            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Slow follow‑up</b><span>Callback cadence slips because humans are busy or absent.</span></div></div>
+            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Inconsistent execution</b><span>Script drift, uneven transfers, and variable quality across reps.</span></div></div>
           </div>
         </div>
         <div class="card">
-          <b>What SmartVoiceX deploys</b>
+          <b>What changes with SmartVoiceX</b>
           <div class="checklist">
-            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>A live deployed agent</b><span>Configured to your workflows with voice, tone, and talk‑tracks.</span></div></div>
-            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Transfer + escalation logic</b><span>Route to humans when needed, with the right context.</span></div></div>
-            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Visibility + iteration</b><span>Recordings, transcripts, summaries, and workflow edits over time.</span></div></div>
+            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>A deployed AI employee</b><span>Configured to your workflows, voice, tone, and talk‑tracks.</span></div></div>
+            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Concurrency + coverage</b><span>Handle multiple calls at once and extend coverage beyond staff hours.</span></div></div>
+            <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Control + visibility</b><span>Recordings, transcripts, summaries, and workflow edits after go‑live.</span></div></div>
           </div>
         </div>
       </div>
@@ -563,88 +572,106 @@
 
     <section class="section" id="capabilities" aria-label="Capabilities">
       <div class="kicker">Capabilities</div>
-      <div class="h2">Everything you need to run phone operations</div>
-      <div class="lead">Operate inbound and outbound at once. Control behavior through editable workflows. Escalate to humans when required.</div>
+      <div class="h2">Operator‑grade AI calling capabilities</div>
+      <div class="lead">Inbound, outbound, concurrency, and workflow control—built to run inside real business operations.</div>
 
       <div class="grid">
-        <div class="card"><b>Answer inbound calls</b><p>First ring, no holds, no voicemails—consistent experience every time.</p></div>
-        <div class="card"><b>Place outbound calls</b><p>Follow up fast while intent is high. Work through contact lists.</p></div>
-        <div class="card"><b>Concurrent calls</b><p>Scale beyond a single human’s capacity—without busy signals.</p></div>
+        <div class="card"><b>Answer inbound calls</b><p>First ring coverage with consistent talk‑tracks and policies.</p></div>
+        <div class="card"><b>Place outbound calls</b><p>Follow up leads/patients fast and work through lists reliably.</p></div>
+        <div class="card"><b>Run concurrent calls</b><p>Scale beyond a single human’s capacity—without busy signals.</p></div>
         <div class="card"><b>Book & confirm appointments</b><p>Scheduling, confirmations, reschedules, and reminders—24/7.</p></div>
-        <div class="card"><b>Navigate IVR systems</b><p>Handle phone trees, detect voicemail, and leave messages when needed.</p></div>
-        <div class="card"><b>Multilingual support</b><p>Auto‑detect language; maintain brand tone across languages.</p></div>
-        <div class="card"><b>Transfer to humans</b><p>Escalate with defined rules and collect context before handoff.</p></div>
-        <div class="card"><b>Workflow editing</b><p>Adjust routing, policies, and talk‑tracks after deployment.</p></div>
-        <div class="card"><b>Recordings + summaries</b><p>Review call outcomes with transcripts and structured summaries.</p></div>
+        <div class="card"><b>Transfers + escalation</b><p>Route to humans with defined rules and captured context.</p></div>
+        <div class="card"><b>Voicemail + IVR handling</b><p>Navigate phone trees, detect voicemail, and leave messages when needed.</p></div>
+        <div class="card"><b>Multilingual (auto‑detect)</b><p>Handle multiple languages while preserving brand tone.</p></div>
+        <div class="card"><b>Workflow editing</b><p>Adjust routing, scripts, and behaviors after deployment.</p></div>
+        <div class="card"><b>Recordings + summaries</b><p>Review outcomes with recordings, transcripts, and structured summaries.</p></div>
       </div>
 
       <div class="cta-row" style="margin-top:16px">
-        <button class="btn primary" type="button" onclick="window.SVXAuth?.openAgentCreator?.()">Deploy your first workflow</button>
-        <button class="btn secondary" type="button" onclick="window.SVXAuth?.openAccount?.()">Open dashboard</button>
+        <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
+        <button class="btn secondary" type="button" onclick="window.location.href='/pages/contact.html'">Book a workflow review</button>
+        <button class="btn ghost" type="button" onclick="window.SVXAuth?.openAgentCreator?.()">Build an agent</button>
       </div>
     </section>
 
     <section class="section" id="integrations" aria-label="Integrations">
       <div class="kicker">Integrations</div>
-      <div class="h2">Connect SmartVoiceX to the systems you already run</div>
-      <div class="lead">SmartVoiceX is designed to operate inside a real business workflow. We scope integrations during discovery and ship what’s needed for the workflow to work end‑to‑end.</div>
+      <div class="h2">Fit SmartVoiceX into your existing stack</div>
+      <div class="lead">We scope integrations during discovery and implement what your workflow needs—so calls can book, update, route, and follow up end‑to‑end.</div>
 
       <div class="split">
         <div class="card">
-          <b>Common integration patterns</b>
-          <p><b>Calendar / scheduling</b> for booking and confirmations.</p>
-          <p><b>CRM / lead systems</b> for logging calls, updating statuses, and driving follow‑up.</p>
-          <p><b>Custom endpoints</b> (webhooks / APIs) when your internal systems require it.</p>
-          <p style="color:var(--muted2)"><b>Note:</b> Availability depends on workable endpoints and your workflow scope.</p>
+          <b>Common systems</b>
+          <p><b>Calendars / scheduling</b> for booking, confirmations, reschedules.</p>
+          <p><b>CRM / lead tools</b> for logging calls, updating statuses, and triggering follow‑up.</p>
+          <p><b>Internal systems</b> via webhooks/APIs when workable endpoints exist.</p>
+          <p style="color:var(--muted2)"><b>Note:</b> Integration availability depends on your workflow scope and system access.</p>
         </div>
         <div class="card">
-          <b>Operational control that matters</b>
-          <p>Define transfer rules, escalation paths, voicemail behavior, and allowed improvisation vs. strict scripting.</p>
-          <p>Support for multiple languages with auto‑detection, brand tone control, and post‑call visibility (recording + transcript + summary).</p>
+          <b>What we configure alongside integrations</b>
+          <p>Transfer rules and escalation paths, voicemail behavior, and how strict vs. flexible the agent should be.</p>
+          <p>Multi‑language handling with auto‑detection, plus post‑call visibility (recording + transcript + summary).</p>
         </div>
       </div>
     </section>
 
-    <section class="section" id="security" aria-label="Trust and security">
-      <div class="kicker">Trust & implementation</div>
-      <div class="h2">Trust comes from specificity, process, and transparency</div>
-      <div class="lead">Regulated and high‑stakes teams need clarity. SmartVoiceX emphasizes live demoability, a standardized onboarding process, and explicit handling of recording/consent and escalation boundaries.</div>
+    <section class="section" id="security" aria-label="Built for reliability">
+      <div class="kicker">Built for reliability</div>
+      <div class="h2">Designed for real operations, not demos</div>
+      <div class="lead">Trust comes from process and transparency: a guided deployment, clear escalation boundaries, and visibility into what happened on every call.</div>
 
       <div class="grid">
-        <div class="card"><b>Recording + consent considerations</b><p>We scope recording, consent, and compliance needs during onboarding and configure accordingly.</p></div>
-        <div class="card"><b>Human override</b><p>Transfer rules and escalation paths ensure a human can take over when needed.</p></div>
-        <div class="card"><b>Implementation handoff</b><p>Discovery → configuration → go‑live → iteration. Deployed capability is the product.</p></div>
+        <div class="card"><b>Guided implementation</b><p>Your first deployment is team‑assisted: discovery → configuration → go‑live → iteration.</p></div>
+        <div class="card"><b>Human override</b><p>Transfers and escalation paths ensure the right person can take over when needed.</p></div>
+        <div class="card"><b>Recording + compliance scoping</b><p>We address recording/consent and any compliance requirements during onboarding.</p></div>
       </div>
     </section>
 
     <section class="section" id="how-it-works" aria-label="How it works">
       <div class="kicker">How it works</div>
-      <div class="h2">Deployed capability is the product</div>
-      <div class="lead">SmartVoiceX isn’t a self‑serve widget. You’re buying a live deployed agent, workflow setup, support, and infrastructure—so it works inside your operations.</div>
+      <div class="h2">A guided deployment in days—not months</div>
+      <div class="lead">You’re not buying “software.” You’re buying a live deployed agent, workflow setup, support, and infrastructure—so it works inside your operations.</div>
 
       <div class="how">
-        <div class="step"><span class="n">1</span><b>Discovery</b><p>Define inbound + outbound workflows, transfer rules, escalations, and requirements.</p></div>
-        <div class="step"><span class="n">2</span><b>Build & configure</b><p>Deploy voice, tone, scripts, multilingual behavior, and system hooks.</p></div>
-        <div class="step"><span class="n">3</span><b>Go live</b><p>Start handling real calls. Capture recordings, transcripts, and summaries.</p></div>
-        <div class="step"><span class="n">4</span><b>Improve</b><p>Edit workflows over time. Tighten routing, refine talk tracks, expand use cases.</p></div>
+        <div class="step"><span class="n">1</span><b>Workflow discovery</b><p>Define inbound/outbound goals, transfers, escalation paths, and requirements.</p></div>
+        <div class="step"><span class="n">2</span><b>Configure the agent</b><p>Voice, tone, talk‑tracks, multilingual behavior, and system hooks.</p></div>
+        <div class="step"><span class="n">3</span><b>Go live</b><p>Start handling real calls with recordings, transcripts, and summaries.</p></div>
+        <div class="step"><span class="n">4</span><b>Iterate</b><p>Edit workflows over time—tighten routing, refine scripts, expand use cases.</p></div>
+      </div>
+
+      <div class="split" style="margin-top:14px">
+        <div class="card">
+          <b>Typical timeline</b>
+          <p><b>Simple workflows:</b> can go live quickly.</p>
+          <p><b>Complex deployments:</b> can take up to ~2 weeks (integrations, edge cases, compliance).</p>
+        </div>
+        <div class="card">
+          <b>What we set during onboarding</b>
+          <p>Transfer/escalation rules, voicemail behavior, allowed improvisation vs. strict scripting, languages, and any recording/consent requirements.</p>
+        </div>
       </div>
     </section>
 
     <section class="section" id="pricing" aria-label="Pricing">
       <div class="kicker">Pricing</div>
-      <div class="h2">Flexible pricing that matches the real commercial model</div>
-      <div class="lead">Most teams start with a low monthly floor plus usage‑based minutes, with custom scope for complex workflows and integrations. We’ll quote after a short workflow review.</div>
+      <div class="h2">Simple floor + usage, with custom scope when needed</div>
+      <div class="lead">Most teams start with a low monthly platform floor plus usage‑based minutes. Complex workflows and integrations are scoped and quoted after a short review.</div>
 
-      <div class="split">
+      <div class="grid" aria-label="Pricing cards">
         <div class="card">
-          <b>Starting at</b>
-          <p><b>$300/month</b> platform floor (typical), plus usage (minutes). Additional scoping for complex accounts.</p>
-          <p style="color:var(--muted2)"><b>Usage reference:</b> founder-described minutes around <b>$0.40/min</b> (varies by scope).</p>
+          <b>Platform floor</b>
+          <p><b>Starting around $300/month</b> for the base deployment (typical).</p>
+          <p style="color:var(--muted2)">Final pricing depends on workflow complexity and support needs.</p>
         </div>
         <div class="card">
-          <b>Deployment timeline</b>
-          <p>Simple workflows can go live quickly. Complex deployments can take up to ~2 weeks.</p>
-          <p>Implementation quality is part of the product—your first launch is team‑assisted.</p>
+          <b>Usage minutes</b>
+          <p>Usage is billed by minutes (often referenced around <b>$0.40/min</b>, varies by scope).</p>
+          <p style="color:var(--muted2)">Best fit for teams that want cost to scale with call volume.</p>
+        </div>
+        <div class="card">
+          <b>Custom scope</b>
+          <p>Advanced workflows, compliance constraints, and integrations are scoped per account.</p>
+          <p style="color:var(--muted2)">We’ll quote after a short workflow review.</p>
         </div>
       </div>
 
