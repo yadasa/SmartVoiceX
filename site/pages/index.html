@@ -206,12 +206,21 @@
     }
     .solid-band > *:not(.solid-band-bg){position:relative; z-index:1}
 
-    /* Footer variant: no bottom gradient; extend top gradient upward more */
+    /* Footer variant: no bottom gradient; fade extends upward into the section above. */
+    .solid-band--footer{
+      /* Pull the band upward so the top fade overlaps the section above */
+      --footer-fade: 240px;
+      margin-top: calc(var(--footer-fade) * -1);
+      padding-top: var(--footer-fade);
+    }
     .solid-band--footer .solid-band-bg{
+      /* Extend the background above the wrapper so the fade has room */
+      top: calc(var(--footer-fade) * -1);
+      bottom: 0;
       background: linear-gradient(
         180deg,
         rgb(var(--c-black) / 0) 0%,
-        rgb(var(--c-black) / 1) 52%,
+        rgb(var(--c-black) / 1) 55%,
         rgb(var(--c-black) / 1) 100%
       );
     }
