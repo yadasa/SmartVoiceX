@@ -185,6 +185,27 @@
       z-index:0;
     }
     .hero > *:not(.hero-bg){position:relative; z-index:1}
+
+    /* Solid black band w/ hero-matching falloff (used for capabilities → integrations) */
+    .solid-band{position:relative}
+    .solid-band-bg{
+      position:absolute;
+      top:0;
+      bottom:0;
+      left:-150vw;
+      right:-150vw;
+      pointer-events:none;
+      background: linear-gradient(
+        180deg,
+        rgb(var(--c-black) / 0) 0%,
+        rgb(var(--c-black) / 1) 18%,
+        rgb(var(--c-black) / 1) 82%,
+        rgb(var(--c-black) / 0) 100%
+      );
+      z-index:0;
+    }
+    .solid-band > *:not(.solid-band-bg){position:relative; z-index:1}
+
     .journey{display:grid;grid-template-columns: 1.25fr 0.75fr;gap:18px;align-items:start}
     .journey-main{min-width:0}
 
@@ -546,9 +567,13 @@
       </div>
     </section>
 
-    <!-- (8) Capabilities -->
-    <section class="section" id="capabilities" aria-label="Core capabilities">
-      <div class="kicker">Core capabilities</div>
+    <!-- (8-9) Solid band: capabilities → integrations -->
+    <div class="solid-band" aria-label="Capabilities and integrations band">
+      <div class="solid-band-bg" aria-hidden="true"></div>
+
+      <!-- (8) Capabilities -->
+      <section class="section" id="capabilities" aria-label="Core capabilities">
+        <div class="kicker">Core capabilities</div>
       <div class="h2">Everything you need to run phone operations with more control.</div>
       <div class="lead">Handle inbound and outbound calls, control the workflow, and escalate to humans when needed.</div>
 
@@ -591,6 +616,8 @@
         </div>
       </div>
     </section>
+
+    </div>
 
     <!-- (10) Trust & implementation -->
     <section class="section" id="reliability" aria-label="Built for reliability">
