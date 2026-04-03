@@ -444,14 +444,28 @@
       }
     }
 
+    function isIOS(){
+      // iOS Safari (and all iOS browsers) have visualViewport address-bar dynamics.
+      // Use a robust-ish heuristic.
+      const ua = navigator.userAgent || '';
+      const isAppleMobile = /iPad|iPhone|iPod/.test(ua);
+      const isIpadOS = (ua.includes('Mac') && ('ontouchend' in document));
+      return isAppleMobile || isIpadOS;
+    }
+
     function resize(){
-      // Use layout viewport for sizing so it matches getBoundingClientRect() coordinates.
-      // visualViewport is used only as a signal (events) to resync rects on mobile.
-      const vw = (window.innerWidth || 1);
-      const vh = (window.innerHeight || 1);
+      const isMobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
+      const vv = window.visualViewport;
+
+      // On iOS Safari, when the address bar grows/shrinks, the visual viewport changes
+      // (height + offsetTop) while the page is composited. To keep glass aligned,
+      // make the canvas match the visual viewport box.
+      const useVVBox = isMobile && isIOS() && vv && vv.width && vv.height;
+
+      const vw = useVVBox ? vv.width : (window.innerWidth || 1);
+      const vh = useVVBox ? vv.height : (window.innerHeight || 1);
 
       // Mobile perf: cap DPR lower on phones/tablets.
-      const isMobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
       const reduce = prefersReducedMotion();
       const dprCap = reduce ? 1 : (isMobile ? 1.25 : 2);
 
@@ -460,6 +474,26 @@
       h = Math.max(1, Math.floor(vh * dpr));
       canvas.width = w;
       canvas.height = h;
+
+      // Align canvas CSS box with visual viewport on iOS to prevent drift during
+      // address bar show/hide.
+      if(useVVBox){
+        const left = (vv && vv.offsetLeft) ? vv.offsetLeft : 0;
+        const top = (vv && vv.offsetTop) ? vv.offsetTop : 0;
+        canvas.style.left = left + 'px';
+        canvas.style.top = top + 'px';
+        canvas.style.width = (vv.width || vw) + 'px';
+        canvas.style.height = (vv.height || vh) + 'px';
+        canvas.style.right = 'auto';
+        canvas.style.bottom = 'auto';
+      } else {
+        canvas.style.left = '0px';
+        canvas.style.top = '0px';
+        canvas.style.right = '0px';
+        canvas.style.bottom = '0px';
+        canvas.style.width = '';
+        canvas.style.height = '';
+      }
 
       gl.viewport(0, 0, w, h);
 
@@ -493,9 +527,9 @@
     // iOS Safari address-bar / visual viewport changes
     if(window.visualViewport){
       try{
-        // iOS Safari address-bar / visual viewport changes: treat as a signal to resync.
-        window.visualViewport.addEventListener('resize', requestRectUpdate, { passive: true });
-        window.visualViewport.addEventListener('scroll', requestRectUpdate, { passive: true });
+        // iOS Safari address-bar / visual viewport changes: keep canvas box + rects synced.
+        window.visualViewport.addEventListener('resize', () => { resize(); requestRectUpdate(); }, { passive: true });
+        window.visualViewport.addEventListener('scroll', () => { resize(); requestRectUpdate(); }, { passive: true });
       } catch(_) {}
     }
 
