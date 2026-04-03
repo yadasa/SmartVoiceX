@@ -425,8 +425,10 @@
       }
 
       // Measure only cards that are likely visible to reduce layout work on long pages.
+      // Use visualViewport only on mobile to avoid desktop 4K/zoom coordinate divergence.
+      const isMobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
       const vv = window.visualViewport;
-      const vhCss = (vv && vv.height) ? vv.height : (window.innerHeight || 0);
+      const vhCss = (isMobile && vv && vv.height) ? vv.height : (window.innerHeight || 0);
       const margin = 160; // px
 
       const all = Array.from(document.querySelectorAll('.card'));
@@ -462,12 +464,17 @@
     }
 
     function resize(){
+      // NOTE: visualViewport sizing is essential for iOS Safari address-bar behavior,
+      // but on desktop (esp. 4K + scaling/zoom) it can diverge from layout viewport
+      // coordinates used by getBoundingClientRect(), causing huge/misaligned glass.
+      const isMobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
       const vv = window.visualViewport;
-      const vw = (vv && vv.width) ? vv.width : (window.innerWidth || 1);
-      const vh = (vv && vv.height) ? vv.height : (window.innerHeight || 1);
+      const useVV = isMobile && vv && vv.width && vv.height;
+
+      const vw = useVV ? vv.width : (window.innerWidth || 1);
+      const vh = useVV ? vv.height : (window.innerHeight || 1);
 
       // Mobile perf: cap DPR lower on phones/tablets.
-      const isMobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
       const reduce = prefersReducedMotion();
       const dprCap = reduce ? 1 : (isMobile ? 1.25 : 2);
 
