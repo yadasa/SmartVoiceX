@@ -92,8 +92,8 @@
       vec2 c5 = (c1 + c2 + c3 + c4) * 0.25;
       c5 += vec2(0.06*sin(t*0.11), 0.05*cos(t*0.15));
 
-      // Slightly shrink radii overall so more black peeks through; shrink further in sharp mode.
-      float k = mix(0.88, 0.72, clamp(u_sharp, 0.0, 1.0));
+      // Shrink radii overall so blobs don't take up the whole screen; shrink further in sharp mode.
+      float k = mix(0.78, 0.64, clamp(u_sharp, 0.0, 1.0));
 
       float w1 = 1.15 * blob(uv, c1, 0.32 * k, aspect);
       float w2 = 1.00 * blob(uv, c2, 0.38 * k, aspect);
@@ -150,8 +150,8 @@
       soft = sharpStep(soft);
       glow = sharpStep(glow);
 
-      vec3 col = base + ink * soft * 0.88;
-      col += ink * glow * 0.30;
+      vec3 col = base + ink * soft * 0.72;
+      col += ink * glow * 0.22;
 
       float vign = smoothstep(1.12, 0.18, length(uv - 0.5));
       col *= 0.78 + 0.22 * vign;
@@ -367,12 +367,18 @@
 
     if(!gl){
       // WebGL unavailable: keep CSS fallback background and do not break page.
+      // Also remove the canvas so we don't leave a 300x150 element scaled to fullscreen.
       document.documentElement.classList.add('no-webgl');
+      try{ canvas.remove(); } catch(_) {}
       return;
     }
 
     const bgProg = link(gl, QUAD_VERT, BG_FRAG);
     const compProg = link(gl, QUAD_VERT, COMPOSE_FRAG);
+
+    // Disable liquid-glass refraction on mobile for stability/perf.
+    // (Keep the blob background.)
+    const allowGlass = !(window.matchMedia && window.matchMedia('(max-width: 820px)').matches);
 
     const quad = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, quad);
@@ -405,12 +411,40 @@
     };
 
     function updateGlassRects(){
-      const nodes = Array.from(document.querySelectorAll('.card'));
+      if(!allowGlass){
+        glass.count = 0;
+        // keep buffer deterministic
+        for(let i = 0; i < 32; i++){
+          const j = i * 4;
+          glass.rectsPx[j + 0] = -99999;
+          glass.rectsPx[j + 1] = -99999;
+          glass.rectsPx[j + 2] = 0;
+          glass.rectsPx[j + 3] = 0;
+        }
+        return;
+      }
+
+      // Measure only cards that are likely visible to reduce layout work on long pages.
+      const vv = window.visualViewport;
+      const vhCss = (vv && vv.height) ? vv.height : (window.innerHeight || 0);
+      const margin = 160; // px
+
+      const all = Array.from(document.querySelectorAll('.card'));
+      const nodes = [];
+      for(const n of all){
+        const r = n.getBoundingClientRect();
+        if(r.width < 2 || r.height < 2) continue;
+        if(r.bottom < -margin) continue;
+        if(r.top > vhCss + margin) continue;
+        nodes.push({ n, r });
+        if(nodes.length >= 32) break;
+      }
+
       // Cap to shader MAX_RECTS (32)
       const max = Math.min(32, nodes.length);
       glass.count = max;
       for(let i = 0; i < max; i++){
-        const r = nodes[i].getBoundingClientRect();
+        const r = nodes[i].r;
         const j = i * 4;
         glass.rectsPx[j + 0] = r.left * dpr;
         glass.rectsPx[j + 1] = r.top * dpr;
@@ -428,9 +462,18 @@
     }
 
     function resize(){
-      dpr = Math.min(2, window.devicePixelRatio || 1);
-      w = Math.max(1, Math.floor(window.innerWidth * dpr));
-      h = Math.max(1, Math.floor(window.innerHeight * dpr));
+      const vv = window.visualViewport;
+      const vw = (vv && vv.width) ? vv.width : (window.innerWidth || 1);
+      const vh = (vv && vv.height) ? vv.height : (window.innerHeight || 1);
+
+      // Mobile perf: cap DPR lower on phones/tablets.
+      const isMobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
+      const reduce = prefersReducedMotion();
+      const dprCap = reduce ? 1 : (isMobile ? 1.25 : 2);
+
+      dpr = Math.min(dprCap, window.devicePixelRatio || 1);
+      w = Math.max(1, Math.floor(vw * dpr));
+      h = Math.max(1, Math.floor(vh * dpr));
       canvas.width = w;
       canvas.height = h;
 
@@ -463,6 +506,13 @@
 
     window.addEventListener('resize', resize, { passive: true });
     window.addEventListener('scroll', requestRectUpdate, { passive: true });
+    // iOS Safari address-bar / visual viewport changes
+    if(window.visualViewport){
+      try{
+        window.visualViewport.addEventListener('resize', resize, { passive: true });
+        window.visualViewport.addEventListener('scroll', requestRectUpdate, { passive: true });
+      } catch(_) {}
+    }
 
     // Pointer influence (mouse + touch) similar to the old CSS blob system.
     let tx = 0, ty = 0;
@@ -521,10 +571,14 @@
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
 
+    // (scroll-tracking state removed; updates are driven by rAF-throttled listeners)
+
     function draw(timeMs){
       const t = timeMs * 0.001;
 
-      if(needsRect){
+      // Keep glass rect alignment stable without doing layout reads inside the render loop.
+      // We rely on rAF-throttled scroll/resize listeners to set needsRect.
+      if(allowGlass && needsRect){
         needsRect = false;
         updateGlassRects();
       }
