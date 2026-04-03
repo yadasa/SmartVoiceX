@@ -445,9 +445,10 @@
     }
 
     function resize(){
-      const vv = window.visualViewport;
-      const vw = (vv && vv.width) ? vv.width : (window.innerWidth || 1);
-      const vh = (vv && vv.height) ? vv.height : (window.innerHeight || 1);
+      // Use layout viewport for sizing so it matches getBoundingClientRect() coordinates.
+      // visualViewport is used only as a signal (events) to resync rects on mobile.
+      const vw = (window.innerWidth || 1);
+      const vh = (window.innerHeight || 1);
 
       // Mobile perf: cap DPR lower on phones/tablets.
       const isMobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
@@ -492,7 +493,8 @@
     // iOS Safari address-bar / visual viewport changes
     if(window.visualViewport){
       try{
-        window.visualViewport.addEventListener('resize', resize, { passive: true });
+        // iOS Safari address-bar / visual viewport changes: treat as a signal to resync.
+        window.visualViewport.addEventListener('resize', requestRectUpdate, { passive: true });
         window.visualViewport.addEventListener('scroll', requestRectUpdate, { passive: true });
       } catch(_) {}
     }
@@ -554,26 +556,14 @@
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
 
-    let _lastScrollY = -1;
-    let _lastVvTop = -1;
-    let _frame = 0;
+    // (removed scroll-tracking state; rect updates are driven by rAF-throttled listeners)
 
     function draw(timeMs){
       const t = timeMs * 0.001;
 
-      // Keep glass rect alignment stable during momentum scrolling (esp. iOS Safari).
-      // Re-measure only when scroll position changes, and not more than every other frame.
-      _frame++;
-      const vv = window.visualViewport;
-      const sy = window.scrollY || window.pageYOffset || 0;
-      const vvTop = vv ? (vv.offsetTop || 0) : 0;
-      const isMobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
-      const scrollCadence = isMobile ? 4 : 2;
-      if((_frame % scrollCadence) === 0 && (sy !== _lastScrollY || vvTop !== _lastVvTop)){
-        _lastScrollY = sy;
-        _lastVvTop = vvTop;
-        updateGlassRects();
-      } else if(needsRect){
+      // Avoid layout reads inside the render loop; let rAF-throttled listeners
+      // trigger re-measurements by setting needsRect.
+      if(needsRect){
         needsRect = false;
         updateGlassRects();
       }
