@@ -624,6 +624,8 @@
     }
 
     let raf = 0;
+    let lastDeviceDpr = (window.devicePixelRatio || 1);
+
     function start(){
       const reduce = prefersReducedMotion();
       if(reduce){
@@ -633,6 +635,15 @@
         return;
       }
       const loop = (ms) => {
+        // On 4K/retina + OS scaling + browser zoom, devicePixelRatio can change without a
+        // reliable resize event (or it can change mid-session when moving between displays).
+        // If we don't rebuild buffers + uniforms, the glass rects can look huge/misaligned.
+        const curDpr = (window.devicePixelRatio || 1);
+        if(Math.abs(curDpr - lastDeviceDpr) > 0.01){
+          lastDeviceDpr = curDpr;
+          try{ resize(); } catch(_) {}
+        }
+
         draw(ms);
         raf = requestAnimationFrame(loop);
       };
