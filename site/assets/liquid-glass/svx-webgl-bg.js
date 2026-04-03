@@ -376,6 +376,9 @@
     const bgProg = link(gl, QUAD_VERT, BG_FRAG);
     const compProg = link(gl, QUAD_VERT, COMPOSE_FRAG);
 
+    // Liquid-glass refraction: enabled on mobile again (with DPR cap + rect throttling).
+    const allowGlass = true;
+
     const quad = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, quad);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
@@ -406,17 +409,25 @@
       count: 0,
     };
 
-    // When pinning the canvas to the visualViewport box (iOS address bar), the canvas origin shifts.
-    // Subtract these offsets (CSS px) from DOM rects before uploading to the shader.
-    let viewOffX = 0;
-    let viewOffY = 0;
-
     function updateGlassRects(){
-      // Measure only cards that are likely visible to reduce layout work on mobile.
+      if(!allowGlass){
+        glass.count = 0;
+        // keep buffer deterministic
+        for(let i = 0; i < 32; i++){
+          const j = i * 4;
+          glass.rectsPx[j + 0] = -99999;
+          glass.rectsPx[j + 1] = -99999;
+          glass.rectsPx[j + 2] = 0;
+          glass.rectsPx[j + 3] = 0;
+        }
+        return;
+      }
+
+      // Measure only cards that are likely visible to reduce layout work on long pages.
+      // Use visualViewport only on mobile to avoid desktop 4K/zoom coordinate divergence.
+      const isMobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
       const vv = window.visualViewport;
-      const vhCss = (vv && vv.height) ? vv.height : (window.innerHeight || 0);
-      const offX = viewOffX;
-      const offY = viewOffY;
+      const vhCss = (isMobile && vv && vv.height) ? vv.height : (window.innerHeight || 0);
       const margin = 160; // px
 
       const all = Array.from(document.querySelectorAll('.card'));
@@ -436,8 +447,8 @@
       for(let i = 0; i < max; i++){
         const r = nodes[i].r;
         const j = i * 4;
-        glass.rectsPx[j + 0] = (r.left - offX) * dpr;
-        glass.rectsPx[j + 1] = (r.top - offY) * dpr;
+        glass.rectsPx[j + 0] = r.left * dpr;
+        glass.rectsPx[j + 1] = r.top * dpr;
         glass.rectsPx[j + 2] = r.width * dpr;
         glass.rectsPx[j + 3] = r.height * dpr;
       }
@@ -451,26 +462,16 @@
       }
     }
 
-    function isIOS(){
-      // iOS Safari (and all iOS browsers) have visualViewport address-bar dynamics.
-      // Use a robust-ish heuristic.
-      const ua = navigator.userAgent || '';
-      const isAppleMobile = /iPad|iPhone|iPod/.test(ua);
-      const isIpadOS = (ua.includes('Mac') && ('ontouchend' in document));
-      return isAppleMobile || isIpadOS;
-    }
-
     function resize(){
+      // NOTE: visualViewport sizing is essential for iOS Safari address-bar behavior,
+      // but on desktop (esp. 4K + scaling/zoom) it can diverge from layout viewport
+      // coordinates used by getBoundingClientRect(), causing huge/misaligned glass.
       const isMobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
       const vv = window.visualViewport;
+      const useVV = isMobile && vv && vv.width && vv.height;
 
-      // On iOS Safari, when the address bar grows/shrinks, the visual viewport changes
-      // (height + offsetTop) while the page is composited. To keep glass aligned,
-      // make the canvas match the visual viewport box.
-      const useVVBox = isMobile && isIOS() && vv && vv.width && vv.height;
-
-      const vw = useVVBox ? vv.width : (window.innerWidth || 1);
-      const vh = useVVBox ? vv.height : (window.innerHeight || 1);
+      const vw = useVV ? vv.width : (window.innerWidth || 1);
+      const vh = useVV ? vv.height : (window.innerHeight || 1);
 
       // Mobile perf: cap DPR lower on phones/tablets.
       const reduce = prefersReducedMotion();
@@ -481,30 +482,6 @@
       h = Math.max(1, Math.floor(vh * dpr));
       canvas.width = w;
       canvas.height = h;
-
-      // Align canvas CSS box with visual viewport on iOS to prevent drift during
-      // address bar show/hide.
-      if(useVVBox){
-        const left = (vv && vv.offsetLeft) ? vv.offsetLeft : 0;
-        const top = (vv && vv.offsetTop) ? vv.offsetTop : 0;
-        viewOffX = left;
-        viewOffY = top;
-        canvas.style.left = left + 'px';
-        canvas.style.top = top + 'px';
-        canvas.style.width = (vv.width || vw) + 'px';
-        canvas.style.height = (vv.height || vh) + 'px';
-        canvas.style.right = 'auto';
-        canvas.style.bottom = 'auto';
-      } else {
-        viewOffX = 0;
-        viewOffY = 0;
-        canvas.style.left = '0px';
-        canvas.style.top = '0px';
-        canvas.style.right = '0px';
-        canvas.style.bottom = '0px';
-        canvas.style.width = '';
-        canvas.style.height = '';
-      }
 
       gl.viewport(0, 0, w, h);
 
@@ -538,9 +515,8 @@
     // iOS Safari address-bar / visual viewport changes
     if(window.visualViewport){
       try{
-        // iOS Safari address-bar / visual viewport changes: keep canvas box + rects synced.
-        window.visualViewport.addEventListener('resize', () => { resize(); requestRectUpdate(); }, { passive: true });
-        window.visualViewport.addEventListener('scroll', () => { resize(); requestRectUpdate(); }, { passive: true });
+        window.visualViewport.addEventListener('resize', resize, { passive: true });
+        window.visualViewport.addEventListener('scroll', requestRectUpdate, { passive: true });
       } catch(_) {}
     }
 
@@ -601,14 +577,14 @@
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
 
-    // (removed scroll-tracking state; rect updates are driven by rAF-throttled listeners)
+    // (scroll-tracking state removed; updates are driven by rAF-throttled listeners)
 
     function draw(timeMs){
       const t = timeMs * 0.001;
 
-      // Avoid layout reads inside the render loop; let rAF-throttled listeners
-      // trigger re-measurements by setting needsRect.
-      if(needsRect){
+      // Keep glass rect alignment stable without doing layout reads inside the render loop.
+      // We rely on rAF-throttled scroll/resize listeners to set needsRect.
+      if(allowGlass && needsRect){
         needsRect = false;
         updateGlassRects();
       }
@@ -654,6 +630,8 @@
     }
 
     let raf = 0;
+    let lastDeviceDpr = (window.devicePixelRatio || 1);
+
     function start(){
       const reduce = prefersReducedMotion();
       if(reduce){
@@ -663,6 +641,15 @@
         return;
       }
       const loop = (ms) => {
+        // On 4K/retina + OS scaling + browser zoom, devicePixelRatio can change without a
+        // reliable resize event (or it can change mid-session when moving between displays).
+        // If we don't rebuild buffers + uniforms, the glass rects can look huge/misaligned.
+        const curDpr = (window.devicePixelRatio || 1);
+        if(Math.abs(curDpr - lastDeviceDpr) > 0.01){
+          lastDeviceDpr = curDpr;
+          try{ resize(); } catch(_) {}
+        }
+
         draw(ms);
         raf = requestAnimationFrame(loop);
       };
