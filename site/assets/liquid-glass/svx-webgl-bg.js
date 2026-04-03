@@ -376,8 +376,9 @@
     const bgProg = link(gl, QUAD_VERT, BG_FRAG);
     const compProg = link(gl, QUAD_VERT, COMPOSE_FRAG);
 
-    // Liquid-glass refraction: enabled on mobile again (with DPR cap + rect throttling).
-    const allowGlass = true;
+    // Disable liquid-glass refraction on mobile for stability/perf.
+    // (Keep the blob background.)
+    const allowGlass = !(window.matchMedia && window.matchMedia('(max-width: 820px)').matches);
 
     const quad = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, quad);
