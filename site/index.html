@@ -170,9 +170,10 @@
       top:0;
       bottom:0;
 
-      /* Obscenely wide full-bleed overlay (avoid container/scrollbar math gaps) */
-      left: -150vw;
-      right: -150vw;
+      /* Full-bleed without causing layout overflow */
+      left: 50%;
+      width: 100vw;
+      transform: translateX(-50%);
 
       pointer-events:none;
       border-radius: 0;
@@ -194,8 +195,9 @@
       position:absolute;
       top:0;
       bottom:0;
-      left:-150vw;
-      right:-150vw;
+      left: 50%;
+      width: 100vw;
+      transform: translateX(-50%);
       pointer-events:none;
       background: linear-gradient(
         180deg,
@@ -463,6 +465,70 @@
     .footer{padding:34px 0 70px 0;color:var(--muted2);font-size:12px}
     .footer a{color:rgb(var(--c-white) / 0.78);font-weight:850}
 
+    /* Mobile safety net: prevent accidental sideways scroll from decorative layers */
+    html, body{ overflow-x: clip; }
+
+    .nav-actions{display:flex;gap:12px;align-items:center}
+    .navmenu-btn{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      height:44px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgb(var(--c-white) / 0.14);
+      background: rgb(var(--c-white) / 0.06);
+      color: rgb(var(--c-white) / 0.92);
+      font: 900 13px/1 var(--svx-font);
+      cursor:pointer;
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+    }
+    .navmenu-btn:active{ transform: translateY(1px); }
+
+    /* Mobile nav sheet */
+    #svx-navmenu-backdrop{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+      z-index: 80;
+    }
+    #svx-navmenu{
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transform: translateY(18px);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 81;
+      padding: 14px;
+      transition: transform 180ms ease, opacity 180ms ease;
+    }
+    #svx-navmenu .sheet{
+      border-radius: 22px;
+      border: 1px solid rgb(var(--c-white) / 0.12);
+      background: rgb(var(--c-white) / 0.08);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 18px 70px rgba(0,0,0,0.55);
+      padding: 14px;
+    }
+    #svx-navmenu .sheet-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+    #svx-navmenu .sheet-title{font: 900 13px/1 var(--svx-font);letter-spacing:0.06em;text-transform:uppercase;color: rgb(var(--c-white) / 0.72)}
+    #svx-navmenu .sheet-close{height:44px;padding:0 14px;border-radius:999px;border:1px solid rgb(var(--c-white) / 0.14);background: rgb(var(--c-white) / 0.06);color: rgb(var(--c-white) / 0.92);cursor:pointer;font:900 13px/1 var(--svx-font)}
+    #svx-navmenu .sheet-links{display:grid;gap:10px;margin: 8px 0 14px}
+    #svx-navmenu .sheet-links a{display:flex;align-items:center;justify-content:space-between;padding: 14px 14px;border-radius: 16px;border: 1px solid rgb(var(--c-white) / 0.10);background: rgb(var(--c-white) / 0.05);color: rgb(var(--c-white) / 0.90);text-decoration:none;font: 900 14px/1 var(--svx-font)}
+    #svx-navmenu .sheet-actions{display:grid;gap:10px}
+    #svx-navmenu .sheet-actions .btn{width:100%}
+
+    body.svx-navmenu-open #svx-navmenu-backdrop{opacity:1; pointer-events:auto}
+    body.svx-navmenu-open #svx-navmenu{opacity:1; pointer-events:auto; transform: translateY(0)}
+    body.svx-navmenu-open{ overflow:hidden; }
+
     @media (max-width: 980px){
       .journey{grid-template-columns:1fr}
       .side-card{position:relative; top:auto}
@@ -472,6 +538,12 @@
       .how{grid-template-columns:1fr}
       .metrics{grid-template-columns:1fr}
       .navlinks{display:none}
+      .navmenu-btn{display:inline-flex}
+      /* avoid cramped header CTA; keep it in the menu instead */
+      .nav-actions .btn.primary{display:none}
+      /* bring tap targets up to 44px */
+      .btn{min-height:44px}
+      .footer a{padding: 10px 0; display:inline-block}
     }
   </style>
 </head>
@@ -481,7 +553,7 @@
   <div class="topbar">
     <div class="container">
       <div class="nav">
-        <!-- Hosting root (/) is /site/index.html which redirects to /pages/index.html -->
+        <!-- Hosting root (/) is this page -->
         <a class="brand" href="/">
           <img class="logo-img" src="/assets/brand/logo-90.png" alt="SmartVoiceX" width="45" height="40" />
           <span>SmartVoiceX</span>
@@ -495,10 +567,36 @@
           <a href="#faq">FAQ</a>
         </div>
 
-        <div style="display:flex;gap:12px;align-items:center">
+        <div class="nav-actions">
           <a class="navutil" id="svx-nav-auth" href="#" onclick="window.SVXAuth?.openSignIn?.(); return false;">Sign in</a>
           <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
+          <button class="navmenu-btn" id="svx-navmenu-open" type="button" aria-label="Open menu">Menu</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile nav sheet -->
+  <div id="svx-navmenu-backdrop" aria-hidden="true"></div>
+  <div id="svx-navmenu" role="dialog" aria-modal="true" aria-label="Menu">
+    <div class="sheet">
+      <div class="sheet-header">
+        <div class="sheet-title">Menu</div>
+        <button class="sheet-close" id="svx-navmenu-close" type="button">Close</button>
+      </div>
+
+      <nav class="sheet-links" aria-label="Sections">
+        <a href="#use-cases" data-svx-navlink>Use Cases</a>
+        <a href="#how-it-works" data-svx-navlink>How It Works</a>
+        <a href="#integrations" data-svx-navlink>Integrations</a>
+        <a href="#pricing" data-svx-navlink>Pricing</a>
+        <a href="#faq" data-svx-navlink>FAQ</a>
+      </nav>
+
+      <div class="sheet-actions" aria-label="Actions">
+        <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
+        <button class="btn secondary" type="button" onclick="window.location.href='/pages/contact.html'">Book a strategy call</button>
+        <button class="btn ghost" type="button" onclick="window.SVXAuth?.openSignIn?.()">My Account / Sign in</button>
       </div>
     </div>
   </div>
@@ -955,6 +1053,40 @@
           }
         });
       }
+    })();
+
+    // Mobile nav sheet
+    (function(){
+      const openBtn = document.getElementById('svx-navmenu-open');
+      const closeBtn = document.getElementById('svx-navmenu-close');
+      const backdrop = document.getElementById('svx-navmenu-backdrop');
+      const sheet = document.getElementById('svx-navmenu');
+      if(!openBtn || !closeBtn || !backdrop || !sheet) return;
+
+      function open(){
+        document.body.classList.add('svx-navmenu-open');
+        // focus close for accessibility
+        try{ closeBtn.focus({ preventScroll: true }); }catch(_){}
+      }
+      function close(){
+        document.body.classList.remove('svx-navmenu-open');
+        try{ openBtn.focus({ preventScroll: true }); }catch(_){}
+      }
+
+      openBtn.addEventListener('click', open);
+      closeBtn.addEventListener('click', close);
+      backdrop.addEventListener('click', close);
+
+      // Close on any nav click
+      sheet.querySelectorAll('[data-svx-navlink]').forEach((a) => {
+        a.addEventListener('click', () => {
+          close();
+        });
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if(e.key === 'Escape' && document.body.classList.contains('svx-navmenu-open')) close();
+      });
     })();
   </script>
   <script src="/assets/liquid-glass/svx-webgl-bg.js?v=20260402c" defer></script>

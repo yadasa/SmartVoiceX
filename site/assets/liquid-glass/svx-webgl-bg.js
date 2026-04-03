@@ -376,9 +376,6 @@
     const bgProg = link(gl, QUAD_VERT, BG_FRAG);
     const compProg = link(gl, QUAD_VERT, COMPOSE_FRAG);
 
-    // Liquid-glass refraction: enabled on mobile again (with DPR cap + rect throttling).
-    const allowGlass = true;
-
     const quad = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, quad);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
@@ -410,24 +407,9 @@
     };
 
     function updateGlassRects(){
-      if(!allowGlass){
-        glass.count = 0;
-        // keep buffer deterministic
-        for(let i = 0; i < 32; i++){
-          const j = i * 4;
-          glass.rectsPx[j + 0] = -99999;
-          glass.rectsPx[j + 1] = -99999;
-          glass.rectsPx[j + 2] = 0;
-          glass.rectsPx[j + 3] = 0;
-        }
-        return;
-      }
-
-      // Measure only cards that are likely visible to reduce layout work on long pages.
-      // Use visualViewport only on mobile to avoid desktop 4K/zoom coordinate divergence.
-      const isMobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
+      // Measure only cards that are likely visible to reduce layout work on mobile.
       const vv = window.visualViewport;
-      const vhCss = (isMobile && vv && vv.height) ? vv.height : (window.innerHeight || 0);
+      const vhCss = (vv && vv.height) ? vv.height : (window.innerHeight || 0);
       const margin = 160; // px
 
       const all = Array.from(document.querySelectorAll('.card'));
@@ -463,17 +445,12 @@
     }
 
     function resize(){
-      // NOTE: visualViewport sizing is essential for iOS Safari address-bar behavior,
-      // but on desktop (esp. 4K + scaling/zoom) it can diverge from layout viewport
-      // coordinates used by getBoundingClientRect(), causing huge/misaligned glass.
-      const isMobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
       const vv = window.visualViewport;
-      const useVV = isMobile && vv && vv.width && vv.height;
-
-      const vw = useVV ? vv.width : (window.innerWidth || 1);
-      const vh = useVV ? vv.height : (window.innerHeight || 1);
+      const vw = (vv && vv.width) ? vv.width : (window.innerWidth || 1);
+      const vh = (vv && vv.height) ? vv.height : (window.innerHeight || 1);
 
       // Mobile perf: cap DPR lower on phones/tablets.
+      const isMobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
       const reduce = prefersReducedMotion();
       const dprCap = reduce ? 1 : (isMobile ? 1.25 : 2);
 
@@ -577,14 +554,26 @@
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
 
-    // (scroll-tracking state removed; updates are driven by rAF-throttled listeners)
+    let _lastScrollY = -1;
+    let _lastVvTop = -1;
+    let _frame = 0;
 
     function draw(timeMs){
       const t = timeMs * 0.001;
 
-      // Keep glass rect alignment stable without doing layout reads inside the render loop.
-      // We rely on rAF-throttled scroll/resize listeners to set needsRect.
-      if(allowGlass && needsRect){
+      // Keep glass rect alignment stable during momentum scrolling (esp. iOS Safari).
+      // Re-measure only when scroll position changes, and not more than every other frame.
+      _frame++;
+      const vv = window.visualViewport;
+      const sy = window.scrollY || window.pageYOffset || 0;
+      const vvTop = vv ? (vv.offsetTop || 0) : 0;
+      const isMobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
+      const scrollCadence = isMobile ? 4 : 2;
+      if((_frame % scrollCadence) === 0 && (sy !== _lastScrollY || vvTop !== _lastVvTop)){
+        _lastScrollY = sy;
+        _lastVvTop = vvTop;
+        updateGlassRects();
+      } else if(needsRect){
         needsRect = false;
         updateGlassRects();
       }
@@ -630,8 +619,6 @@
     }
 
     let raf = 0;
-    let lastDeviceDpr = (window.devicePixelRatio || 1);
-
     function start(){
       const reduce = prefersReducedMotion();
       if(reduce){
@@ -641,15 +628,6 @@
         return;
       }
       const loop = (ms) => {
-        // On 4K/retina + OS scaling + browser zoom, devicePixelRatio can change without a
-        // reliable resize event (or it can change mid-session when moving between displays).
-        // If we don't rebuild buffers + uniforms, the glass rects can look huge/misaligned.
-        const curDpr = (window.devicePixelRatio || 1);
-        if(Math.abs(curDpr - lastDeviceDpr) > 0.01){
-          lastDeviceDpr = curDpr;
-          try{ resize(); } catch(_) {}
-        }
-
         draw(ms);
         raf = requestAnimationFrame(loop);
       };
