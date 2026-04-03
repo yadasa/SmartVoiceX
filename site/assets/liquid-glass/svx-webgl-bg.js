@@ -406,10 +406,17 @@
       count: 0,
     };
 
+    // When pinning the canvas to the visualViewport box (iOS address bar), the canvas origin shifts.
+    // Subtract these offsets (CSS px) from DOM rects before uploading to the shader.
+    let viewOffX = 0;
+    let viewOffY = 0;
+
     function updateGlassRects(){
       // Measure only cards that are likely visible to reduce layout work on mobile.
       const vv = window.visualViewport;
       const vhCss = (vv && vv.height) ? vv.height : (window.innerHeight || 0);
+      const offX = viewOffX;
+      const offY = viewOffY;
       const margin = 160; // px
 
       const all = Array.from(document.querySelectorAll('.card'));
@@ -429,8 +436,8 @@
       for(let i = 0; i < max; i++){
         const r = nodes[i].r;
         const j = i * 4;
-        glass.rectsPx[j + 0] = r.left * dpr;
-        glass.rectsPx[j + 1] = r.top * dpr;
+        glass.rectsPx[j + 0] = (r.left - offX) * dpr;
+        glass.rectsPx[j + 1] = (r.top - offY) * dpr;
         glass.rectsPx[j + 2] = r.width * dpr;
         glass.rectsPx[j + 3] = r.height * dpr;
       }
@@ -480,6 +487,8 @@
       if(useVVBox){
         const left = (vv && vv.offsetLeft) ? vv.offsetLeft : 0;
         const top = (vv && vv.offsetTop) ? vv.offsetTop : 0;
+        viewOffX = left;
+        viewOffY = top;
         canvas.style.left = left + 'px';
         canvas.style.top = top + 'px';
         canvas.style.width = (vv.width || vw) + 'px';
@@ -487,6 +496,8 @@
         canvas.style.right = 'auto';
         canvas.style.bottom = 'auto';
       } else {
+        viewOffX = 0;
+        viewOffY = 0;
         canvas.style.left = '0px';
         canvas.style.top = '0px';
         canvas.style.right = '0px';
