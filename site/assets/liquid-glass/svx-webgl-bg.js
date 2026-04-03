@@ -520,6 +520,25 @@
     // Throttled scroll/resize updates.
     let needsRect = true;
     let ticking = false;
+
+    // iOS Safari: address-bar + momentum scroll can cause jitter.
+    // Strategy: disable refraction during active scroll; re-sync when scrolling settles.
+    const isMobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
+    const freezeOnScroll = isMobile && isIOS();
+    let scrollFreeze = false;
+    let scrollFreezeTimer = 0;
+
+    function setScrolling(){
+      if(!freezeOnScroll) return;
+      scrollFreeze = true;
+      if(scrollFreezeTimer) clearTimeout(scrollFreezeTimer);
+      scrollFreezeTimer = setTimeout(() => {
+        scrollFreeze = false;
+        needsRect = true;
+        requestRectUpdate();
+      }, 160);
+    }
+
     function requestRectUpdate(){
       needsRect = true;
       if(ticking) return;
@@ -534,13 +553,13 @@
     }
 
     window.addEventListener('resize', resize, { passive: true });
-    window.addEventListener('scroll', requestRectUpdate, { passive: true });
+    window.addEventListener('scroll', (e) => { setScrolling(); requestRectUpdate(); }, { passive: true });
     // iOS Safari address-bar / visual viewport changes
     if(window.visualViewport){
       try{
         // iOS Safari address-bar / visual viewport changes: keep canvas box + rects synced.
-        window.visualViewport.addEventListener('resize', () => { resize(); requestRectUpdate(); }, { passive: true });
-        window.visualViewport.addEventListener('scroll', () => { resize(); requestRectUpdate(); }, { passive: true });
+        window.visualViewport.addEventListener('resize', () => { setScrolling(); resize(); requestRectUpdate(); }, { passive: true });
+        window.visualViewport.addEventListener('scroll', () => { setScrolling(); resize(); requestRectUpdate(); }, { passive: true });
       } catch(_) {}
     }
 
@@ -638,7 +657,7 @@
       gl.bindTexture(gl.TEXTURE_2D, bgTex);
       gl.uniform1i(u_c.bgTex, 0);
 
-      gl.uniform1i(u_c.count, glass.count);
+      gl.uniform1i(u_c.count, (scrollFreeze ? 0 : glass.count));
       gl.uniform4fv(u_c.rects, glass.rectsPx);
 
       gl.uniform1f(u_c.radius, GLASS_PRESET.radius * dpr);
