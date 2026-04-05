@@ -3,6 +3,7 @@
     "source": "functions"
   }],
   "hosting": {
+    "target": "prod",
     "public": "site",
     "ignore": [
       "firebase.json",
