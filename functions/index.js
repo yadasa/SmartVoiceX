@@ -89,8 +89,8 @@ async function handleLatestExe(req, res) {
   const decoded = await requireAuth(req);
   void decoded;
 
-  const bucket = admin.storage().bucket();
-  const prefix = String(process.env.SVX_WINDOWS_RELEASES_PREFIX || 'releases/windows/');
+  const bucket = admin.storage().bucket('keiazodentai.firebasestorage.app');
+  const prefix = 'installer/';
 
   const latest = await findLatestExe(bucket, prefix);
   if (!latest) {
@@ -238,7 +238,7 @@ async function handleCreateAgent(req, res) {
   }
 }
 
-function api(req, res) {
+async function api(req, res) {
   // Basic CORS for browser calls (same-origin in Firebase Hosting is preferred)
   res.set('access-control-allow-origin', '*');
   res.set('access-control-allow-methods', 'GET,POST,OPTIONS');
@@ -253,11 +253,11 @@ function api(req, res) {
     }
 
     if (req.method === 'POST' && (path === '/svx/agents/create' || path === '/api/svx/agents/create')) {
-      return handleCreateAgent(req, res);
+      return await handleCreateAgent(req, res);
     }
 
     if (req.method === 'GET' && (path === '/svx/app/latest-exe' || path === '/api/svx/app/latest-exe')) {
-      return handleLatestExe(req, res);
+      return await handleLatestExe(req, res);
     }
 
     return json(res, 404, { ok: false, error: 'not_found', path });

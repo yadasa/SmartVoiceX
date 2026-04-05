@@ -6,7 +6,7 @@
     "keiazodentai": {
       "hosting": {
         "prod": [
-          "REPLACE_WITH_PROD_HOSTING_SITE_ID"
+          "smartvoicex"
         ]
       }
     }

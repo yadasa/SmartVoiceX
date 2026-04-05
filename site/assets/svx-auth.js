@@ -245,7 +245,18 @@
     if (meta) meta.textContent = '';
 
     try {
-      const resp = await fetch('/api/svx/app/latest-exe', { method: 'GET' });
+      const { auth } = ensureFirebase();
+      const user = auth.currentUser;
+      if (!user) throw new Error('Not signed in.');
+
+      const token = await user.getIdToken();
+
+      const resp = await fetch('/api/svx/app/latest-exe', {
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
       const data = await resp.json().catch(() => ({}));
 
       if (!resp.ok || data?.ok === false) {
