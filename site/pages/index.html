@@ -421,7 +421,7 @@
       50%{
         transform: scale(1.10);
         box-shadow:
-          0 0 0 9px rgb(var(--c-blue) / 0.18),
+          0 0 0 9px rgb(var(--c-blue) / 0.09),
           0 0 28px rgb(var(--c-blue) / 0.95),
           0 0 62px rgb(var(--c-blue) / 0.48);
         filter: blur(1.2px);
@@ -569,7 +569,7 @@
 
         <div class="nav-actions">
           <a class="navutil" id="svx-nav-auth" href="#" onclick="window.SVXAuth?.openSignIn?.(); return false;">Sign in</a>
-          <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
+          <button class="btn primary" type="button" onclick="window.SVXOpenWidget?.()">Talk to the AI live</button>
           <button class="navmenu-btn" id="svx-navmenu-open" type="button" aria-label="Open menu">Menu</button>
         </div>
       </div>
@@ -594,7 +594,7 @@
       </nav>
 
       <div class="sheet-actions" aria-label="Actions">
-        <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
+        <button class="btn primary" type="button" onclick="window.SVXOpenWidget?.()">Talk to the AI live</button>
         <button class="btn secondary" type="button" onclick="window.location.href='/pages/contact.html'">Book a strategy call</button>
         <button class="btn ghost" type="button" onclick="window.SVXAuth?.openSignIn?.()">My Account / Sign in</button>
       </div>
@@ -617,7 +617,7 @@
             </div>
 
             <div class="cta-row">
-              <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
+              <button class="btn primary" type="button" onclick="window.SVXOpenWidget?.()">Talk to the AI live</button>
               <button class="btn secondary" type="button" onclick="window.location.href='/pages/contact.html'">Book a strategy call</button>
               <button class="btn ghost" type="button" onclick="window.location.href='#how-it-works'">See how it works</button>
             </div>
@@ -672,7 +672,7 @@
         </div>
 
         <div class="cta-row" style="margin-top:12px">
-          <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Start live demo</button>
+          <button class="btn primary" type="button" onclick="window.SVXOpenWidget?.()">Start live demo</button>
         </div>
       </aside>
     </div>
@@ -747,7 +747,7 @@
       </div>
 
       <div class="cta-row" style="margin-top:16px">
-        <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
+        <button class="btn primary" type="button" onclick="window.SVXOpenWidget?.()">Talk to the AI live</button>
         <button class="btn secondary" type="button" onclick="window.location.href='/pages/contact.html'">Book a strategy call</button>
       </div>
     </section>
@@ -858,7 +858,7 @@
       </div>
 
       <div class="cta-row" style="margin-top:16px">
-        <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
+        <button class="btn primary" type="button" onclick="window.SVXOpenWidget?.()">Talk to the AI live</button>
         <button class="btn secondary" type="button" onclick="window.location.href='/pages/contact.html'">Request a quote</button>
       </div>
     </section>
@@ -927,7 +927,7 @@
         <div class="h2" style="margin-top:0">See if SmartVoiceX fits your workflow.</div>
         <div class="lead">Talk to the AI live, then book a strategy call with our team. If it’s a fit, we’ll deploy a tailored agent around your scripts, routing rules, and integrations.</div>
         <div class="cta-row" style="margin-top:14px">
-          <button class="btn primary" type="button" onclick="window.SVXAuth?.openSignUp?.()">Talk to the AI live</button>
+          <button class="btn primary" type="button" onclick="window.SVXOpenWidget?.()">Talk to the AI live</button>
           <button class="btn secondary" type="button" onclick="window.location.href='/pages/contact.html'">Book a strategy call</button>
         </div>
       </div>
@@ -1094,5 +1094,17 @@
   <!-- SmartVoiceX Widget (from Dentai staging) -->
   <script src="https://staging.smartvoicex.com/svx-widget.js"></script>
   <smartvoicex-widget agent-id="agent_7401kn7jxcf7f1c8ecmd087n9c52" mode="voice"></smartvoicex-widget>
+  <script>
+    // Open the embedded widget from CTA buttons
+    window.SVXOpenWidget = function(){
+      try {
+        const w = document.querySelector('smartvoicex-widget');
+        if (!w) return;
+        w.setAttribute('open', '');
+        w.setAttribute('mode', 'voice');
+        if (typeof w.open === 'function') w.open();
+      } catch (_) {}
+    };
+  </script>
 </body>
 </html>
