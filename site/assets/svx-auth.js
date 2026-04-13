@@ -397,7 +397,12 @@
           else alert(`Agent “${it.title}” needs setup:\n\n- ${it._missing.join('\n- ')}`);
         });
       }
-    } catch (_) {
+    } catch (e) {
+      console.warn('[SVX] Failed to load svxAgents', e);
+      if (errWrap) {
+        errWrap.classList.add('error');
+        errWrap.textContent = `Agents failed to load: ${e?.message || 'unknown_error'}`;
+      }
       renderList(agentsWrap, [], 'No agents yet.');
     }
 
