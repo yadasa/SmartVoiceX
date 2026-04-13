@@ -35,6 +35,23 @@
   <script src="/assets/svx-auth.js" defer></script>
 
   <style>
+    /* Pricing hover: dim + slightly blur non-hovered cards (333ms transition) */
+    #pricing .pricing-grid .card {
+      transition: opacity 333ms ease, filter 333ms ease;
+    }
+    #pricing .pricing-grid:hover .card {
+      opacity: 0.55;
+    }
+    #pricing .pricing-grid:hover .card:hover {
+      opacity: 1;
+      filter: none;
+    }
+    #pricing .pricing-grid:hover .card:not(:hover) {
+      filter: blur(0.8px);
+    }
+  </style>
+
+  <style>
     :root{
       /* Base palette (RGB triplets for easy alpha usage) */
       --c-black: 0 0 0;
@@ -815,7 +832,7 @@
       <div class="h2">Pricing built around your workflow.</div>
       <div class="lead">Most teams start with a monthly platform fee plus usage‑based minutes. More complex workflows, integrations, and higher‑volume deployments are scoped separately.</div>
 
-      <div class="split" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px">
+      <div class="split pricing-grid" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px">
         <div class="card" id="plan-99">
           <b>Starter (Inbound)</b>
           <p><b>$99/mo</b> + usage</p>
