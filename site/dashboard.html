@@ -137,7 +137,9 @@
     #svx-signedin-modal{position:static !important; inset:auto !important; display:block !important;}
     #svx-signedin-modal.open{display:block !important;}
     #svx-signedin-modal .svx-close{display:none !important;}
-    #svx-signedin-modal .svx-modal{max-width: 1100px; margin: 24px auto;}
+    #svx-signedin-modal .svx-modal{max-width: 1100px; margin: 24px auto; max-height:none !important; overflow:visible !important;}
+    /* Ensure only the page scrolls */
+    html, body{overflow-y:auto}
   </style>
 </head>
 
@@ -218,11 +220,11 @@
       });
     })();
 
-    // Once the auth script loads, open the dashboard UI.
+    // Once the auth script loads, open dashboard UI if authed, otherwise show sign-in.
     window.addEventListener('load', () => {
       try {
-        // If authed, this opens the dashboard. If not, it opens sign-in.
-        window.SVXAuth?.openAccount?.();
+        // openSignIn() will open the dashboard if signed in, otherwise it opens sign-in.
+        window.SVXAuth?.openSignIn?.();
       } catch (_) {}
     });
   </script>
