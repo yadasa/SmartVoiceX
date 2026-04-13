@@ -1,5 +1,6 @@
 const { onRequest } = require('firebase-functions/v2/https');
 const admin = require('firebase-admin');
+const Stripe = require('stripe');
 const { findLatestExe } = require('./_latestRelease');
 
 if (!admin.apps.length) {
@@ -49,6 +50,16 @@ function requireJson(req) {
   return req.body;
 }
 
+function appUrlFromReq(req) {
+  // Prefer explicit env, otherwise derive from request.
+  const env = process.env.APP_URL;
+  if (env) return String(env).replace(/\/$/, '');
+  const proto = (req.headers['x-forwarded-proto'] || 'https');
+  const host = (req.headers['x-forwarded-host'] || req.headers.host || '').toString();
+  if (!host) return 'https://smartvoicex.com';
+  return `${proto}://${host}`;
+}
+
 async function elevenFetch(path, { method = 'GET', body } = {}) {
   const apiKey = process.env.ELEVENLABS_API_KEY;
   if (!apiKey) {
@@ -80,6 +91,42 @@ async function elevenFetch(path, { method = 'GET', body } = {}) {
   }
 
   return data;
+}
+
+// POST /api/svx/billing/checkout-session
+// Body: { planKey }
+async function handleCreateStripeCheckout(req, res) {
+  const decoded = await requireAuth(req);
+  const body = requireJson(req);
+
+  const planKey = String(body.planKey || '').trim();
+  if (!planKey) return json(res, 400, { ok: false, error: 'planKey_required' });
+
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+  if (!stripeSecretKey) return json(res, 500, { ok: false, error: 'missing_STRIPE_SECRET_KEY' });
+
+  // Map planKey -> Stripe Price ID (configure in env)
+  const priceEnvKey = `STRIPE_PRICE_${planKey.toUpperCase()}`;
+  const priceId = process.env[priceEnvKey];
+  if (!priceId) return json(res, 500, { ok: false, error: 'missing_price_id', priceEnvKey });
+
+  const stripe = new Stripe(stripeSecretKey, { apiVersion: '2024-06-20' });
+  const appUrl = appUrlFromReq(req);
+
+  const uid = decoded.uid;
+  const successUrl = `${appUrl}/dashboard.html?billing=success&session_id={CHECKOUT_SESSION_ID}`;
+  const cancelUrl = `${appUrl}/dashboard.html?billing=cancelled&plan=${encodeURIComponent(planKey)}`;
+
+  const session = await stripe.checkout.sessions.create({
+    mode: 'subscription',
+    line_items: [{ price: String(priceId), quantity: 1 }],
+    success_url: successUrl,
+    cancel_url: cancelUrl,
+    // Keep metadata so webhooks can attach subscription to user.
+    metadata: { uid, planKey },
+  });
+
+  return json(res, 200, { ok: true, url: session.url, id: session.id });
 }
 
 // POST /api/svx/agents/create
@@ -263,6 +310,10 @@ async function api(req, res) {
       return await handleCreateAgent(req, res);
     }
 
+    if (req.method === 'POST' && (path === '/svx/billing/checkout-session' || path === '/api/svx/billing/checkout-session')) {
+      return await handleCreateStripeCheckout(req, res);
+    }
+
     if (req.method === 'GET' && (path === '/svx/app/latest-exe' || path === '/api/svx/app/latest-exe')) {
       return await handleLatestExe(req, res);
     }
@@ -275,5 +326,5 @@ async function api(req, res) {
 
 exports.api = onRequest({
   region: 'us-central1',
-  secrets: ['ELEVENLABS_API_KEY'],
+  secrets: ['ELEVENLABS_API_KEY', 'STRIPE_SECRET_KEY'],
 }, api);

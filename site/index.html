@@ -63,6 +63,28 @@
       border: 1px solid rgb(var(--c-white) / 0.22);
       pointer-events:none;
     }
+
+    /* Pricing subscribe buttons */
+    .svx-subscribe-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      padding: 12px 14px;
+      border-radius: 999px;
+      border: 1px solid rgb(var(--c-white) / 0.14);
+      color: #fff;
+      background: linear-gradient(90deg, rgb(var(--c-blue) / 0.95), rgb(var(--c-purple) / 0.95));
+      box-shadow: 0 10px 26px rgb(var(--c-blue) / 0.18);
+      transition: transform 333ms ease, box-shadow 333ms ease, filter 333ms ease;
+    }
+    .svx-subscribe-btn:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 4px rgb(var(--c-purple) / 0.18), 0 18px 40px rgb(var(--c-purple) / 0.20);
+      filter: brightness(1.05);
+    }
   </style>
 
   <style>
@@ -850,6 +872,7 @@
         <div class="card" id="plan-99">
           <b>Starter (Inbound)</b>
           <p><b>$99/mo</b> + usage</p>
+          <a class="svx-subscribe-btn" href="#" onclick="window.SVXSubscribe?.('starter'); return false;">Subscribe</a>
           <p style="margin:8px 0 0 0;color:var(--muted);font-weight:700;font-size:12px;line-height:1.55">
             Inbound AI phone agent for getting live fast.
           </p>
@@ -872,6 +895,7 @@
         <div class="card" id="plan-179">
           <b>Team</b>
           <p><b>$179/mo</b> + usage</p>
+          <a class="svx-subscribe-btn" href="#" onclick="window.SVXSubscribe?.('team'); return false;">Subscribe</a>
           <p style="margin:8px 0 0 0;color:var(--muted);font-weight:700;font-size:12px;line-height:1.55">
             Inbound + outbound calling, integrations, and custom workflows.
           </p>
@@ -894,6 +918,7 @@
         <div class="card" id="plan-299">
           <b>Business</b>
           <p><b>$299/mo</b> + usage</p>
+          <a class="svx-subscribe-btn" href="#" onclick="window.SVXSubscribe?.('business'); return false;">Subscribe</a>
           <p style="margin:8px 0 0 0;color:var(--muted);font-weight:700;font-size:12px;line-height:1.55">
             Lower cost per minute, more languages, and free unlimited recording.
           </p>
@@ -915,6 +940,7 @@
         <div class="card" id="plan-399">
           <b>Scale</b>
           <p><b>$399/mo</b> + usage</p>
+          <a class="svx-subscribe-btn" href="#" onclick="window.SVXSubscribe?.('scale'); return false;">Subscribe</a>
           <p style="margin:8px 0 0 0;color:var(--muted);font-weight:700;font-size:12px;line-height:1.55">
             Unlimited setup flexibility, maximum capacity, and the best economics.
           </p>

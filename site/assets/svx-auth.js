@@ -65,6 +65,72 @@
     return { auth, db };
   }
 
+  function getNextParam() {
+    try {
+      const u = new URL(window.location.href);
+      const next = u.searchParams.get('next');
+      return next ? String(next) : '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function stashNext(next) {
+    try {
+      if (!next) return;
+      sessionStorage.setItem('svx_next', String(next));
+    } catch (_) {}
+  }
+
+  function popNext() {
+    try {
+      const v = sessionStorage.getItem('svx_next');
+      if (!v) return '';
+      sessionStorage.removeItem('svx_next');
+      return String(v);
+    } catch (_) {
+      return '';
+    }
+  }
+
+  async function startStripeCheckout(planKey) {
+    const s = $('#svx-dashboard-status');
+    try {
+      const { auth } = ensureFirebase();
+      const user = auth.currentUser;
+      if (!user) throw new Error('not_signed_in');
+
+      if (s) {
+        s.classList.remove('error', 'success');
+        s.textContent = 'Redirecting to checkout…';
+      }
+
+      const token = await user.getIdToken();
+      const resp = await fetch('/api/svx/billing/checkout-session', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ planKey: String(planKey) }),
+      });
+
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok || !data?.ok || !data?.url) {
+        const msg = data?.error || `checkout_failed (HTTP ${resp.status})`;
+        throw new Error(msg);
+      }
+
+      window.location.href = String(data.url);
+    } catch (e) {
+      console.warn('[SVX] checkout error', e);
+      if (s) {
+        s.classList.add('error');
+        s.textContent = e?.message || 'Checkout failed.';
+      }
+    }
+  }
+
   function openModal(mode = 'signin') {
     $('#svx-auth-backdrop')?.classList.add('open');
     $('#svx-auth-modal')?.classList.add('open');
@@ -662,6 +728,18 @@
           if (auth.currentUser) {
             openSignedInModal();
             refreshSignedInDashboard();
+
+            // Auto-start checkout if requested.
+            try {
+              const u = new URL(window.location.href);
+              const planKey = u.searchParams.get('checkout_plan');
+              if (planKey) {
+                // Clear the param to avoid repeated attempts on back/refresh.
+                u.searchParams.delete('checkout_plan');
+                window.history.replaceState({}, '', u.toString());
+                await startStripeCheckout(planKey);
+              }
+            } catch (_) {}
             return;
           }
 
@@ -683,6 +761,16 @@
               if (user) {
                 openSignedInModal();
                 refreshSignedInDashboard();
+
+                try {
+                  const u = new URL(window.location.href);
+                  const planKey = u.searchParams.get('checkout_plan');
+                  if (planKey) {
+                    u.searchParams.delete('checkout_plan');
+                    window.history.replaceState({}, '', u.toString());
+                    void startStripeCheckout(planKey);
+                  }
+                } catch (_) {}
               } else {
                 openModal('signin');
               }
@@ -699,6 +787,22 @@
       close: () => { closeModal(); closeSignedInModal(); },
       refreshDashboard: () => refreshSignedInDashboard(),
     });
+
+    // Pricing subscribe buttons (homepage): route user to dashboard + checkout.
+    window.SVXSubscribe = async (planKey) => {
+      try {
+        const { auth } = ensureFirebase();
+        const next = `/dashboard.html?checkout_plan=${encodeURIComponent(String(planKey || ''))}`;
+        if (!auth.currentUser) {
+          window.location.href = `/dashboard.html?next=${encodeURIComponent(next)}`;
+          return;
+        }
+        window.location.href = next;
+      } catch (_) {
+        const next = `/dashboard.html?checkout_plan=${encodeURIComponent(String(planKey || ''))}`;
+        window.location.href = `/dashboard.html?next=${encodeURIComponent(next)}`;
+      }
+    };
 
     // Events
     // (FAB removed: navbar buttons call window.SVXAuth.openSignIn/openSignUp directly)
@@ -899,6 +1003,9 @@
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     } catch (_) {}
 
+    // If a page lands with ?next=..., stash it until auth is available.
+    stashNext(getNextParam());
+
     auth.onAuthStateChanged(async (user) => {
       if (!user) {
         setAuthButtonSignedOut();
@@ -912,6 +1019,12 @@
 
       const profile = await loadProfile(db, user.uid);
       setAuthButtonSignedIn(user, profile);
+
+      // Post-login redirect.
+      const next = popNext();
+      if (next) {
+        try { window.location.href = next; } catch (_) {}
+      }
     });
   }
 
