@@ -49,6 +49,20 @@
     #pricing .pricing-grid:hover .card:not(:hover) {
       filter: blur(0.8px);
     }
+
+    /* Timeline: 1 thumb + 5 fixed steps */
+    .timeline-track{position:relative}
+    .timeline-step{
+      position:absolute;
+      top:50%;
+      transform:translate(-50%,-50%);
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background: rgb(var(--c-white) / 0.18);
+      border: 1px solid rgb(var(--c-white) / 0.22);
+      pointer-events:none;
+    }
   </style>
 
   <style>
@@ -930,11 +944,12 @@
 
         <div class="timeline" aria-label="Go-live timeline slider">
           <div class="timeline-track" id="svxTimelineTrack" role="group" aria-label="Milestones">
-            <div class="timeline-thumb" data-i="0" style="left:0%" aria-label="Day 0 milestone"></div>
-            <div class="timeline-thumb" data-i="1" style="left:6.67%" aria-label="Day 1 milestone"></div>
-            <div class="timeline-thumb" data-i="2" style="left:20%" aria-label="Day 3 milestone"></div>
-            <div class="timeline-thumb" data-i="3" style="left:46.67%" aria-label="Day 7 milestone"></div>
-            <div class="timeline-thumb" data-i="4" style="left:100%" aria-label="Day 15 milestone"></div>
+            <div class="timeline-step" data-i="0" style="left:0%" aria-label="Day 0"></div>
+            <div class="timeline-step" data-i="1" style="left:6.67%" aria-label="Day 1"></div>
+            <div class="timeline-step" data-i="2" style="left:20%" aria-label="Day 3"></div>
+            <div class="timeline-step" data-i="3" style="left:46.67%" aria-label="Day 7"></div>
+            <div class="timeline-step" data-i="4" style="left:100%" aria-label="Day 15"></div>
+            <div class="timeline-thumb" id="svxTimelineThumb" style="left:6.67%" aria-label="Timeline handle"></div>
           </div>
           <div class="timeline-text" id="svxTimelineText" aria-live="polite">Drag a marker to see the milestone.</div>
         </div>
@@ -1036,11 +1051,12 @@
 
     const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Timeline slider (5 draggable thumbs)
+    // Timeline slider (1 draggable thumb + 5 fixed steps)
     (function(){
       const track = document.getElementById('svxTimelineTrack');
       const out = document.getElementById('svxTimelineText');
-      if(!track || !out) return;
+      const thumb = document.getElementById('svxTimelineThumb');
+      if(!track || !out || !thumb) return;
 
       const milestones = [
         { day: 0, text: '0 — Sign up, fill out your profile, and install.' },
@@ -1050,43 +1066,62 @@
         { day: 15, text: 'Day 15 — Any custom integrations you requested should be integrated by now.' },
       ];
 
-      function setActive(i){
-        const m = milestones[i];
-        out.textContent = m ? m.text : 'Drag a marker to see the milestone.';
+      const steps = Array.from(track.querySelectorAll('.timeline-step'));
+      const stepPcts = steps.map(s => parseFloat((s.style.left || '0').replace('%','')));
+
+      function clampPct(p){ return Math.max(0, Math.min(100, p)); }
+      function pctFromEvent(e){
+        const rect = track.getBoundingClientRect();
+        const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+        return clampPct((x / rect.width) * 100);
+      }
+      function nearestStep(pct){
+        let best = 0;
+        let bestDist = Infinity;
+        for(let i=0;i<stepPcts.length;i++){
+          const d = Math.abs(stepPcts[i] - pct);
+          if(d < bestDist){ bestDist = d; best = i; }
+        }
+        return best;
       }
 
-      let active = null;
+      function setActive(i){
+        const idx = Math.max(0, Math.min(milestones.length - 1, i|0));
+        const m = milestones[idx];
+        out.textContent = m ? m.text : '';
+        thumb.style.left = (stepPcts[idx] ?? 0) + '%';
+      }
+
+      let dragging = false;
       let pointerId = null;
 
       function onDown(e){
-        const thumb = e.currentTarget;
-        active = thumb;
+        dragging = true;
         pointerId = e.pointerId;
-        thumb.setPointerCapture(pointerId);
-        setActive(parseInt(thumb.dataset.i || '0', 10));
+        try{ thumb.setPointerCapture(pointerId); } catch(_){}
       }
 
       function onMove(e){
-        if(!active || e.pointerId !== pointerId) return;
-        const rect = track.getBoundingClientRect();
-        const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
-        const pct = (x / rect.width) * 100;
-        active.style.left = pct + '%';
+        if(!dragging || e.pointerId !== pointerId) return;
+        thumb.style.left = pctFromEvent(e) + '%';
       }
 
       function onUp(e){
-        if(!active || e.pointerId !== pointerId) return;
-        try{ active.releasePointerCapture(pointerId); } catch(_){}
-        active = null;
+        if(!dragging || e.pointerId !== pointerId) return;
+        try{ thumb.releasePointerCapture(pointerId); } catch(_){}
+        dragging = false;
         pointerId = null;
+        const pct = parseFloat((thumb.style.left || '0').replace('%',''));
+        setActive(nearestStep(pct));
       }
 
-      const thumbs = Array.from(track.querySelectorAll('.timeline-thumb'));
-      thumbs.forEach((t) => {
-        t.addEventListener('pointerdown', onDown);
-        t.addEventListener('pointermove', onMove);
-        t.addEventListener('pointerup', onUp);
-        t.addEventListener('pointercancel', onUp);
+      thumb.addEventListener('pointerdown', onDown);
+      thumb.addEventListener('pointermove', onMove);
+      thumb.addEventListener('pointerup', onUp);
+      thumb.addEventListener('pointercancel', onUp);
+
+      track.addEventListener('pointerdown', (e) => {
+        setActive(nearestStep(pctFromEvent(e)));
       });
 
       if(!reduceMotion) setActive(1);
