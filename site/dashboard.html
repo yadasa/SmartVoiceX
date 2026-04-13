@@ -76,7 +76,9 @@
 
     .topbar-bg{
       position:absolute;top:0;left:0;right:0;height:96px;
-      background: var(--bg2);
+      /* On homepage this strip is visually transparent because WebGL bg sits behind.
+         Keep it transparent on dashboard to match the look. */
+      background: transparent;
       z-index:1;pointer-events:none;
     }
     .topbar{
