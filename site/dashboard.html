@@ -223,8 +223,8 @@
     // Once the auth script loads, open dashboard UI if authed, otherwise show sign-in.
     window.addEventListener('load', () => {
       try {
-        // openSignIn() will open the dashboard if signed in, otherwise it opens sign-in.
-        window.SVXAuth?.openSignIn?.();
+        // Wait for Firebase auth to hydrate, then open dashboard or sign-in.
+        window.SVXAuth?.openDashboard?.();
       } catch (_) {}
     });
   </script>

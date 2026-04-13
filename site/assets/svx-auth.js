@@ -655,6 +655,45 @@
         } catch (_) {}
         openModal('signin');
       },
+      // Dashboard landing helper: waits for Firebase auth to hydrate before deciding.
+      openDashboard: async () => {
+        try {
+          const { auth } = ensureFirebase();
+          if (auth.currentUser) {
+            openSignedInModal();
+            refreshSignedInDashboard();
+            return;
+          }
+
+          await new Promise((resolve) => {
+            let done = false;
+            const timeout = setTimeout(() => {
+              if (done) return;
+              done = true;
+              // If auth hasn't hydrated quickly, fall back to sign-in.
+              openModal('signin');
+              resolve();
+            }, 900);
+
+            const unsub = auth.onAuthStateChanged((user) => {
+              if (done) return;
+              done = true;
+              clearTimeout(timeout);
+              try { unsub(); } catch (_) {}
+              if (user) {
+                openSignedInModal();
+                refreshSignedInDashboard();
+              } else {
+                openModal('signin');
+              }
+              resolve();
+            });
+          });
+          return;
+        } catch (_) {
+          openModal('signin');
+        }
+      },
       openSignUp: () => openModal('signup'),
       openAccount: () => { openSignedInModal(); refreshSignedInDashboard(); },
       close: () => { closeModal(); closeSignedInModal(); },
