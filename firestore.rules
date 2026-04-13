@@ -1,21 +1,249 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Username uniqueness (create-only by owner)
-    match /usernames/{username} {
-      allow create: if request.auth != null 
-        && request.resource.data.uid == request.auth.uid;
-      allow read: if request.auth != null;
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function getUserDoc(uid) {
+      return get(/databases/$(database)/documents/users/$(uid));
+    }
+
+    function isOrgMember(orgId, uid) {
+      let userDoc = getUserDoc(uid);
+      return signedIn()
+        && uid == request.auth.uid
+        && userDoc.data != null
+        && userDoc.data.orgId == orgId;
+    }
+
+    function isOrgAdminOrOwner(orgId, uid) {
+      let userDoc = getUserDoc(uid);
+      return isOrgMember(orgId, uid)
+        && (userDoc.data.role in ['Owner', 'Admin', 'owner', 'admin']);
+    }
+
+    function isOrgOwner(orgId) {
+      return isOrgAdminOrOwner(orgId, request.auth.uid);
+    }
+
+    // ----------------------
+    // USERS (profile)
+    // users/{uid}
+    // Read/Write: signed-in self-only.
+    // Note: Admin SDK bypasses rules, so server access is unaffected.
+    // ----------------------
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+
+      // Allow limited self-service profile writes, but protect server-authoritative fields.
+      // This is required for the SMS gate plan: the client MUST NOT be able to set
+      // smsGate.verifiedAt or increment demoCalls.
+      //
+      // Allowed client-writable fields (adjust as needed):
+      // - displayName, photoURL, timezone, preferences
+      // - plus any other purely cosmetic fields
+      function allowedUserProfileWrite() {
+        // Firestore rules do not support statement-style `if`; use a conditional expression.
+        // Allow minimal self-service profile shape. Keep server-authoritative fields protected.
+        return !exists(/databases/$(database)/documents/users/$(uid))
+          ? request.resource.data.keys().hasOnly([
+              'uid',
+              'email',
+              'createdAt',
+              'updatedAt',
+              'displayName',
+              'photoURL',
+              'timezone',
+              'preferences',
+              // SmartVoiceX allows capturing these at signup
+              'username',
+              'phone'
+            ])
+          : request.resource.data.diff(resource.data).changedKeys().hasOnly([
+              'updatedAt',
+              'displayName',
+              'photoURL',
+              'timezone',
+              'preferences',
+              // Allow the user to correct their own basic contact fields
+              'email',
+              'phone'
+            ]);
+      }
+
+      allow create, update: if signedIn() && request.auth.uid == uid && allowedUserProfileWrite();
+      allow delete: if false;
+
+      // Server-owned usage tracking: client cannot write demoSessions.
+      match /demoSessions/{sessionId} {
+        allow read, write: if false;
+      }
+
+      // SmartVoiceX agents live under the signed-in user's doc.
+      match /svxAgents/{agentId} {
+        allow read, write: if signedIn() && request.auth.uid == uid;
+      }
+    }
+
+    // SMS gate server-owned session tracking
+    match /widgetSmsSessions/{smsSessionId} {
+      allow read, write: if false;
+    }
+
+    // ----------------------
+    // ORGANIZATIONS
+    // organizations/{orgId}
+    // Create: signed-in AND ownerUid == requester
+    // Read: signed-in
+    // Update/Delete: owner only
+    // ----------------------
+    match /organizations/{orgId} {
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow read: if signedIn();
+      allow update, delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+    }
+
+    // ----------------------
+    // ORGANIZATIONS WALLET
+    // organizations/{orgId}/wallet/{walletId} (e.g. main)
+    //
+    // Hosted widget demo: server-only.
+    // Deny all client reads/writes to wallet + transactions unless you are
+    // explicitly building an authenticated admin dashboard that needs it.
+    // (Admin SDK bypasses rules.)
+    // ----------------------
+    match /organizations/{orgId}/wallet/{walletId} {
+      allow read, write: if false;
+
+      match /transactions/{txId} {
+        allow read, write: if false;
+      }
+    }
+
+    // ----------------------
+    // ORGANIZATION SETTINGS (subcollection)
+    // organizations/{orgId}/settings/{docId}
+    //
+    // Sensitive config should remain admin/owner only.
+    // Auto-topup needs org members to *read* wallet settings (so any station can
+    // trigger the low-balance check), but only admins/owners may *write* them.
+    // ----------------------
+
+    // Wallet + auto-topup settings
+    match /organizations/{orgId}/settings/wallet {
+      allow read: if isOrgMember(orgId, request.auth.uid);
+      allow create, update, delete: if isOrgAdminOrOwner(orgId, request.auth.uid);
+    }
+
+    // Other settings docs (default: admin/owner only)
+    match /organizations/{orgId}/settings/{docId} {
+      allow read: if isOrgOwner(orgId);
+      allow create, update, delete: if isOrgOwner(orgId) && docId == "config";
+    }
+
+    // ----------------------
+    // CUSTOMERS
+    // customers/{customerNumber}
+    // Create/Read/Update/Delete: signed-in
+    // ----------------------
+    match /customers/{customerNumber} {
+      allow read, create, update, delete: if signedIn();
+    }
+
+    // Org appointments (Firestore-only when Google Calendar is disabled)
+    match /organizations/{orgId}/appointments/{aptId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isOrgOwner(orgId);
+    }
+
+    // ----------------------
+    // USERNAMES (displayName -> uid/email)
+    // Allow public read so you can check availability before signup.
+    // Create only by signed-in user whose uid matches request.auth.uid.
+    // No update/delete to prevent takeovers.
+    // ----------------------
+    match /usernames/{displayName} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && !exists(/databases/$(database)/documents/usernames/$(displayName));
       allow update, delete: if false;
     }
-    // User profile + SVX agents (user-only)
-    match /users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
 
-      match /svxAgents/{agentId} {
-        // Scope agents strictly to the owning user path.
-        allow read, write: if request.auth != null && request.auth.uid == uid;
+    // ----------------------
+    // LIVE SUMMARIES
+    // Renderer reads directly from Firestore.
+    // Support both layouts (legacy + org-scoped).
+    // ----------------------
+    match /liveSummaries/{orgId}/{agentId}/{entryId} {
+      allow read: if isOrgMember(orgId, request.auth.uid);
+      allow create: if isOrgMember(orgId, request.auth.uid)
+        && request.resource.data.orgId == orgId
+        && request.resource.data.agentId == agentId;
+      allow update: if isOrgMember(orgId, request.auth.uid)
+        && resource.data.orgId == orgId
+        && request.resource.data.orgId == orgId;
+      allow delete: if isOrgMember(orgId, request.auth.uid);
+    }
+
+    match /organizations/{orgId}/liveSummaries/{agentId}/entries/{entryId} {
+      allow read: if isOrgMember(orgId, request.auth.uid);
+      allow create: if isOrgMember(orgId, request.auth.uid)
+        && request.resource.data.orgId == orgId
+        && request.resource.data.agentId == agentId;
+      allow update: if isOrgMember(orgId, request.auth.uid)
+        && resource.data.orgId == orgId
+        && request.resource.data.orgId == orgId;
+      allow delete: if isOrgMember(orgId, request.auth.uid);
+    }
+
+    // ----------------------
+    // XI transcripts (webhook persisted)
+    // orgs/{orgId}/conversations/{convId}
+    // Read: org member
+    // Write: server-only
+    // ----------------------
+    match /orgs/{orgId}/conversations/{convId} {
+      allow read: if isOrgMember(orgId, request.auth.uid);
+      allow write: if false;
+
+      match /turns/{turnId} {
+        allow read: if isOrgMember(orgId, request.auth.uid);
+        allow write: if false;
       }
+
+      match /webhookEvents/{eventId} {
+        allow read: if isOrgMember(orgId, request.auth.uid);
+        allow write: if false;
+      }
+    }
+
+    // ----------------------
+    // DEMO SESSIONS (widget realtime bootstrap)
+    // demoSessions/{sessionId}
+    // Server-only: created by Firebase Function; read by Cloud Run gateway (Admin SDK).
+    // ----------------------
+    match /demoSessions/{sessionId} {
+      allow read, write: if false;
+    }
+
+    // ----------------------
+    // WIDGET SETTINGS
+    // organizations/{orgId}/widgetSettings
+    // Read: org members
+    // Write: org admin/owner
+    // ----------------------
+    match /organizations/{orgId}/widgetSettings {
+      allow read: if isOrgMember(orgId, request.auth.uid);
+      allow create, update, delete: if isOrgAdminOrOwner(orgId, request.auth.uid);
+    }
+
+    // ----------------------
+    // Default deny
+    // ----------------------
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
