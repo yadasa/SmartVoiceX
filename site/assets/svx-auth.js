@@ -530,6 +530,21 @@
     document.body.appendChild(backdrop);
     document.body.appendChild(modal);
 
+    // Wizard styles (progress bar + slide transitions)
+    try {
+      if (!document.getElementById('svx-agent-wizard-style')) {
+        const st = document.createElement('style');
+        st.id = 'svx-agent-wizard-style';
+        st.textContent = `
+          .svx-progress{height:10px;border-radius:999px;background:rgba(255,255,255,0.10);overflow:hidden;margin:10px 0 14px 0;border:1px solid rgba(255,255,255,0.10)}
+          .svx-progress-bar{height:100%;width:0%;background:linear-gradient(90deg, rgba(98,20,217,1), rgba(79,123,255,1));transition:width 333ms ease}
+          .svx-steps{display:flex;overflow:hidden;transform:translateX(0%);transition:transform 333ms ease;will-change:transform}
+          .svx-step{min-width:100%}
+        `;
+        document.head.appendChild(st);
+      }
+    } catch (_) {}
+
     // Signed-in modal shell (dashboard)
     const signedInModal = el('div', { id: 'svx-signedin-modal', role: 'dialog', 'aria-modal': 'true' }, [
       el('div', { class: 'svx-modal svx-dashboard' }, [
@@ -899,35 +914,52 @@
         ]),
 
         el('form', { id: 'svx-agent-form', class: 'svx-form' }, [
-          el('label', {}, [el('span', { text: 'Agent nickname (label)' }), el('input', { id: 'svx-agent-nickname', type: 'text', placeholder: 'e.g. Lakeside Front Desk' })]),
-          el('label', {}, [el('span', { text: 'Business name' }), el('input', { id: 'svx-agent-business', type: 'text', placeholder: 'e.g. Lakeside Dental' })]),
-          el('label', {}, [el('span', { text: 'Industry' }), el('input', { id: 'svx-agent-industry', type: 'text', placeholder: 'e.g. Dental, Oncology, Call Center, Home Services' })]),
-          el('label', {}, [el('span', { text: 'Primary workflows (what should it do?)' }), el('input', { id: 'svx-agent-goals', type: 'text', placeholder: 'e.g. book appointments, confirm visits, follow up leads, outbound list calls' })]),
-          el('label', {}, [el('span', { text: 'Must-do’s (rules it must follow)' }), el('input', { id: 'svx-agent-mustdos', type: 'text', placeholder: 'e.g. always confirm phone number; always offer next available slot' })]),
-          el('label', {}, [el('span', { text: 'Never-do’s (hard prohibitions)' }), el('input', { id: 'svx-agent-neverdos', type: 'text', placeholder: 'e.g. never give medical advice; never quote pricing without approval' })]),
-          el('label', {}, [el('span', { text: 'Scripts / talk tracks (optional)' }), el('input', { id: 'svx-agent-scripts', type: 'text', placeholder: 'Paste short scripts or guidelines' })]),
-          el('label', {}, [el('span', { text: 'First message (exact first line when the call connects)' }), el('input', { id: 'svx-agent-firstmessage', type: 'text', placeholder: 'Hi, thanks for calling Lakeside Dental—how can I help today?' })]),
-          el('label', {}, [el('span', { text: 'Personality' }), el('input', { id: 'svx-agent-personality', type: 'text', placeholder: 'Warm, confident, concise, professional' })]),
-          el('label', {}, [el('span', { text: 'Seniority / role style' }), el('input', { id: 'svx-agent-seniority', type: 'text', placeholder: 'e.g. receptionist, office manager, sales rep' })]),
-
-          el('label', {}, [
-            el('span', { text: 'Should it hide that it’s AI?' }),
-            el('input', { id: 'svx-agent-hideai', type: 'checkbox' }),
+          el('div', { class: 'svx-card-sub', id: 'svx-agent-step-label', text: 'Step 1 of 4' }),
+          el('div', { class: 'svx-progress' }, [
+            el('div', { class: 'svx-progress-bar', id: 'svx-agent-progress' }),
           ]),
 
-          el('label', {}, [
-            el('span', { text: 'Can it transfer calls?' }),
-            el('input', { id: 'svx-agent-transfer', type: 'checkbox' }),
-          ]),
-          el('label', { id: 'svx-agent-transfer-to-wrap', hidden: 'hidden' }, [
-            el('span', { text: 'If yes, where should it transfer?' }),
-            el('input', { id: 'svx-agent-transfer-to', type: 'text', placeholder: 'e.g. +1 312 555 0100 or “front desk”' }),
-          ]),
+          el('div', { class: 'svx-steps', id: 'svx-agent-steps' }, [
+            el('div', { class: 'svx-step' }, [
+              el('label', {}, [el('span', { text: 'Agent nickname (label)' }), el('input', { id: 'svx-agent-nickname', type: 'text', placeholder: 'e.g. Lakeside Front Desk' })]),
+              el('label', {}, [el('span', { text: 'Business name' }), el('input', { id: 'svx-agent-business', type: 'text', placeholder: 'e.g. Lakeside Dental' })]),
+              el('label', {}, [el('span', { text: 'Industry' }), el('input', { id: 'svx-agent-industry', type: 'text', placeholder: 'e.g. Dental, Oncology, Call Center, Home Services' })]),
+            ]),
 
-          el('label', {}, [el('span', { text: 'Greeting style (tone, pace, language)' }), el('input', { id: 'svx-agent-greeting-sound', type: 'text', placeholder: 'e.g. calm + reassuring, clear, no jargon; auto-detect Spanish' })]),
+            el('div', { class: 'svx-step' }, [
+              el('label', {}, [el('span', { text: 'Primary workflows (what should it do?)' }), el('input', { id: 'svx-agent-goals', type: 'text', placeholder: 'e.g. book appointments, confirm visits, follow up leads, outbound list calls' })]),
+              el('label', {}, [el('span', { text: 'Must-do’s (rules it must follow)' }), el('input', { id: 'svx-agent-mustdos', type: 'text', placeholder: 'e.g. always confirm phone number; always offer next available slot' })]),
+              el('label', {}, [el('span', { text: 'Never-do’s (hard prohibitions)' }), el('input', { id: 'svx-agent-neverdos', type: 'text', placeholder: 'e.g. never give medical advice; never quote pricing without approval' })]),
+              el('label', {}, [el('span', { text: 'Scripts / talk tracks (optional)' }), el('input', { id: 'svx-agent-scripts', type: 'text', placeholder: 'Paste short scripts or guidelines' })]),
+            ]),
+
+            el('div', { class: 'svx-step' }, [
+              el('label', {}, [el('span', { text: 'First message (exact first line when the call connects)' }), el('input', { id: 'svx-agent-firstmessage', type: 'text', placeholder: 'Hi, thanks for calling Lakeside Dental—how can I help today?' })]),
+              el('label', {}, [el('span', { text: 'Personality' }), el('input', { id: 'svx-agent-personality', type: 'text', placeholder: 'Warm, confident, concise, professional' })]),
+              el('label', {}, [el('span', { text: 'Seniority / role style' }), el('input', { id: 'svx-agent-seniority', type: 'text', placeholder: 'e.g. receptionist, office manager, sales rep' })]),
+              el('label', {}, [el('span', { text: 'Greeting style (tone, pace, language)' }), el('input', { id: 'svx-agent-greeting-sound', type: 'text', placeholder: 'e.g. calm + reassuring, clear, no jargon; auto-detect Spanish' })]),
+              el('label', {}, [
+                el('span', { text: 'Should it hide that it’s AI?' }),
+                el('input', { id: 'svx-agent-hideai', type: 'checkbox' }),
+              ]),
+            ]),
+
+            el('div', { class: 'svx-step' }, [
+              el('label', {}, [
+                el('span', { text: 'Can it transfer calls?' }),
+                el('input', { id: 'svx-agent-transfer', type: 'checkbox' }),
+              ]),
+              el('label', { id: 'svx-agent-transfer-to-wrap', hidden: 'hidden' }, [
+                el('span', { text: 'If yes, where should it transfer?' }),
+                el('input', { id: 'svx-agent-transfer-to', type: 'text', placeholder: 'e.g. +1 312 555 0100 or “front desk”' }),
+              ]),
+            ]),
+          ]),
 
           el('div', { class: 'svx-actions' }, [
-            el('button', { class: 'svx-primary', type: 'submit', text: 'Create agent' }),
+            el('button', { class: 'svx-secondary', type: 'button', text: 'Back', id: 'svx-agent-back' }),
+            el('button', { class: 'svx-primary', type: 'button', text: 'Next', id: 'svx-agent-next' }),
+            el('button', { class: 'svx-primary', type: 'submit', text: 'Create agent', id: 'svx-agent-submit' }),
             el('button', { class: 'svx-secondary', type: 'button', text: 'Cancel', id: 'svx-agent-cancel' }),
           ]),
 
@@ -941,6 +973,73 @@
     $('#svx-agent-close')?.addEventListener('click', closeAgentModal);
     $('#svx-agent-cancel')?.addEventListener('click', closeAgentModal);
 
+    // Wizard state
+    const stepsWrap = $('#svx-agent-steps');
+    const stepLabel = $('#svx-agent-step-label');
+    const progress = $('#svx-agent-progress');
+    const btnBack = $('#svx-agent-back');
+    const btnNext = $('#svx-agent-next');
+    const btnSubmit = $('#svx-agent-submit');
+    const steps = stepsWrap ? Array.from(stepsWrap.querySelectorAll('.svx-step')) : [];
+    let step = 0;
+
+    function renderStep() {
+      const total = Math.max(1, steps.length);
+      const clamped = Math.max(0, Math.min(total - 1, step));
+      step = clamped;
+      if (stepsWrap) stepsWrap.style.transform = `translateX(-${step * 100}%)`;
+      if (stepLabel) stepLabel.textContent = `Step ${step + 1} of ${total}`;
+      if (progress) progress.style.width = `${((step + 1) / total) * 100}%`;
+      if (btnBack) btnBack.toggleAttribute('disabled', step === 0);
+      const isLast = step === total - 1;
+      if (btnNext) btnNext.style.display = isLast ? 'none' : '';
+      if (btnSubmit) btnSubmit.style.display = isLast ? '' : 'none';
+      setAgentStatus('');
+    }
+
+    function requireVal(id, msg) {
+      const v = String($(`#${id}`)?.value || '').trim();
+      if (!v) {
+        setAgentStatus(msg || 'Please complete this step.', 'error');
+        return false;
+      }
+      return true;
+    }
+
+    function validateStep(i) {
+      // Keep it minimal: only enforce fields that are required by the backend.
+      if (i === 0) {
+        return requireVal('svx-agent-nickname', 'Add a nickname for your agent.')
+          && requireVal('svx-agent-business', 'Business name is required.')
+          && requireVal('svx-agent-industry', 'Industry is required.');
+      }
+      if (i === 1) {
+        return requireVal('svx-agent-goals', 'Primary workflows are required.');
+      }
+      if (i === 2) {
+        return requireVal('svx-agent-firstmessage', 'First message is required.')
+          && requireVal('svx-agent-personality', 'Personality is required.')
+          && requireVal('svx-agent-greeting-sound', 'Greeting style is required.');
+      }
+      if (i === 3) {
+        const transfer = Boolean($('#svx-agent-transfer')?.checked);
+        if (transfer) return requireVal('svx-agent-transfer-to', 'Transfer destination is required.');
+      }
+      return true;
+    }
+
+    btnBack?.addEventListener('click', () => {
+      step = Math.max(0, step - 1);
+      renderStep();
+    });
+    btnNext?.addEventListener('click', () => {
+      if (!validateStep(step)) return;
+      step = Math.min(steps.length - 1, step + 1);
+      renderStep();
+    });
+
+    renderStep();
+
     const transfer = $('#svx-agent-transfer');
     transfer?.addEventListener('change', () => {
       const wrap = $('#svx-agent-transfer-to-wrap');
@@ -951,6 +1050,22 @@
 
     $('#svx-agent-form')?.addEventListener('submit', async (ev) => {
       ev.preventDefault();
+
+      // If user hits enter mid-wizard, treat it as "Next".
+      try {
+        const stepsWrap = $('#svx-agent-steps');
+        const steps = stepsWrap ? Array.from(stepsWrap.querySelectorAll('.svx-step')) : [];
+        const total = Math.max(1, steps.length);
+        const label = $('#svx-agent-step-label')?.textContent || '';
+        const match = label.match(/Step\s+(\d+)\s+of\s+(\d+)/i);
+        const cur = match ? Math.max(0, parseInt(match[1], 10) - 1) : (total - 1);
+        if (cur < total - 1) {
+          // Click the next button instead of submitting.
+          $('#svx-agent-next')?.click();
+          return;
+        }
+      } catch (_) {}
+
       setAgentStatus('Creating agent…');
 
       if (!window.firebase) return setAgentStatus('Firebase not loaded.', 'error');
