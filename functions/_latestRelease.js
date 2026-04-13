@@ -13,7 +13,6 @@ async function findLatestExe(bucket, prefix) {
   let bestUpdated = 0;
 
   for (const f of exeFiles) {
-    // Ensure metadata is loaded
     let meta = f.metadata;
     if (!meta || !meta.updated) {
       try {
