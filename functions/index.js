@@ -129,6 +129,52 @@ async function handleCreateStripeCheckout(req, res) {
   return json(res, 200, { ok: true, url: session.url, id: session.id });
 }
 
+// POST /api/svx/billing/confirm-checkout
+// Body: { sessionId }
+// Verifies the Stripe Checkout Session metadata matches the signed-in uid, then updates users/{uid}.userPlan.
+async function handleConfirmStripeCheckout(req, res) {
+  const decoded = await requireAuth(req);
+  const body = requireJson(req);
+
+  const sessionId = String(body.sessionId || '').trim();
+  if (!sessionId) return json(res, 400, { ok: false, error: 'sessionId_required' });
+
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+  if (!stripeSecretKey) return json(res, 500, { ok: false, error: 'missing_STRIPE_SECRET_KEY' });
+
+  const stripe = new Stripe(stripeSecretKey, { apiVersion: '2024-06-20' });
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+  const uid = decoded.uid;
+  const metaUid = String(session?.metadata?.uid || '');
+  const planKey = String(session?.metadata?.planKey || '').trim();
+
+  if (!metaUid || metaUid !== uid) {
+    return json(res, 403, { ok: false, error: 'session_uid_mismatch' });
+  }
+  if (!planKey) {
+    return json(res, 400, { ok: false, error: 'missing_planKey_in_session_metadata' });
+  }
+
+  // Best-effort: only mark plan on completed sessions.
+  const status = String(session?.status || '').toLowerCase();
+  if (status && status !== 'complete') {
+    return json(res, 409, { ok: false, error: 'session_not_complete', status });
+  }
+
+  await db.collection('users').doc(uid).set({
+    userPlan: planKey,
+    stripe: {
+      checkoutSessionId: session.id,
+      customer: session.customer || null,
+      subscription: session.subscription || null,
+    },
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  }, { merge: true });
+
+  return json(res, 200, { ok: true, userPlan: planKey });
+}
+
 // POST /api/svx/agents/create
 // Body: { business, goals, mustDos, neverDos, scripts, firstMessage, personality, industry, seniority, hideAI, transferCalls, transferTo, greetingSound }
 async function handleLatestExe(req, res) {
@@ -312,6 +358,10 @@ async function api(req, res) {
 
     if (req.method === 'POST' && (path === '/svx/billing/checkout-session' || path === '/api/svx/billing/checkout-session')) {
       return await handleCreateStripeCheckout(req, res);
+    }
+
+    if (req.method === 'POST' && (path === '/svx/billing/confirm-checkout' || path === '/api/svx/billing/confirm-checkout')) {
+      return await handleConfirmStripeCheckout(req, res);
     }
 
     if (req.method === 'GET' && (path === '/svx/app/latest-exe' || path === '/api/svx/app/latest-exe')) {

@@ -80,6 +80,22 @@
       box-shadow: 0 10px 26px rgb(var(--c-blue) / 0.18);
       transition: transform 333ms ease, box-shadow 333ms ease, filter 333ms ease;
     }
+    .svx-subscribe-btn.is-disabled{
+      opacity: 0.55;
+      background: rgb(var(--c-white) / 0.10);
+      border: 1px solid rgb(var(--c-white) / 0.12);
+      color: rgb(var(--c-white) / 0.72);
+      box-shadow: none;
+      pointer-events: none;
+      filter: none;
+      transform: none;
+    }
+    .svx-subscribe-btn.is-current{
+      background: rgb(var(--c-white) / 0.10);
+      border: 1px solid rgb(var(--c-white) / 0.16);
+      box-shadow: none;
+      pointer-events: none;
+    }
     .svx-subscribe-btn:hover{
       transform: translateY(-1px);
       box-shadow: 0 0 0 4px rgb(var(--c-purple) / 0.18), 0 18px 40px rgb(var(--c-purple) / 0.20);

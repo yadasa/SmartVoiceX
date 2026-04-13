@@ -131,6 +131,82 @@
     }
   }
 
+  async function confirmStripeCheckout(sessionId) {
+    const s = $('#svx-dashboard-status');
+    try {
+      const { auth } = ensureFirebase();
+      const user = auth.currentUser;
+      if (!user) throw new Error('not_signed_in');
+
+      if (s) {
+        s.classList.remove('error', 'success');
+        s.textContent = 'Finalizing subscription…';
+      }
+
+      const token = await user.getIdToken();
+      const resp = await fetch('/api/svx/billing/confirm-checkout', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ sessionId: String(sessionId) }),
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok || !data?.ok) {
+        const msg = data?.error || `confirm_failed (HTTP ${resp.status})`;
+        throw new Error(msg);
+      }
+
+      if (s) {
+        s.classList.add('success');
+        s.textContent = `Subscribed: ${String(data.userPlan || '').toUpperCase()}`;
+      }
+      return data;
+    } catch (e) {
+      console.warn('[SVX] confirm checkout error', e);
+      if (s) {
+        s.classList.add('error');
+        s.textContent = e?.message || 'Failed to confirm subscription.';
+      }
+      return null;
+    }
+  }
+
+  function applyPlanToPricingUI(userPlan) {
+    // Only applies on pages that actually have the pricing subscribe buttons.
+    const buttons = Array.from(document.querySelectorAll('.svx-subscribe-btn'));
+    if (!buttons.length) return;
+
+    const order = ['starter', 'team', 'business', 'scale'];
+    const cur = String(userPlan || '').toLowerCase();
+    const curIdx = order.indexOf(cur);
+
+    for (const btn of buttons) {
+      const onClick = btn.getAttribute('onclick') || '';
+      const m = onClick.match(/SVXSubscribe\?\.\('([^']+)'\)/) || onClick.match(/SVXSubscribe\?\.\("([^"]+)"\)/);
+      const planKey = m ? String(m[1]) : '';
+      const idx = order.indexOf(planKey);
+
+      btn.classList.remove('is-disabled', 'is-current');
+
+      if (curIdx >= 0 && idx >= 0) {
+        if (idx < curIdx) {
+          btn.textContent = 'Subscribe';
+          btn.classList.add('is-disabled');
+        } else if (idx === curIdx) {
+          btn.textContent = 'Current plan';
+          btn.classList.add('is-current');
+        } else {
+          btn.textContent = 'Upgrade';
+        }
+      } else {
+        // Unknown plan or signed out
+        btn.textContent = 'Subscribe';
+      }
+    }
+  }
+
   function openModal(mode = 'signin') {
     $('#svx-auth-backdrop')?.classList.add('open');
     $('#svx-auth-modal')?.classList.add('open');
@@ -733,11 +809,22 @@
             try {
               const u = new URL(window.location.href);
               const planKey = u.searchParams.get('checkout_plan');
+              const billing = u.searchParams.get('billing');
+              const sessionId = u.searchParams.get('session_id');
               if (planKey) {
                 // Clear the param to avoid repeated attempts on back/refresh.
                 u.searchParams.delete('checkout_plan');
                 window.history.replaceState({}, '', u.toString());
                 await startStripeCheckout(planKey);
+              }
+
+              if (billing === 'success' && sessionId) {
+                // Confirm + update user plan after successful checkout.
+                u.searchParams.delete('billing');
+                u.searchParams.delete('session_id');
+                window.history.replaceState({}, '', u.toString());
+                await confirmStripeCheckout(sessionId);
+                await refreshSignedInDashboard();
               }
             } catch (_) {}
             return;
@@ -765,10 +852,18 @@
                 try {
                   const u = new URL(window.location.href);
                   const planKey = u.searchParams.get('checkout_plan');
+                  const billing = u.searchParams.get('billing');
+                  const sessionId = u.searchParams.get('session_id');
                   if (planKey) {
                     u.searchParams.delete('checkout_plan');
                     window.history.replaceState({}, '', u.toString());
                     void startStripeCheckout(planKey);
+                  }
+                  if (billing === 'success' && sessionId) {
+                    u.searchParams.delete('billing');
+                    u.searchParams.delete('session_id');
+                    window.history.replaceState({}, '', u.toString());
+                    void confirmStripeCheckout(sessionId).then(() => refreshSignedInDashboard());
                   }
                 } catch (_) {}
               } else {
@@ -1009,6 +1104,7 @@
     auth.onAuthStateChanged(async (user) => {
       if (!user) {
         setAuthButtonSignedOut();
+        applyPlanToPricingUI(null);
         return;
       }
 
@@ -1019,6 +1115,7 @@
 
       const profile = await loadProfile(db, user.uid);
       setAuthButtonSignedIn(user, profile);
+      applyPlanToPricingUI(profile?.userPlan ?? profile?.plan ?? null);
 
       // Post-login redirect.
       const next = popNext();
