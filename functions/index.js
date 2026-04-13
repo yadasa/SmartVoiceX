@@ -7,6 +7,8 @@
 // If you update API routes, auth, or env/secrets here, mirror the exact same
 // changes in SmartVoiceX/functions/index.js (and vice versa) to avoid
 // accidentally deploying different backends to the same Firebase project.
+// SYNC_SHA256: b8b53a13247747aeda31c4d53db1f0df4e79846edf12ddb903eb444ac5761268
+// (sha256 of this file with CRLF normalized and this SYNC_SHA256 line removed)
 const express = require("express");
 const cors = require("cors");
 const admin = require("firebase-admin");
