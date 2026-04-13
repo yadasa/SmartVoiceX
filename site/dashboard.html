@@ -25,6 +25,113 @@
   <style>
     body{margin:0;background:#000;color:#fff}
 
+    /* Bring over homepage base + navbar styling so dashboard matches / */
+    :root{
+      --c-black: 0 0 0;
+      --c-white: 255 255 255;
+      --c-blue: 79 123 255;
+      --c-purple: 98 20 217;
+
+      --bg: rgb(var(--c-black) / 1);
+      --bg2: rgb(var(--c-black) / 1);
+
+      --panel: rgb(var(--c-white) / 0.06);
+      --panel2: rgb(var(--c-white) / 0.08);
+      --border: rgb(var(--c-white) / 0.12);
+
+      --text: rgb(var(--c-white) / 0.92);
+      --muted: rgb(var(--c-white) / 0.68);
+      --muted2: rgb(var(--c-white) / 0.55);
+
+      --svx-purple: rgb(var(--c-purple) / 1);
+      --svx-blue: rgb(var(--c-blue) / 1);
+      --c-blueText: 122 166 255;
+      --svx-blueText: rgb(var(--c-blueText) / 1);
+      --svx-white: rgb(var(--c-white) / 0.95);
+
+      --accent: var(--svx-purple);
+      --accent2: var(--svx-blue);
+
+      --ring: rgb(var(--c-purple) / 0.35);
+      --shadow: rgb(var(--c-black) / 0.40);
+      --glass-1: rgb(var(--c-white) / 0.05);
+      --glass-2: rgb(var(--c-white) / 0.10);
+      --glass-3: rgb(var(--c-white) / 0.14);
+      --ink-1: rgb(var(--c-black) / 0.10);
+      --ink-2: rgb(var(--c-black) / 0.22);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      background: var(--bg);
+      color:var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      letter-spacing: -0.01em;
+    }
+    a{color:inherit;text-decoration:none}
+
+    .container{max-width:1120px;margin:0 auto;padding:0 20px}
+    .topbar .container{max-width:1200px}
+
+    .topbar-bg{
+      position:absolute;top:0;left:0;right:0;height:96px;
+      background: var(--bg2);
+      z-index:1;pointer-events:none;
+    }
+    .topbar{
+      position:fixed;top:0;left:50%;transform:translateX(-50%);
+      width:100%;z-index:20;padding:20px 0;
+      pointer-events:none;background:transparent;
+    }
+    .nav{
+      display:flex;align-items:center;justify-content:space-between;gap:18px;
+      pointer-events:auto;
+      background: rgb(var(--c-white) / 0.06);
+      border: 1px solid rgb(var(--c-white) / 0.10);
+      border-radius: 999px;
+      padding: 12px 14px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 16px 40px rgb(var(--c-black) / 0.35);
+    }
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700}
+    .logo-img{display:block}
+    .navlinks{display:flex;align-items:center;gap:14px;opacity:0.92}
+    .navlinks a{padding:8px 10px;border-radius:999px;color:var(--muted)}
+    .navlinks a[aria-current="page"], .navlinks a:hover{color:var(--text);background: rgb(var(--c-white) / 0.06)}
+    .nav-actions{display:flex;align-items:center;gap:10px}
+    .navutil{color:var(--muted);padding:8px 10px;border-radius:999px}
+    .navutil:hover{color:var(--text);background: rgb(var(--c-white) / 0.06)}
+
+    .btn{border:0;cursor:pointer;border-radius:999px;padding:10px 14px;font-weight:650}
+    .btn.primary{color:#fff;background: linear-gradient(90deg, rgb(var(--c-purple)), rgb(var(--c-blue)))}
+    .btn.secondary{color:var(--text);background: rgb(var(--c-white) / 0.08);border:1px solid rgb(var(--c-white) / 0.12)}
+    .btn.ghost{color:var(--text);background:transparent;border:1px solid rgb(var(--c-white) / 0.12)}
+
+    .navmenu-btn{display:none}
+
+    /* Mobile menu (basic) */
+    #svx-navmenu-backdrop{display:none;position:fixed;inset:0;background: rgb(var(--c-black) / 0.55);z-index:40}
+    #svx-navmenu{display:none;position:fixed;inset:auto 12px 12px 12px;z-index:50}
+    body.svx-navmenu-open #svx-navmenu-backdrop{display:block}
+    body.svx-navmenu-open #svx-navmenu{display:block}
+    #svx-navmenu .sheet{background: rgb(var(--c-white) / 0.06);border:1px solid rgb(var(--c-white) / 0.12);border-radius:18px;backdrop-filter: blur(12px);-webkit-backdrop-filter: blur(12px);padding:14px}
+    #svx-navmenu .sheet-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    #svx-navmenu .sheet-title{font-weight:700}
+    #svx-navmenu .sheet-close{border:1px solid rgb(var(--c-white) / 0.12);background:transparent;color:var(--text);border-radius:12px;padding:8px 10px;cursor:pointer}
+    #svx-navmenu .sheet-links{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+    #svx-navmenu .sheet-links a{padding:10px 12px;border-radius:12px;background: rgb(var(--c-white) / 0.05);border:1px solid rgb(var(--c-white) / 0.10)}
+    #svx-navmenu .sheet-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+    @media (max-width: 920px){
+      .navlinks{display:none}
+      .navmenu-btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid rgb(var(--c-white) / 0.12);background: rgb(var(--c-white) / 0.06);color:var(--text);border-radius:999px;padding:10px 14px;cursor:pointer}
+    }
+
+    /* Ensure page content isn't hidden under fixed navbar */
+    body{padding-top: 110px;}
+
     /* Turn the signed-in "modal" into a normal page surface */
     #svx-auth-backdrop{display:none !important;}
     #svx-signedin-modal{position:static !important; inset:auto !important; display:block !important;}
