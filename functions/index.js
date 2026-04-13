@@ -122,6 +122,8 @@ async function handleCreateAgent(req, res) {
 
   const uid = decoded.uid;
 
+  const nickname = String(body.nickname || '').trim();
+
   const business = String(body.business || '').trim();
   const industry = String(body.industry || '').trim();
   const goals = String(body.goals || '').trim();
@@ -137,6 +139,7 @@ async function handleCreateAgent(req, res) {
   const transferCalls = Boolean(body.transferCalls);
   const transferTo = String(body.transferTo || '').trim();
 
+  if (!nickname) return json(res, 400, { ok: false, error: 'nickname_required' });
   if (!business) return json(res, 400, { ok: false, error: 'business_required' });
   if (!industry) return json(res, 400, { ok: false, error: 'industry_required' });
   if (!goals) return json(res, 400, { ok: false, error: 'goals_required' });
@@ -150,6 +153,7 @@ async function handleCreateAgent(req, res) {
   const draft = {
     uid,
     status: 'creating',
+    nickname,
     business,
     industry,
     goals,
@@ -163,6 +167,8 @@ async function handleCreateAgent(req, res) {
     transferCalls,
     transferTo: transferCalls ? transferTo : null,
     greetingSound,
+    // Setup state (temporary): user must select a phone number before this agent is considered ready.
+    phoneNumberSelected: false,
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   };
@@ -196,7 +202,7 @@ async function handleCreateAgent(req, res) {
     providerResp = await elevenFetch('/v1/convai/agents/create', {
       method: 'POST',
       body: {
-        name: `SVX - ${business}`,
+        name: `SVX - ${nickname}`,
         conversation_config: {
           agent: {
             language: 'en',

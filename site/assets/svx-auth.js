@@ -201,7 +201,13 @@
       const title = it.title || it.summary || it.name || it.id || 'Item';
       const sub = it.sub || it.createdAt || it.when || '';
 
-      ul.appendChild(el('li', { class: 'svx-list-item' }, [
+      const liAttrs = { class: 'svx-list-item' };
+      if (it.id) {
+        liAttrs['data-svx-item'] = '1';
+        liAttrs['data-svx-id'] = String(it.id);
+      }
+
+      ul.appendChild(el('li', liAttrs, [
         el('div', { class: 'svx-list-title', text: title }),
         sub ? el('div', { class: 'svx-list-sub', text: sub }) : el('div', { class: 'svx-list-sub', text: '' }),
       ]));
@@ -310,6 +316,7 @@
   async function refreshSignedInDashboard() {
     const summariesWrap = $('#svx-live-summaries');
     const apptsWrap = $('#svx-appointments');
+    const agentsWrap = $('#svx-agents');
     const errWrap = $('#svx-dashboard-status');
 
     if (errWrap) {
@@ -319,6 +326,7 @@
 
     renderSkeletonList(summariesWrap, 3);
     renderSkeletonList(apptsWrap, 3);
+    renderSkeletonList(agentsWrap, 2);
 
     let auth, db;
     try {
@@ -335,14 +343,62 @@
     if (!user) return;
 
     // Profile header
+    let profile = null;
     try {
-      const profile = await loadProfile(db, user.uid);
+      profile = await loadProfile(db, user.uid);
       const username = profile?.username || user.displayName || (user.email ? user.email.split('@')[0] : 'Account');
       setText('svx-profile-name', username ? `@${username}`.replace('@@', '@') : 'Account');
       setText('svx-profile-email', user.email || profile?.email || '');
     } catch (_) {
       setText('svx-profile-name', user.email ? user.email.split('@')[0] : 'Account');
       setText('svx-profile-email', user.email || '');
+    }
+
+    const userPlan = profile?.userPlan ?? profile?.plan ?? null;
+    const hasPaidPlan = Boolean(userPlan) && String(userPlan) !== 'free';
+
+    // Agents
+    try {
+      const qs = await db
+        .collection('users').doc(user.uid)
+        .collection('svxAgents')
+        .orderBy('createdAt', 'desc')
+        .limit(10)
+        .get();
+
+      const items = qs.docs.map((d) => {
+        const a = d.data() || {};
+        const nickname = a.nickname || a.label || a.name || a.business || 'Agent';
+        const phoneSelected = Boolean(a.phoneNumberSelected);
+        const missing = [];
+        if (!hasPaidPlan) missing.push('Select a paid plan');
+        if (!phoneSelected) missing.push('Select a phone number');
+        const ready = missing.length === 0;
+        return {
+          id: d.id,
+          title: String(nickname),
+          sub: ready ? 'Ready' : 'Needs setup',
+          _ready: ready,
+          _missing: missing,
+        };
+      });
+
+      renderList(agentsWrap, items, 'No agents yet. Click “Create / deploy agent” to create one.');
+
+      if (agentsWrap && !agentsWrap.__svxAgentsClickBound) {
+        agentsWrap.__svxAgentsClickBound = true;
+        agentsWrap.addEventListener('click', (ev) => {
+          const row = ev.target?.closest?.('[data-svx-item]');
+          if (!row) return;
+          const id = row.getAttribute('data-svx-id');
+          const it = items.find((x) => x.id === id);
+          if (!it) return;
+          if (it._ready) alert(`Agent “${it.title}” is ready.`);
+          else alert(`Agent “${it.title}” needs setup:\n\n- ${it._missing.join('\n- ')}`);
+        });
+      }
+    } catch (_) {
+      renderList(agentsWrap, [], 'No agents yet.');
     }
 
     // Latest Windows download
@@ -504,6 +560,15 @@
         ]),
 
         el('div', { class: 'svx-dashboard-grid' }, [
+          el('div', { class: 'svx-card' }, [
+            el('div', { class: 'svx-card-head' }, [
+              el('div', { class: 'svx-card-title', text: 'SVX Agents' }),
+              el('div', { class: 'svx-card-pill', text: 'your agents' }),
+            ]),
+            el('div', { class: 'svx-card-sub', text: 'Status becomes Ready once a paid plan is selected and a phone number is set.' }),
+            el('div', { id: 'svx-agents' }),
+          ]),
+
           el('div', { class: 'svx-card' }, [
             el('div', { class: 'svx-card-head' }, [
               el('div', { class: 'svx-card-title', text: 'Latest Windows download' }),
@@ -834,6 +899,7 @@
         ]),
 
         el('form', { id: 'svx-agent-form', class: 'svx-form' }, [
+          el('label', {}, [el('span', { text: 'Agent nickname (label)' }), el('input', { id: 'svx-agent-nickname', type: 'text', placeholder: 'e.g. Lakeside Front Desk' })]),
           el('label', {}, [el('span', { text: 'Business name' }), el('input', { id: 'svx-agent-business', type: 'text', placeholder: 'e.g. Lakeside Dental' })]),
           el('label', {}, [el('span', { text: 'Industry' }), el('input', { id: 'svx-agent-industry', type: 'text', placeholder: 'e.g. Dental, Oncology, Call Center, Home Services' })]),
           el('label', {}, [el('span', { text: 'Primary workflows (what should it do?)' }), el('input', { id: 'svx-agent-goals', type: 'text', placeholder: 'e.g. book appointments, confirm visits, follow up leads, outbound list calls' })]),
@@ -893,6 +959,7 @@
       if (!user) return setAgentStatus('Please sign in first.', 'error');
 
       const body = {
+        nickname: String($('#svx-agent-nickname')?.value || '').trim(),
         business: String($('#svx-agent-business')?.value || '').trim(),
         industry: String($('#svx-agent-industry')?.value || '').trim(),
         goals: String($('#svx-agent-goals')?.value || '').trim(),
@@ -927,6 +994,7 @@
 
         setAgentStatus('Agent created.', 'success');
         setTimeout(closeAgentModal, 700);
+        try { refreshSignedInDashboard(); } catch (_) {}
       } catch (e) {
         setAgentStatus(e?.message || 'Failed to create agent.', 'error');
       }
