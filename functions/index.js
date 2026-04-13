@@ -254,7 +254,8 @@ async function api(req, res) {
   try {
     const path = (req.path || '/').replace(/\/$/, '');
 
-    if (req.method === 'GET' && (path === '' || path === '/')) {
+    // Health check. Hosting rewrites can preserve a leading /api prefix.
+    if (req.method === 'GET' && (path === '' || path === '/' || path === '/api')) {
       return json(res, 200, { ok: true, service: 'smartvoicex-api' });
     }
 
