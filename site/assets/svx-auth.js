@@ -538,8 +538,9 @@
         st.textContent = `
           .svx-progress{height:10px;border-radius:999px;background:rgba(255,255,255,0.10);overflow:hidden;margin:10px 0 14px 0;border:1px solid rgba(255,255,255,0.10)}
           .svx-progress-bar{height:100%;width:0%;background:linear-gradient(90deg, rgba(98,20,217,1), rgba(79,123,255,1));transition:width 333ms ease}
-          .svx-steps{display:flex;overflow:hidden;transform:translateX(0%);transition:transform 333ms ease;will-change:transform}
-          .svx-step{min-width:100%}
+          .svx-steps-viewport{overflow:hidden}
+          .svx-steps{display:flex;transform:translateX(0%);transition:transform 333ms ease;will-change:transform}
+          .svx-step{flex:0 0 100%;min-width:100%}
         `;
         document.head.appendChild(st);
       }
@@ -919,21 +920,22 @@
             el('div', { class: 'svx-progress-bar', id: 'svx-agent-progress' }),
           ]),
 
-          el('div', { class: 'svx-steps', id: 'svx-agent-steps' }, [
-            el('div', { class: 'svx-step' }, [
+          el('div', { class: 'svx-steps-viewport' }, [
+            el('div', { class: 'svx-steps', id: 'svx-agent-steps' }, [
+              el('div', { class: 'svx-step' }, [
               el('label', {}, [el('span', { text: 'Agent nickname (label)' }), el('input', { id: 'svx-agent-nickname', type: 'text', placeholder: 'e.g. Lakeside Front Desk' })]),
               el('label', {}, [el('span', { text: 'Business name' }), el('input', { id: 'svx-agent-business', type: 'text', placeholder: 'e.g. Lakeside Dental' })]),
               el('label', {}, [el('span', { text: 'Industry' }), el('input', { id: 'svx-agent-industry', type: 'text', placeholder: 'e.g. Dental, Oncology, Call Center, Home Services' })]),
-            ]),
+              ]),
 
-            el('div', { class: 'svx-step' }, [
+              el('div', { class: 'svx-step' }, [
               el('label', {}, [el('span', { text: 'Primary workflows (what should it do?)' }), el('input', { id: 'svx-agent-goals', type: 'text', placeholder: 'e.g. book appointments, confirm visits, follow up leads, outbound list calls' })]),
               el('label', {}, [el('span', { text: 'Must-do’s (rules it must follow)' }), el('input', { id: 'svx-agent-mustdos', type: 'text', placeholder: 'e.g. always confirm phone number; always offer next available slot' })]),
               el('label', {}, [el('span', { text: 'Never-do’s (hard prohibitions)' }), el('input', { id: 'svx-agent-neverdos', type: 'text', placeholder: 'e.g. never give medical advice; never quote pricing without approval' })]),
               el('label', {}, [el('span', { text: 'Scripts / talk tracks (optional)' }), el('input', { id: 'svx-agent-scripts', type: 'text', placeholder: 'Paste short scripts or guidelines' })]),
-            ]),
+              ]),
 
-            el('div', { class: 'svx-step' }, [
+              el('div', { class: 'svx-step' }, [
               el('label', {}, [el('span', { text: 'First message (exact first line when the call connects)' }), el('input', { id: 'svx-agent-firstmessage', type: 'text', placeholder: 'Hi, thanks for calling Lakeside Dental—how can I help today?' })]),
               el('label', {}, [el('span', { text: 'Personality' }), el('input', { id: 'svx-agent-personality', type: 'text', placeholder: 'Warm, confident, concise, professional' })]),
               el('label', {}, [el('span', { text: 'Seniority / role style' }), el('input', { id: 'svx-agent-seniority', type: 'text', placeholder: 'e.g. receptionist, office manager, sales rep' })]),
@@ -942,9 +944,9 @@
                 el('span', { text: 'Should it hide that it’s AI?' }),
                 el('input', { id: 'svx-agent-hideai', type: 'checkbox' }),
               ]),
-            ]),
+              ]),
 
-            el('div', { class: 'svx-step' }, [
+              el('div', { class: 'svx-step' }, [
               el('label', {}, [
                 el('span', { text: 'Can it transfer calls?' }),
                 el('input', { id: 'svx-agent-transfer', type: 'checkbox' }),
@@ -952,6 +954,7 @@
               el('label', { id: 'svx-agent-transfer-to-wrap', hidden: 'hidden' }, [
                 el('span', { text: 'If yes, where should it transfer?' }),
                 el('input', { id: 'svx-agent-transfer-to', type: 'text', placeholder: 'e.g. +1 312 555 0100 or “front desk”' }),
+              ]),
               ]),
             ]),
           ]),
@@ -994,6 +997,15 @@
       const isLast = step === total - 1;
       if (btnNext) btnNext.style.display = isLast ? 'none' : '';
       if (btnSubmit) btnSubmit.style.display = isLast ? '' : 'none';
+
+      // Make non-active steps non-interactive without breaking the flex track.
+      for (let i = 0; i < steps.length; i++) {
+        const active = i === step;
+        steps[i].setAttribute('aria-hidden', active ? 'false' : 'true');
+        steps[i].style.visibility = active ? 'visible' : 'hidden';
+        // inert is supported in modern Chromium; safe to try.
+        try { steps[i].inert = !active; } catch (_) {}
+      }
       setAgentStatus('');
     }
 
