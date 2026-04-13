@@ -904,6 +904,8 @@
   function mountAgentUI() {
     if ($('#svx-agent-modal')) return;
 
+    console.info('[SVX] mountAgentUI(): building agent wizard modal');
+
     const modal = el('div', { id: 'svx-agent-modal', role: 'dialog', 'aria-modal': 'true' }, [
       el('div', { class: 'svx-modal' }, [
         el('div', { class: 'svx-modal-header' }, [
@@ -972,6 +974,8 @@
     ]);
 
     document.body.appendChild(modal);
+
+    console.info('[SVX] mountAgentUI(): agent wizard modal mounted');
 
     $('#svx-agent-close')?.addEventListener('click', closeAgentModal);
     $('#svx-agent-cancel')?.addEventListener('click', closeAgentModal);
@@ -1051,6 +1055,8 @@
     });
 
     renderStep();
+
+    console.info('[SVX] agent wizard: initial renderStep complete', { step });
 
     const transfer = $('#svx-agent-transfer');
     transfer?.addEventListener('change', () => {
