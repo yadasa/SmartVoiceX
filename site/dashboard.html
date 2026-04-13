@@ -20,6 +20,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="/assets/svx-auth.js" defer></script>
+  <script src="/assets/liquid-glass/svx-webgl-bg.js?v=20260402c" defer></script>
 
   <style>
     body{margin:0;background:#000;color:#fff}
@@ -36,7 +37,80 @@
 <body>
   <noscript>You need JavaScript enabled to use the SmartVoiceX dashboard.</noscript>
 
+  <div class="topbar-bg" aria-hidden="true"></div>
+
+  <div class="topbar">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="/">
+          <img class="logo-img" src="/assets/brand/logo-90.png" alt="SmartVoiceX" width="45" height="40" />
+          <span>SmartVoiceX</span>
+        </a>
+
+        <div class="navlinks" aria-label="Primary">
+          <a href="/">Home</a>
+          <a href="/#pricing">Pricing</a>
+          <a href="/#faq">FAQ</a>
+          <a href="/dashboard.html" aria-current="page">Dashboard</a>
+        </div>
+
+        <div class="nav-actions">
+          <a class="navutil" id="svx-nav-auth" href="#" onclick="window.SVXAuth?.openSignIn?.(); return false;">Sign in</a>
+          <button class="btn primary" type="button" onclick="window.SVXOpenWidget?.()">Talk to the AI live</button>
+          <button class="navmenu-btn" id="svx-navmenu-open" type="button" aria-label="Open menu">Menu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="svx-navmenu-backdrop" aria-hidden="true"></div>
+  <div id="svx-navmenu" role="dialog" aria-modal="true" aria-label="Menu">
+    <div class="sheet">
+      <div class="sheet-header">
+        <div class="sheet-title">Menu</div>
+        <button class="sheet-close" id="svx-navmenu-close" type="button">Close</button>
+      </div>
+
+      <nav class="sheet-links" aria-label="Sections">
+        <a href="/" data-svx-navlink>Home</a>
+        <a href="/#pricing" data-svx-navlink>Pricing</a>
+        <a href="/#faq" data-svx-navlink>FAQ</a>
+        <a href="/dashboard.html" data-svx-navlink>Dashboard</a>
+      </nav>
+
+      <div class="sheet-actions" aria-label="Actions">
+        <button class="btn primary" type="button" onclick="window.SVXOpenWidget?.()">Talk to the AI live</button>
+        <button class="btn ghost" type="button" onclick="location.href='/dashboard.html'">Dashboard</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // Mobile nav menu behavior (same as homepage)
+    (function(){
+      const openBtn = document.getElementById('svx-navmenu-open');
+      const closeBtn = document.getElementById('svx-navmenu-close');
+      const backdrop = document.getElementById('svx-navmenu-backdrop');
+      const sheet = document.getElementById('svx-navmenu');
+      if(!openBtn || !closeBtn || !backdrop || !sheet) return;
+
+      function open(){
+        document.body.classList.add('svx-navmenu-open');
+        try{ sheet.querySelector('a,button')?.focus({ preventScroll:true }); }catch(_){ }
+      }
+      function close(){
+        document.body.classList.remove('svx-navmenu-open');
+        try{ openBtn.focus({ preventScroll:true }); }catch(_){ }
+      }
+      openBtn.addEventListener('click', open);
+      closeBtn.addEventListener('click', close);
+      backdrop.addEventListener('click', close);
+      sheet.querySelectorAll('[data-svx-navlink]').forEach((a) => a.addEventListener('click', close));
+      document.addEventListener('keydown', (e) => {
+        if(e.key === 'Escape' && document.body.classList.contains('svx-navmenu-open')) close();
+      });
+    })();
+
     // Once the auth script loads, open the dashboard UI.
     window.addEventListener('load', () => {
       try {
@@ -45,6 +119,20 @@
       } catch (_) {}
     });
   </script>
+
+  <!-- SmartVoiceX Widget (from Dentai staging) -->
+  <script src="https://staging.smartvoicex.com/svx-widget.js"></script>
+  <smartvoicex-widget agent-id="agent_7401kn7jxcf7f1c8ecmd087n9c52" mode="voice"></smartvoicex-widget>
+  <script>
+    window.SVXOpenWidget = function(){
+      try {
+        const w = document.querySelector('smartvoicex-widget');
+        if (!w) return;
+        w.setAttribute('open', '');
+        w.setAttribute('mode', 'voice');
+        if (typeof w.open === 'function') w.open();
+      } catch (_) {}
+    };
+  </script>
 </body>
 </html>
-

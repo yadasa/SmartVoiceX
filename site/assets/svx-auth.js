@@ -107,7 +107,17 @@
 
   function setAuthButtonSignedOut() {
     const nav = $('#svx-nav-auth');
-    if (nav) nav.textContent = 'Sign in';
+    if (nav) {
+      nav.textContent = 'Sign in';
+      try {
+        nav.setAttribute('href', '#');
+        nav.onclick = (e) => {
+          try { e?.preventDefault?.(); } catch (_) {}
+          try { window.SVXAuth?.openSignIn?.(); } catch (_) {}
+          return false;
+        };
+      } catch (_) {}
+    }
 
     const btn = $('#svx-auth-btn');
     if (btn) btn.textContent = 'Sign in';
@@ -118,7 +128,17 @@
 
   function setAuthButtonSignedIn(user, profile) {
     const nav = $('#svx-nav-auth');
-    if (nav) nav.textContent = 'My Account';
+    if (nav) {
+      nav.textContent = 'Dashboard';
+      try {
+        nav.setAttribute('href', '/dashboard.html');
+        nav.onclick = (e) => {
+          try { e?.preventDefault?.(); } catch (_) {}
+          try { window.location.href = '/dashboard.html'; } catch (_) {}
+          return false;
+        };
+      } catch (_) {}
+    }
 
     const btn = $('#svx-auth-btn');
     const label = (profile && profile.username) ? `@${profile.username}` : (user.email || 'Account');
