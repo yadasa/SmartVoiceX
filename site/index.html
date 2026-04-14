@@ -73,11 +73,15 @@
       margin-top: 10px;
       margin-bottom: 10px;
       padding: 12px 14px;
-      border-radius: 999px;
-      border: 1px solid rgb(var(--c-white) / 0.14);
+      border-radius: 19px;
+      border: 1px solid rgb(var(--c-white) / 0.16);
       color: #fff;
-      background: linear-gradient(90deg, rgb(var(--c-blue) / 0.95), rgb(var(--c-purple) / 0.95));
-      box-shadow: 0 10px 26px rgb(var(--c-blue) / 0.18);
+      background: rgb(var(--c-blue) / 0.95);
+      /* subtle bevel */
+      box-shadow:
+        inset 0 1px 0 rgb(var(--c-white) / 0.22),
+        inset 0 -1px 0 rgb(var(--c-black) / 0.35),
+        0 10px 26px rgb(var(--c-blue) / 0.18);
       transition: transform 333ms ease, box-shadow 333ms ease, filter 333ms ease;
     }
     .svx-subscribe-btn.is-disabled{
@@ -98,7 +102,11 @@
     }
     .svx-subscribe-btn:hover{
       transform: translateY(-1px);
-      box-shadow: 0 0 0 4px rgb(var(--c-purple) / 0.18), 0 18px 40px rgb(var(--c-purple) / 0.20);
+      box-shadow:
+        inset 0 1px 0 rgb(var(--c-white) / 0.24),
+        inset 0 -1px 0 rgb(var(--c-black) / 0.35),
+        0 0 0 4px rgb(var(--c-purple) / 0.18),
+        0 18px 40px rgb(var(--c-purple) / 0.22);
       filter: brightness(1.05);
     }
   </style>
