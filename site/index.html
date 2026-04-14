@@ -109,6 +109,21 @@
         0 18px 40px rgb(var(--c-purple) / 0.22);
       filter: brightness(1.05);
     }
+
+    /* Pricing grid responsiveness */
+    #pricing .pricing-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:14px;
+    }
+    @media (max-width: 980px){
+      #pricing .pricing-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width: 640px){
+      #pricing .pricing-grid{ grid-template-columns:1fr; }
+      /* kicker should span most of the screen on mobile */
+      .kicker{ --kicker-w: 92vw; }
+    }
   </style>
 
   <style>
@@ -892,7 +907,7 @@
       <div class="h2">Pricing built around your workflow.</div>
       <div class="lead">Most teams start with a monthly platform fee plus usage‑based minutes. More complex workflows, integrations, and higher‑volume deployments are scoped separately.</div>
 
-      <div class="split pricing-grid" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px">
+      <div class="split pricing-grid">
         <div class="card" id="plan-99">
           <b>Starter (Inbound)</b>
           <p><b>$99/mo</b> + usage</p>
