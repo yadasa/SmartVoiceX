@@ -108,16 +108,21 @@ service cloud.firestore {
     // ORGANIZATIONS WALLET
     // organizations/{orgId}/wallet/{walletId} (e.g. main)
     //
-    // Hosted widget demo: server-only.
-    // Deny all client reads/writes to wallet + transactions unless you are
-    // explicitly building an authenticated admin dashboard that needs it.
-    // (Admin SDK bypasses rules.)
+    // App UI needs to read wallet state. Allow org members to read.
+    // Allow limited member writes only where required (self-logged tx records).
+    // Keep privileged operations admin/owner-only.
     // ----------------------
     match /organizations/{orgId}/wallet/{walletId} {
-      allow read, write: if false;
+      allow read: if isOrgMember(orgId, request.auth.uid);
+      // Allow balance debits only if your client requires it. Safer default is admin/owner.
+      allow create, update, delete: if isOrgAdminOrOwner(orgId, request.auth.uid);
 
       match /transactions/{txId} {
-        allow read, write: if false;
+        allow read: if isOrgMember(orgId, request.auth.uid);
+        // Members may create tx logs only for themselves.
+        allow create: if isOrgMember(orgId, request.auth.uid)
+          && request.resource.data.uid == request.auth.uid;
+        allow update, delete: if isOrgAdminOrOwner(orgId, request.auth.uid);
       }
     }
 
