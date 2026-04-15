@@ -179,6 +179,9 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
     const track = root.querySelector('.svx-side-track');
     if (!track) return;
 
+    const viewport = root.querySelector('.svx-side-viewport');
+    const pages = Array.from(root.querySelectorAll('.svx-side-page'));
+
     const btnPrev = root.querySelector('[data-svx-side-prev]');
     const btnNext = root.querySelector('[data-svx-side-next]');
 
@@ -186,8 +189,17 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
     let timer = null;
     let paused = false;
 
+    const syncHeight = () => {
+      if (!viewport) return;
+      const page = pages[index];
+      if (!page) return;
+      // Height transition is handled via CSS on the viewport.
+      viewport.style.height = page.offsetHeight + 'px';
+    };
+
     const apply = () => {
       track.style.transform = `translateX(${-50 * index}%)`;
+      syncHeight();
     };
 
     const go = (next) => {
@@ -224,6 +236,13 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
     });
     btnNext?.addEventListener('click', () => {
       go(index + 1);
+    });
+
+    // Keep height correct on resize.
+    let resizeT = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeT);
+      resizeT = setTimeout(() => syncHeight(), 80);
     });
 
     apply();

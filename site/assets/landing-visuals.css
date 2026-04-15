@@ -7,8 +7,8 @@
 }
 
 /* Hero sticky slider (two-page rail) */
-.svx-side-slider{ position:relative; margin-top:12px; }
-.svx-side-viewport{ overflow:hidden; border-radius:16px; }
+.svx-side-slider{ position:relative; margin-top:12px; padding:0 26px; }
+.svx-side-viewport{ overflow:hidden; border-radius:16px; height:auto; transition:height 333ms ease; }
 .svx-side-track{
   display:flex;
   width:200%;
@@ -19,22 +19,19 @@
 
 .svx-side-arrow{
   position:absolute;
-  top:10px;
-  width:30px;
-  height:30px;
-  border-radius:999px;
-  border:1px solid rgb(var(--c-white) / 0.14);
-  background:rgb(var(--c-black) / 0.35);
-  color:rgb(var(--c-white) / 0.85);
+  top:50%;
+  transform:translateY(-50%);
+  padding:6px 8px;
+  border:none;
+  background:transparent;
+  color:rgb(var(--c-white) / 0.72);
+  font:900 28px/1 Consolas, monospace;
   cursor:pointer;
-  display:grid;
-  place-items:center;
-  z-index:2;
-  box-shadow:0 10px 22px rgb(var(--c-black) / 0.35);
+  z-index:3;
 }
-.svx-side-arrow:hover{ background:rgb(var(--c-black) / 0.55); }
-.svx-side-arrow--left{ left:10px; }
-.svx-side-arrow--right{ right:10px; }
+.svx-side-arrow:hover{ color:rgb(var(--c-white) / 0.92); }
+.svx-side-arrow--left{ left:0; }
+.svx-side-arrow--right{ right:0; }
 
 .svx-preview-card,
 .svx-cost-card,
