@@ -423,6 +423,8 @@
 }
 
 @media (max-width: 640px){
+  /* Make kicker span most of the screen on mobile */
+  .kicker{ --kicker-w: 92vw; }
   .svx-cost-card .svx-cost-row{ grid-template-columns: 1fr; }
   .reliability-grid{
     grid-template-columns:1fr;
