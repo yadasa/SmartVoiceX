@@ -319,6 +319,43 @@
   font-weight:800;
 }
 
+/* Core node: intentionally styled differently (bring back the larger purple core) */
+.svx-node--core .svx-node-dot{
+  width:40px;
+  height:40px;
+  background:rgb(var(--c-purple) / 0.85);
+  border:1px solid rgb(var(--c-purple) / 0.95);
+  box-shadow:
+    0 0 0 8px rgb(var(--c-purple) / 0.14),
+    0 0 26px rgb(var(--c-purple) / 0.55),
+    0 0 58px rgb(var(--c-purple) / 0.32);
+  animation: svxCorePulse 2.2s ease-in-out infinite;
+}
+
+.svx-node--core .svx-node-dot::after{
+  width:10px;
+  height:10px;
+  background: rgb(var(--c-white) / 0.94);
+  animation: dotInnerPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes svxCorePulse{
+  0%, 100%{
+    transform: scale(1);
+    box-shadow:
+      0 0 0 8px rgb(var(--c-purple) / 0.14),
+      0 0 26px rgb(var(--c-purple) / 0.55),
+      0 0 58px rgb(var(--c-purple) / 0.32);
+  }
+  50%{
+    transform: scale(1.06);
+    box-shadow:
+      0 0 0 12px rgb(var(--c-purple) / 0.08),
+      0 0 38px rgb(var(--c-purple) / 0.72),
+      0 0 78px rgb(var(--c-purple) / 0.42);
+  }
+}
+
 .svx-control-list{
   display:grid;
   gap:8px;
@@ -373,8 +410,7 @@
   flex:0 0 48px;
 }
 
-.svx-online-ring,
-.svx-online-core{
+.svx-online-ring{
   position:absolute;
   inset:0;
   border-radius:999px;
