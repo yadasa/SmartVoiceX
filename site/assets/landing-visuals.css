@@ -173,12 +173,14 @@
 
 .svx-cost-card .svx-cost-row{
   display:grid;
-  gap:6px;
+  grid-template-columns: 260px 1fr;
+  align-items:center;
+  gap:12px;
   margin-top:12px;
 }
 
 .svx-cost-track{
-  height:10px;
+  height:12px;
   border-radius:999px;
   overflow:hidden;
   background:rgb(var(--c-white) / 0.08);
@@ -188,16 +190,10 @@
   width:0;
   height:100%;
   border-radius:999px;
-  transition:width 700ms cubic-bezier(.22,.61,.36,1);
+  transition:none;
 }
 
-.svx-cost-fill--staff{
-  background:linear-gradient(90deg,
-    rgb(56 189 127 / 0.55),
-    rgb(250 204 21 / 0.55),
-    rgb(239 68 68 / 0.55)
-  );
-}
+.svx-cost-fill--staff{ background:rgb(56 189 127 / 0.55); }
 .svx-cost-fill--vendor{ background:rgb(var(--c-white) / 0.24); }
 .svx-cost-fill--brand{ background:rgb(var(--c-purple) / 0.90); }
 
@@ -427,6 +423,7 @@
 }
 
 @media (max-width: 640px){
+  .svx-cost-card .svx-cost-row{ grid-template-columns: 1fr; }
   .reliability-grid{
     grid-template-columns:1fr;
   }

@@ -69,21 +69,71 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
   }
 
   function animateCostCards(){
-    const rows = document.querySelectorAll('.svx-cost-row');
+    const rows = Array.from(document.querySelectorAll('.svx-cost-row'));
+    if (!rows.length) return;
     if (!('IntersectionObserver' in window)) return setCostWidths();
 
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
+    const rafByFill = new WeakMap();
+
+    const resetRow = (row) => {
+      const fill = row.querySelector('.svx-cost-fill');
+      if (!fill) return;
+      const rafId = rafByFill.get(fill);
+      if (rafId) cancelAnimationFrame(rafId);
+      rafByFill.delete(fill);
+      fill.style.width = '0%';
+      if (fill.classList.contains('svx-cost-fill--staff')) {
+        fill.style.background = 'rgb(56 189 127 / 0.55)';
+      }
+    };
+
+    const animateRow = (row) => {
+      const fill = row.querySelector('.svx-cost-fill');
+      if (!fill) return;
+
+      const target = Number(row.getAttribute('data-width') || '0');
+      if (!isFinite(target) || target <= 0) return;
+
+      // Restart from 0 every time it enters view.
+      resetRow(row);
+
+      const isStaff = fill.classList.contains('svx-cost-fill--staff');
+      const duration = 1400; // slower than before
+      const t0 = performance.now();
+
+      const step = (now) => {
+        const p = Math.min(1, (now - t0) / duration);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const w = target * eased;
+        fill.style.width = w.toFixed(2) + '%';
+
+        if (isStaff) {
+          // Whole bar changes color as it approaches 100% of its predefined length.
+          const frac = eased;
+          if (frac < 0.55) fill.style.background = 'rgb(56 189 127 / 0.55)';
+          else if (frac < 0.85) fill.style.background = 'rgb(250 204 21 / 0.55)';
+          else fill.style.background = 'rgb(239 68 68 / 0.55)';
+        }
+
+        if (p < 1) {
+          rafByFill.set(fill, requestAnimationFrame(step));
+        } else {
+          rafByFill.delete(fill);
+        }
+      };
+
+      rafByFill.set(fill, requestAnimationFrame(step));
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
         const row = entry.target;
-        const width = row.getAttribute('data-width') || '0';
-        const fill = row.querySelector('.svx-cost-fill');
-        if (fill) fill.style.width = width + '%';
-        observer.unobserve(row);
+        if (entry.isIntersecting) animateRow(row);
+        else resetRow(row);
       });
     }, { threshold: 0.35 });
 
-    rows.forEach(row => observer.observe(row));
+    rows.forEach((row) => observer.observe(row));
   }
 
   function setCostWidths(){
