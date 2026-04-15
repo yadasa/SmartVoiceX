@@ -260,6 +260,7 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
 
     const syncHeight = () => {
       if (!viewport) return;
+      if (isMobile() && !inView) return;
       const page = pages[index];
       if (!page) return;
       // Height transition is handled via CSS on the viewport.
@@ -326,7 +327,10 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
     let resizeT = null;
     window.addEventListener('resize', () => {
       clearTimeout(resizeT);
-      resizeT = setTimeout(() => syncHeight(), 80);
+      resizeT = setTimeout(() => {
+        if (isMobile() && !inView) return;
+        syncHeight();
+      }, 80);
     });
 
     apply();
