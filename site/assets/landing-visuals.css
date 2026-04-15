@@ -382,11 +382,6 @@
 }
 
 @media (max-width: 980px){
-  .svx-preview-card,
-  .svx-cost-card,
-  .svx-activity-card{
-    display:none;
-  }
   .reliability-grid{
     grid-template-columns:1fr 1fr;
   }

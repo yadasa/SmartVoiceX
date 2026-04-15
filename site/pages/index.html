@@ -666,72 +666,10 @@
         <div class="side-title">Talk to a live SmartVoiceX agent right on this page.</div>
         <div class="side-sub">Test SmartVoiceX live before you book a call.</div>
 
-        <div class="svx-hero-rail">
-          <section class="svx-preview-card" aria-label="Live conversation preview">
-            <div class="svx-preview-head">
-              <div>
-                <h3>Live conversation preview</h3>
-                <p>See how SmartVoiceX handles a real call</p>
-              </div>
-              <div class="svx-live-pill">
-                <span class="svx-live-dot"></span>
-                <span>LIVE</span>
-              </div>
-            </div>
-
-            <div class="svx-preview-wave" aria-hidden="true">
-              <div class="svx-wave-bars" id="svxWaveBars"></div>
-            </div>
-
-            <div class="svx-preview-chat" id="svxPreviewChat">
-              <div class="svx-chat-row svx-chat-row--agent is-visible">
-                <div class="svx-chat-avatar"></div>
-                <div class="svx-chat-bubble">Good morning! Thank you for calling SmartVoiceX. How can I help you today?</div>
-              </div>
-              <div class="svx-chat-row svx-chat-row--user">
-                <div class="svx-chat-bubble">Hi, I'd like to schedule an appointment for next Tuesday.</div>
-              </div>
-              <div class="svx-chat-row svx-chat-row--agent">
-                <div class="svx-chat-avatar"></div>
-                <div class="svx-chat-bubble">Of course! I have availability at 10:00 AM and 2:30 PM. Which works better?</div>
-              </div>
-              <div class="svx-chat-row svx-chat-row--user">
-                <div class="svx-chat-bubble">2:30 PM works great.</div>
-              </div>
-              <div class="svx-chat-row svx-chat-row--agent">
-                <div class="svx-chat-avatar"></div>
-                <div class="svx-chat-bubble">Perfect — you're booked for Tuesday at 2:30 PM. I'll send a confirmation shortly.</div>
-              </div>
-            </div>
-          </section>
-
-          <section class="svx-cost-card" aria-label="Cost comparison">
-            <h3>Cost comparison</h3>
-            <p>Monthly cost to handle the same call volume</p>
-
-            <div class="svx-cost-row" data-width="100">
-              <div class="svx-cost-meta"><span>Full-time receptionist</span><strong>$3,800/mo</strong></div>
-              <div class="svx-cost-track"><div class="svx-cost-fill svx-cost-fill--staff"></div></div>
-            </div>
-
-            <div class="svx-cost-row" data-width="58">
-              <div class="svx-cost-meta"><span>Outsourced call center</span><strong>$2,200/mo</strong></div>
-              <div class="svx-cost-track"><div class="svx-cost-fill svx-cost-fill--vendor"></div></div>
-            </div>
-
-            <div class="svx-cost-row" data-width="8">
-              <div class="svx-cost-meta"><span class="is-brand">SmartVoiceX</span><strong class="is-brand">$299/mo</strong></div>
-              <div class="svx-cost-track"><div class="svx-cost-fill svx-cost-fill--brand"></div></div>
-            </div>
-          </section>
-
-          <section class="svx-activity-card" aria-label="Daily call activity">
-            <h4>Daily call activity</h4>
-            <p class="svx-activity-total"><span id="svxActivityCount">847</span> <span>calls today</span></p>
-            <div class="svx-activity-bars" id="svxActivityBars"></div>
-            <div class="svx-activity-axis"><span>6 AM</span><span>12 PM</span><span>9 PM</span></div>
-            <div class="svx-activity-note">Illustrative activity pattern</div>
-          </section>
+        <div class="side-list" role="list">
+          <div class="side-item" role="listitem"><b>Natural, professional conversations</b><span>Consistent tone, clear responses, and configurable scripts.</span></div>
+          <div class="side-item" role="listitem"><b>Real workflow handling</b><span>Appointments, confirmations, routing, voicemail behavior, and escalation logic.</span></div>
+          <div class="side-item" role="listitem"><b>Visibility after go‑live</b><span>Recordings, transcripts, summaries, and workflow edits for ongoing control.</span></div>
         </div>
 
         <div class="cta-row" style="margin-top:12px">
@@ -771,15 +709,35 @@
             <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Inconsistent handling</b><span>Different reps create different outcomes, which makes quality hard to control.</span></div></div>
             <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Staff time trapped in repetition</b><span>Your team should not be spending its best hours on low‑value call volume.</span></div></div>
           </div>
-        </div>
-        <div class="card">
+      </div>
+      <div class="card">
           <b>What SmartVoiceX gives you</b>
           <div class="checklist">
             <div class="check"><span class="dot" aria-hidden="true"></span><div><b>A live deployed AI agent</b><span>Configured to your workflow, voice, tone, and business rules.</span></div></div>
             <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Transfer and escalation logic</b><span>Route calls to humans when needed, with the right context.</span></div></div>
             <div class="check"><span class="dot" aria-hidden="true"></span><div><b>Visibility and control</b><span>Review recordings, transcripts, and summaries, then refine the workflow over time.</span></div></div>
-          </div>
         </div>
+      </div>
+
+      <section class="card svx-cost-card" aria-label="Cost comparison" style="margin-top:14px">
+        <h3>Cost comparison</h3>
+        <p>Monthly cost to handle the same call volume</p>
+
+        <div class="svx-cost-row" data-width="100">
+          <div class="svx-cost-meta"><span>Full-time receptionist</span><strong>$3,800/mo</strong></div>
+          <div class="svx-cost-track"><div class="svx-cost-fill svx-cost-fill--staff"></div></div>
+        </div>
+
+        <div class="svx-cost-row" data-width="58">
+          <div class="svx-cost-meta"><span>Outsourced call center</span><strong>$2,200/mo</strong></div>
+          <div class="svx-cost-track"><div class="svx-cost-fill svx-cost-fill--vendor"></div></div>
+        </div>
+
+        <div class="svx-cost-row" data-width="8">
+          <div class="svx-cost-meta"><span class="is-brand">SmartVoiceX</span><strong class="is-brand">$299/mo</strong></div>
+          <div class="svx-cost-track"><div class="svx-cost-fill svx-cost-fill--brand"></div></div>
+        </div>
+      </section>
       </div>
     </section>
 
@@ -788,94 +746,21 @@
       <div class="solid-band-bg" aria-hidden="true"></div>
 
       <!-- (8) Capabilities -->
-      <section class="section" id="capabilities" aria-label="Core capabilities">
+    <section class="section" id="capabilities" aria-label="Core capabilities">
         <div class="kicker">Core capabilities</div>
       <div class="h2">Everything you need to run phone operations with more control.</div>
       <div class="lead">Handle inbound and outbound calls, control the workflow, and escalate to humans when needed.</div>
 
-      <div class="overview-gif-wrap" aria-label="Overview">
-        <img class="overview-gif" src="/assets/overview%20gif.gif" alt="SmartVoiceX overview" loading="lazy">
-      </div>
+      <div class="split" aria-label="Operational visibility">
+        <section class="card svx-activity-card" aria-label="Daily call activity">
+          <h4>Daily call activity</h4>
+          <p class="svx-activity-total"><span id="svxActivityCount">847</span> <span>calls today</span></p>
+          <div class="svx-activity-bars" id="svxActivityBars"></div>
+          <div class="svx-activity-axis"><span>6 AM</span><span>12 PM</span><span>9 PM</span></div>
+          <div class="svx-activity-note">Illustrative activity pattern</div>
+        </section>
 
-      <div class="grid" aria-label="Capabilities cards">
-        <div class="card"><b>Answer inbound calls</b><p>Deliver a fast, consistent experience from the first ring.</p></div>
-        <div class="card"><b>Place outbound calls</b><p>Follow up while intent is high and work through contact lists efficiently.</p></div>
-        <div class="card"><b>Concurrent calls</b><p>Handle multiple conversations at the same time without busy signals.</p></div>
-        <div class="card"><b>Book and confirm appointments</b><p>Support scheduling, confirmations, reminders, and reschedules.</p></div>
-        <div class="card"><b>Navigate IVR systems</b><p>Handle phone trees, detect voicemail, and leave messages when needed.</p></div>
-        <div class="card"><b>Multilingual support</b><p>Auto‑detect language and maintain the right tone across conversations.</p></div>
-        <div class="card"><b>Transfer to humans</b><p>Escalate based on your rules and collect context before handoff.</p></div>
-        <div class="card"><b>Workflow editing</b><p>Adjust routing, policies, scripts, and logic after deployment.</p></div>
-        <div class="card"><b>Recordings and summaries</b><p>Review outcomes with transcripts, recordings, and structured call summaries.</p></div>
-      </div>
-
-      <div class="cta-row" style="margin-top:16px">
-        <button class="btn primary" type="button" onclick="window.SVXOpenWidget?.()">Talk to the AI live</button>
-        <button class="btn secondary" type="button" onclick="window.location.href='/pages/contact.html'">Book a strategy call</button>
-      </div>
-    </section>
-
-    <!-- (9) Integrations -->
-    <section class="section" id="integrations" aria-label="Integrations">
-      <div class="kicker">Integrations</div>
-      <div class="h2">Works with the systems you already use.</div>
-      <div class="lead">SmartVoiceX connects to calendars, CRMs, internal tools, and custom workflows so your agent can operate inside your real process, not beside it.</div>
-
-      <div class="split">
-        <div class="card">
-          <b>Common integration patterns</b>
-          <p><b>Calendar and scheduling systems</b><br>For bookings, confirmations, reminders, and reschedules.</p>
-          <p><b>CRM and lead systems</b><br>For logging calls, updating statuses, and triggering follow‑up.</p>
-          <p><b>Payments and business tools</b><br>For workflows that require transactional steps or account actions.</p>
-          <p><b>Custom APIs and webhooks</b><br>For internal systems and industry‑specific software.</p>
-          <p style="color:var(--muted2)"><b>Note:</b> Integration availability depends on your systems and workflow requirements.</p>
-        </div>
-        <div class="card svx-integration-card">
-          <div class="svx-constellation" aria-label="Integration map">
-            <svg class="svx-constellation-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-              <line x1="50" y1="50" x2="15" y2="20"></line>
-              <line x1="50" y1="50" x2="85" y2="20"></line>
-              <line x1="50" y1="50" x2="10" y2="70"></line>
-              <line x1="50" y1="50" x2="90" y2="75"></line>
-              <line x1="50" y1="50" x2="50" y2="95"></line>
-            </svg>
-
-            <div class="svx-node svx-node--core" style="left:50%;top:50%;">
-              <div class="svx-node-dot"></div>
-              <span>SmartVoiceX</span>
-            </div>
-
-            <div class="svx-node" style="left:15%;top:20%;"><div class="svx-node-dot"></div><span>Calendar</span></div>
-            <div class="svx-node" style="left:85%;top:20%;"><div class="svx-node-dot"></div><span>CRM</span></div>
-            <div class="svx-node" style="left:10%;top:70%;"><div class="svx-node-dot"></div><span>Payments</span></div>
-            <div class="svx-node" style="left:90%;top:75%;"><div class="svx-node-dot"></div><span>Webhooks</span></div>
-            <div class="svx-node" style="left:50%;top:95%;"><div class="svx-node-dot"></div><span>Your API</span></div>
-          </div>
-
-          <div class="svx-control-list">
-            <div><b>Transfer rules</b><span>Route calls to the right person, team, or location.</span></div>
-            <div><b>Escalation paths</b><span>Set conditions for human handoff and context pass-through.</span></div>
-            <div><b>Voicemail behavior</b><span>Detect voicemail and trigger approved follow-up paths.</span></div>
-            <div><b>Language handling</b><span>Keep tone and logic consistent across supported languages.</span></div>
-            <div><b>Script adherence</b><span>Control how tightly the agent follows approved talk tracks.</span></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    </div>
-
-    <!-- (10) Trust & implementation -->
-    <section class="section" id="reliability" aria-label="Built for reliability">
-      <div class="kicker">Built for reliability</div>
-      <div class="h2">Configured with clear rules before it ever handles live calls.</div>
-      <div class="lead">SmartVoiceX is deployed with structured onboarding, defined escalation rules, configurable recording behavior, and clear workflow boundaries so your team knows how it will behave before go‑live.</div>
-
-      <div class="grid reliability-grid" aria-label="Reliability cards">
-        <div class="card"><b>Recording and consent</b><p>We scope recording, consent, and compliance needs during onboarding and configure the workflow accordingly.</p></div>
-        <div class="card"><b>Human handoff</b><p>When a human is needed, the agent can transfer the call using your routing rules and escalation logic.</p></div>
-        <div class="card"><b>Implementation process</b><p>Discovery, configuration, go‑live, and iteration — so the system matches the way your business actually operates.</p></div>
-        <div class="card svx-status-card" aria-label="System status">
+        <section class="card svx-status-card" aria-label="System status">
           <h4>System status</h4>
           <p class="svx-status-sub">All systems operational</p>
 
@@ -899,7 +784,137 @@
               <p class="svx-online-sub">3 concurrent calls active</p>
             </div>
           </div>
+        </section>
+      </div>
+
+      <div class="split" aria-label="Go-live timeline and live preview" style="align-items:flex-start">
+        <div class="overview-gif-wrap" aria-label="Overview">
+          <img class="overview-gif" src="/assets/overview%20gif.gif" alt="SmartVoiceX overview" loading="lazy">
         </div>
+
+        <section class="card svx-preview-card" aria-label="Live conversation preview">
+          <div class="svx-preview-head">
+            <div>
+              <h3>Live conversation preview</h3>
+              <p>See how SmartVoiceX handles a real call</p>
+            </div>
+            <div class="svx-live-pill">
+              <span class="svx-live-dot"></span>
+              <span>LIVE</span>
+            </div>
+          </div>
+
+          <div class="svx-preview-wave" aria-hidden="true">
+            <div class="svx-wave-bars" id="svxWaveBars"></div>
+          </div>
+
+          <div class="svx-preview-chat" id="svxPreviewChat">
+            <div class="svx-chat-row svx-chat-row--agent is-visible">
+              <div class="svx-chat-avatar"></div>
+              <div class="svx-chat-bubble">Good morning! Thank you for calling SmartVoiceX. How can I help you today?</div>
+            </div>
+            <div class="svx-chat-row svx-chat-row--user">
+              <div class="svx-chat-bubble">Hi, I'd like to schedule an appointment for next Tuesday.</div>
+            </div>
+            <div class="svx-chat-row svx-chat-row--agent">
+              <div class="svx-chat-avatar"></div>
+              <div class="svx-chat-bubble">Of course! I have availability at 10:00 AM and 2:30 PM. Which works better?</div>
+            </div>
+            <div class="svx-chat-row svx-chat-row--user">
+              <div class="svx-chat-bubble">2:30 PM works great.</div>
+            </div>
+            <div class="svx-chat-row svx-chat-row--agent">
+              <div class="svx-chat-avatar"></div>
+              <div class="svx-chat-bubble">Perfect — you're booked for Tuesday at 2:30 PM. I'll send a confirmation shortly.</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="grid" aria-label="Capabilities cards">
+        <div class="card"><b>Answer inbound calls</b><p>Deliver a fast, consistent experience from the first ring.</p></div>
+        <div class="card"><b>Place outbound calls</b><p>Follow up while intent is high and work through contact lists efficiently.</p></div>
+        <div class="card"><b>Concurrent calls</b><p>Handle multiple conversations at the same time without busy signals.</p></div>
+        <div class="card"><b>Book and confirm appointments</b><p>Support scheduling, confirmations, reminders, and reschedules.</p></div>
+        <div class="card"><b>Navigate IVR systems</b><p>Handle phone trees, detect voicemail, and leave messages when needed.</p></div>
+        <div class="card"><b>Multilingual support</b><p>Auto‑detect language and maintain the right tone across conversations.</p></div>
+        <div class="card"><b>Transfer to humans</b><p>Escalate based on your rules and collect context before handoff.</p></div>
+        <div class="card"><b>Workflow editing</b><p>Adjust routing, policies, scripts, and logic after deployment.</p></div>
+        <div class="card"><b>Recordings and summaries</b><p>Review outcomes with transcripts, recordings, and structured call summaries.</p></div>
+      </div>
+
+      <div class="cta-row" style="margin-top:16px">
+        <button class="btn primary" type="button" onclick="window.SVXOpenWidget?.()">Talk to the AI live</button>
+        <button class="btn secondary" type="button" onclick="window.location.href='/pages/contact.html'">Book a strategy call</button>
+      </div>
+    </section>
+
+    <!-- (9) Integrations -->
+    <section class="section" id="integrations" aria-label="Integrations">
+      <div class="kicker">Integrations</div>
+
+      <div class="split" aria-label="Integrations overview" style="align-items:flex-start">
+        <div>
+          <div class="h2">Works with the systems you already use.</div>
+          <div class="lead">SmartVoiceX connects to calendars, CRMs, internal tools, and custom workflows so your agent can operate inside your real process, not beside it.</div>
+        </div>
+
+        <div class="svx-constellation" aria-label="Integration map">
+          <svg class="svx-constellation-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <line x1="50" y1="50" x2="15" y2="20"></line>
+            <line x1="50" y1="50" x2="85" y2="20"></line>
+            <line x1="50" y1="50" x2="10" y2="70"></line>
+            <line x1="50" y1="50" x2="90" y2="75"></line>
+            <line x1="50" y1="50" x2="50" y2="95"></line>
+          </svg>
+
+          <div class="svx-node svx-node--core" style="left:50%;top:50%;">
+            <div class="svx-node-dot"></div>
+            <span>SmartVoiceX</span>
+          </div>
+
+          <div class="svx-node" style="left:15%;top:20%;"><div class="svx-node-dot"></div><span>Calendar</span></div>
+          <div class="svx-node" style="left:85%;top:20%;"><div class="svx-node-dot"></div><span>CRM</span></div>
+          <div class="svx-node" style="left:10%;top:70%;"><div class="svx-node-dot"></div><span>Payments</span></div>
+          <div class="svx-node" style="left:90%;top:75%;"><div class="svx-node-dot"></div><span>Webhooks</span></div>
+          <div class="svx-node" style="left:50%;top:95%;"><div class="svx-node-dot"></div><span>Your API</span></div>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="card">
+          <b>Common integration patterns</b>
+          <p><b>Calendar and scheduling systems</b><br>For bookings, confirmations, reminders, and reschedules.</p>
+          <p><b>CRM and lead systems</b><br>For logging calls, updating statuses, and triggering follow‑up.</p>
+          <p><b>Payments and business tools</b><br>For workflows that require transactional steps or account actions.</p>
+          <p><b>Custom APIs and webhooks</b><br>For internal systems and industry‑specific software.</p>
+          <p style="color:var(--muted2)"><b>Note:</b> Integration availability depends on your systems and workflow requirements.</p>
+        </div>
+        <div class="card">
+          <b>You control how the agent behaves.</b>
+          <div class="svx-control-list" style="margin-top:10px">
+            <div><b>Transfer rules</b><span>Route calls to the right person, team, or location.</span></div>
+            <div><b>Escalation paths</b><span>Set conditions for human handoff and context pass-through.</span></div>
+            <div><b>Voicemail behavior</b><span>Detect voicemail and trigger approved follow-up paths.</span></div>
+            <div><b>Language handling</b><span>Keep tone and logic consistent across supported languages.</span></div>
+            <div><b>Script adherence</b><span>Control how tightly the agent follows approved talk tracks.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    </div>
+
+    <!-- (10) Trust & implementation -->
+    <section class="section" id="reliability" aria-label="Built for reliability">
+      <div class="kicker">Built for reliability</div>
+      <div class="h2">Configured with clear rules before it ever handles live calls.</div>
+      <div class="lead">SmartVoiceX is deployed with structured onboarding, defined escalation rules, configurable recording behavior, and clear workflow boundaries so your team knows how it will behave before go‑live.</div>
+
+      <div class="grid" aria-label="Reliability cards">
+        <div class="card"><b>Recording and consent</b><p>We scope recording, consent, and compliance needs during onboarding and configure the workflow accordingly.</p></div>
+        <div class="card"><b>Human handoff</b><p>When a human is needed, the agent can transfer the call using your routing rules and escalation logic.</p></div>
+        <div class="card"><b>Implementation process</b><p>Discovery, configuration, go‑live, and iteration — so the system matches the way your business actually operates.</p></div>
       </div>
     </section>
 
