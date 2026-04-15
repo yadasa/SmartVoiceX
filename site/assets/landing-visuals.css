@@ -12,10 +12,11 @@
 .svx-side-track{
   display:flex;
   width:200%;
+  align-items:flex-start;
   transform:translateX(0%);
   transition:transform 420ms cubic-bezier(.22,.61,.36,1);
 }
-.svx-side-page{ width:50%; padding:0; }
+.svx-side-page{ width:50%; flex:0 0 50%; align-self:flex-start; padding:0; }
 
 .svx-side-arrow{
   position:absolute;
