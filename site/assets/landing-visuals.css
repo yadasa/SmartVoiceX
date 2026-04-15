@@ -285,33 +285,33 @@
 }
 
 .svx-node-dot{
-  width:26px;
-  height:26px;
+  position: relative;
+  width:10px;
+  height:10px;
   border-radius:999px;
-  background:rgb(var(--c-white) / 0.05);
-  border:1px solid rgb(var(--c-white) / 0.10);
-  position:relative;
+  background: rgb(var(--c-blue) / 0.92);
+  box-shadow:
+    0 0 0 6px rgb(var(--c-blue) / 0.20),
+    0 0 18px rgb(var(--c-blue) / 0.78),
+    0 0 44px rgb(var(--c-blue) / 0.40);
+  animation: dotPulse 2.2s ease-in-out infinite;
+  transform-origin: center;
 }
 
 .svx-node-dot::after{
   content:"";
   position:absolute;
-  inset:9px;
+  left:50%;
+  top:50%;
+  width:5px;
+  height:5px;
+  transform: translate(-50%,-50%);
   border-radius:999px;
-  background:rgb(var(--c-blue) / 0.66);
-}
-
-.svx-node--core .svx-node-dot{
-  width:40px;
-  height:40px;
-  background:rgb(var(--c-purple) / 0.85);
-  border-color:rgb(var(--c-purple) / 0.95);
-  box-shadow:0 0 24px rgb(var(--c-purple) / 0.35);
-}
-
-.svx-node--core .svx-node-dot::after{
-  inset:13px;
-  background:rgb(var(--c-white) / 0.96);
+  background: rgb(var(--c-white) / 0.92);
+  filter: blur(0.6px);
+  opacity: 0.85;
+  animation: dotInnerPulse 2.2s ease-in-out infinite;
+  pointer-events:none;
 }
 
 .svx-node--core span{
@@ -389,17 +389,36 @@
 .svx-online-ring:nth-child(3){ animation-delay:1.2s; }
 
 .svx-online-core{
-  inset:9px;
-  background:rgb(var(--c-blue) / 0.18);
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  background: rgb(var(--c-blue) / 0.92);
+  box-shadow:
+    0 0 0 6px rgb(var(--c-blue) / 0.20),
+    0 0 18px rgb(var(--c-blue) / 0.78),
+    0 0 44px rgb(var(--c-blue) / 0.40);
+  animation: dotPulse 2.2s ease-in-out infinite;
+  transform-origin:center;
 }
 
 .svx-online-core::after{
   content:"";
   position:absolute;
-  inset:10px;
+  left:50%;
+  top:50%;
+  width:5px;
+  height:5px;
+  transform: translate(-50%,-50%);
   border-radius:999px;
-  background:rgb(var(--c-blue) / 0.95);
-  animation:svxPulse 1.8s ease-in-out infinite;
+  background: rgb(var(--c-white) / 0.92);
+  filter: blur(0.6px);
+  opacity: 0.85;
+  animation: dotInnerPulse 2.2s ease-in-out infinite;
+  pointer-events:none;
 }
 
 .svx-online-title{
@@ -441,7 +460,13 @@
 
 @media (prefers-reduced-motion: reduce){
   .svx-live-dot,
+  .svx-node-dot,
+  .svx-online-core,
   .svx-online-ring,
+  .svx-online-core::after{
+    animation:none !important;
+  }
+  .svx-node-dot::after,
   .svx-online-core::after{
     animation:none !important;
   }
