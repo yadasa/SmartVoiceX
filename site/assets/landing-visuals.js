@@ -254,6 +254,9 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
     let index = 0;
     let timer = null;
     let paused = false;
+    let inView = true;
+
+    const isMobile = () => window.matchMedia && window.matchMedia('(max-width: 640px)').matches;
 
     const syncHeight = () => {
       if (!viewport) return;
@@ -269,6 +272,7 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
     };
 
     const go = (next) => {
+      if (isMobile() && !inView) return;
       index = ((next % 2) + 2) % 2;
       apply();
     };
@@ -278,6 +282,7 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
       if (timer) return;
       timer = setInterval(() => {
         if (paused) return;
+        if (isMobile() && !inView) return;
         go(index + 1);
       }, 3000);
     };
@@ -296,6 +301,19 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
       paused = false;
       start();
     });
+
+    // On mobile, freeze auto-rotation and size changes when at least ~43% is out of view.
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        const ratio = entry.intersectionRatio || 0;
+        inView = ratio >= 0.57;
+        if (!inView) stop();
+        else if (!paused) start();
+      }, { threshold: [0, 0.57, 1] });
+      io.observe(root);
+    }
 
     btnPrev?.addEventListener('click', () => {
       go(index - 1);
