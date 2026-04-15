@@ -108,11 +108,27 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
         fill.style.width = w.toFixed(2) + '%';
 
         if (isStaff) {
-          // Whole bar changes color as it approaches 100% of its predefined length.
+          // Whole bar fades green -> yellow -> red as it approaches 100%.
           const frac = eased;
-          if (frac < 0.55) fill.style.background = 'rgb(56 189 127 / 0.55)';
-          else if (frac < 0.85) fill.style.background = 'rgb(250 204 21 / 0.55)';
-          else fill.style.background = 'rgb(239 68 68 / 0.55)';
+          const a = 0.55;
+          const GREEN = [56, 189, 127];
+          const YELLOW = [250, 204, 21];
+          const RED = [239, 68, 68];
+
+          const lerp = (x, y, t) => x + (y - x) * t;
+          const mix = (c1, c2, t) => [
+            Math.round(lerp(c1[0], c2[0], t)),
+            Math.round(lerp(c1[1], c2[1], t)),
+            Math.round(lerp(c1[2], c2[2], t)),
+          ];
+
+          let rgb;
+          if (frac <= 0.6) {
+            rgb = mix(GREEN, YELLOW, frac / 0.6);
+          } else {
+            rgb = mix(YELLOW, RED, (frac - 0.6) / 0.4);
+          }
+          fill.style.background = `rgb(${rgb[0]} ${rgb[1]} ${rgb[2]} / ${a})`;
         }
 
         if (p < 1) {
