@@ -46,6 +46,14 @@
   box-shadow:0 14px 46px rgb(var(--c-black) / 0.28);
 }
 
+/* Flat variant (no liquid-glass look) */
+.svx-cost-card--flat{
+  background: rgb(var(--c-black) / 0.35);
+  border: 1px solid rgb(var(--c-white) / 0.10);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
 .svx-preview-head,
 .svx-cost-meta,
 .svx-uptime-meta,
