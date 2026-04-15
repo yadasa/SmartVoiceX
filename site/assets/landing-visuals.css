@@ -193,9 +193,20 @@
   transition:width 700ms cubic-bezier(.22,.61,.36,1);
 }
 
-.svx-cost-fill--staff{ background:rgb(214 80 80 / 0.40); }
+.svx-cost-fill--staff{
+  background:linear-gradient(90deg,
+    rgb(56 189 127 / 0.55),
+    rgb(250 204 21 / 0.55),
+    rgb(239 68 68 / 0.55)
+  );
+}
 .svx-cost-fill--vendor{ background:rgb(var(--c-white) / 0.24); }
 .svx-cost-fill--brand{ background:rgb(var(--c-purple) / 0.90); }
+
+.svx-cost-card--wide{
+  width:100%;
+  max-width:none;
+}
 
 .is-brand{ color:var(--svx-blueText); }
 
