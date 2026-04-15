@@ -17,7 +17,6 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
     animateCostCards();
     animateActivityBars();
     animateUptimeBars();
-    animateActivityCount(847);
   } else {
     revealAllChatRows();
     setCostWidths();
@@ -174,23 +173,34 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
   }
 
   function animateActivityBars(){
-    const bars = document.querySelectorAll('.svx-activity-bar');
+    const wrap = document.getElementById('svxActivityBars');
+    if (!wrap) return;
+    const bars = Array.from(wrap.querySelectorAll('.svx-activity-bar'));
     if (!bars.length) return;
     if (!('IntersectionObserver' in window)) return setStaticActivityBars();
 
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        bars.forEach((bar, index) => {
-          setTimeout(() => {
-            bar.style.height = (bar.dataset.target || '0') + '%';
-          }, index * 40);
-        });
-        observer.disconnect();
+    const reset = () => {
+      bars.forEach((bar) => { bar.style.height = '0%'; });
+    };
+
+    const play = () => {
+      reset();
+      bars.forEach((bar, index) => {
+        setTimeout(() => {
+          bar.style.height = (bar.dataset.target || '0') + '%';
+        }, index * 40);
       });
+      animateActivityCount(847);
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      if (entry.isIntersecting) play();
+      else reset();
     }, { threshold: 0.35 });
 
-    observer.observe(document.getElementById('svxActivityBars'));
+    observer.observe(wrap);
   }
 
   function setStaticActivityBars(){
@@ -226,11 +236,31 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
   }
 
   function animateUptimeBars(){
-    const bars = document.querySelectorAll('.svx-uptime-bar');
+    const wrap = document.getElementById('svxUptimeStrip');
+    if (!wrap) return;
+    const bars = Array.from(wrap.querySelectorAll('.svx-uptime-bar'));
     if (!bars.length) return;
-    bars.forEach((bar, index) => {
-      setTimeout(() => { bar.style.transform = 'scaleY(1)'; }, index * 25);
-    });
+    if (!('IntersectionObserver' in window)) return setStaticUptimeBars();
+
+    const reset = () => {
+      bars.forEach((bar) => { bar.style.transform = 'scaleY(0)'; });
+    };
+
+    const play = () => {
+      reset();
+      bars.forEach((bar, index) => {
+        setTimeout(() => { bar.style.transform = 'scaleY(1)'; }, index * 25);
+      });
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      if (entry.isIntersecting) play();
+      else reset();
+    }, { threshold: 0.35 });
+
+    observer.observe(wrap);
   }
 
   function setStaticUptimeBars(){
