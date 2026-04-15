@@ -6,6 +6,36 @@
   margin-top:12px;
 }
 
+/* Hero sticky slider (two-page rail) */
+.svx-side-slider{ position:relative; margin-top:12px; }
+.svx-side-viewport{ overflow:hidden; border-radius:16px; }
+.svx-side-track{
+  display:flex;
+  width:200%;
+  transform:translateX(0%);
+  transition:transform 420ms cubic-bezier(.22,.61,.36,1);
+}
+.svx-side-page{ width:50%; padding:0; }
+
+.svx-side-arrow{
+  position:absolute;
+  top:10px;
+  width:30px;
+  height:30px;
+  border-radius:999px;
+  border:1px solid rgb(var(--c-white) / 0.14);
+  background:rgb(var(--c-black) / 0.35);
+  color:rgb(var(--c-white) / 0.85);
+  cursor:pointer;
+  display:grid;
+  place-items:center;
+  z-index:2;
+  box-shadow:0 10px 22px rgb(var(--c-black) / 0.35);
+}
+.svx-side-arrow:hover{ background:rgb(var(--c-black) / 0.55); }
+.svx-side-arrow--left{ left:10px; }
+.svx-side-arrow--right{ right:10px; }
+
 .svx-preview-card,
 .svx-cost-card,
 .svx-activity-card,

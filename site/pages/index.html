@@ -666,10 +666,61 @@
         <div class="side-title">Talk to a live SmartVoiceX agent right on this page.</div>
         <div class="side-sub">Test SmartVoiceX live before you book a call.</div>
 
-        <div class="side-list" role="list">
-          <div class="side-item" role="listitem"><b>Natural, professional conversations</b><span>Consistent tone, clear responses, and configurable scripts.</span></div>
-          <div class="side-item" role="listitem"><b>Real workflow handling</b><span>Appointments, confirmations, routing, voicemail behavior, and escalation logic.</span></div>
-          <div class="side-item" role="listitem"><b>Visibility after go‑live</b><span>Recordings, transcripts, summaries, and workflow edits for ongoing control.</span></div>
+        <div class="svx-side-slider" data-svx-side-slider aria-label="Hero rail preview carousel">
+          <button class="svx-side-arrow svx-side-arrow--left" type="button" aria-label="Previous" data-svx-side-prev>‹</button>
+          <button class="svx-side-arrow svx-side-arrow--right" type="button" aria-label="Next" data-svx-side-next>›</button>
+
+          <div class="svx-side-viewport">
+            <div class="svx-side-track">
+              <div class="svx-side-page" data-svx-side-page="0">
+                <div class="side-list" role="list">
+                  <div class="side-item" role="listitem"><b>Natural, professional conversations</b><span>Consistent tone, clear responses, and configurable scripts.</span></div>
+                  <div class="side-item" role="listitem"><b>Real workflow handling</b><span>Appointments, confirmations, routing, voicemail behavior, and escalation logic.</span></div>
+                  <div class="side-item" role="listitem"><b>Visibility after go‑live</b><span>Recordings, transcripts, summaries, and workflow edits for ongoing control.</span></div>
+                </div>
+              </div>
+
+              <div class="svx-side-page" data-svx-side-page="1">
+                <section class="svx-preview-card" aria-label="Live conversation preview">
+                  <div class="svx-preview-head">
+                    <div>
+                      <h3>Live conversation preview</h3>
+                      <p>See how SmartVoiceX handles a real call</p>
+                    </div>
+                    <div class="svx-live-pill">
+                      <span class="svx-live-dot"></span>
+                      <span>LIVE</span>
+                    </div>
+                  </div>
+
+                  <div class="svx-preview-wave" aria-hidden="true">
+                    <div class="svx-wave-bars" id="svxWaveBars"></div>
+                  </div>
+
+                  <div class="svx-preview-chat" id="svxPreviewChat">
+                    <div class="svx-chat-row svx-chat-row--agent is-visible">
+                      <div class="svx-chat-avatar"></div>
+                      <div class="svx-chat-bubble">Good morning! Thank you for calling SmartVoiceX. How can I help you today?</div>
+                    </div>
+                    <div class="svx-chat-row svx-chat-row--user">
+                      <div class="svx-chat-bubble">Hi, I'd like to schedule an appointment for next Tuesday.</div>
+                    </div>
+                    <div class="svx-chat-row svx-chat-row--agent">
+                      <div class="svx-chat-avatar"></div>
+                      <div class="svx-chat-bubble">Of course! I have availability at 10:00 AM and 2:30 PM. Which works better?</div>
+                    </div>
+                    <div class="svx-chat-row svx-chat-row--user">
+                      <div class="svx-chat-bubble">2:30 PM works great.</div>
+                    </div>
+                    <div class="svx-chat-row svx-chat-row--agent">
+                      <div class="svx-chat-avatar"></div>
+                      <div class="svx-chat-bubble">Perfect — you're booked for Tuesday at 2:30 PM. I'll send a confirmation shortly.</div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="cta-row" style="margin-top:12px">
@@ -787,48 +838,8 @@
         </section>
       </div>
 
-      <div class="split" aria-label="Go-live timeline and live preview" style="align-items:flex-start">
-        <div class="overview-gif-wrap" aria-label="Overview">
-          <img class="overview-gif" src="/assets/overview%20gif.gif" alt="SmartVoiceX overview" loading="lazy">
-        </div>
-
-        <section class="card svx-preview-card" aria-label="Live conversation preview">
-          <div class="svx-preview-head">
-            <div>
-              <h3>Live conversation preview</h3>
-              <p>See how SmartVoiceX handles a real call</p>
-            </div>
-            <div class="svx-live-pill">
-              <span class="svx-live-dot"></span>
-              <span>LIVE</span>
-            </div>
-          </div>
-
-          <div class="svx-preview-wave" aria-hidden="true">
-            <div class="svx-wave-bars" id="svxWaveBars"></div>
-          </div>
-
-          <div class="svx-preview-chat" id="svxPreviewChat">
-            <div class="svx-chat-row svx-chat-row--agent is-visible">
-              <div class="svx-chat-avatar"></div>
-              <div class="svx-chat-bubble">Good morning! Thank you for calling SmartVoiceX. How can I help you today?</div>
-            </div>
-            <div class="svx-chat-row svx-chat-row--user">
-              <div class="svx-chat-bubble">Hi, I'd like to schedule an appointment for next Tuesday.</div>
-            </div>
-            <div class="svx-chat-row svx-chat-row--agent">
-              <div class="svx-chat-avatar"></div>
-              <div class="svx-chat-bubble">Of course! I have availability at 10:00 AM and 2:30 PM. Which works better?</div>
-            </div>
-            <div class="svx-chat-row svx-chat-row--user">
-              <div class="svx-chat-bubble">2:30 PM works great.</div>
-            </div>
-            <div class="svx-chat-row svx-chat-row--agent">
-              <div class="svx-chat-avatar"></div>
-              <div class="svx-chat-bubble">Perfect — you're booked for Tuesday at 2:30 PM. I'll send a confirmation shortly.</div>
-            </div>
-          </div>
-        </section>
+      <div class="overview-gif-wrap" aria-label="Overview">
+        <img class="overview-gif" src="/assets/overview%20gif.gif" alt="SmartVoiceX overview" loading="lazy">
       </div>
 
       <div class="grid" aria-label="Capabilities cards">

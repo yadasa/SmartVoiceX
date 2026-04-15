@@ -5,6 +5,8 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
     window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  initHeroStickySlider();
+
   buildWaveBars();
   buildActivityBars();
   buildUptimeBars();
@@ -169,5 +171,62 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
     document.querySelectorAll('.svx-uptime-bar').forEach(bar => {
       bar.style.transform = 'scaleY(1)';
     });
+  }
+
+  function initHeroStickySlider(){
+    const root = document.querySelector('[data-svx-side-slider]');
+    if (!root) return;
+    const track = root.querySelector('.svx-side-track');
+    if (!track) return;
+
+    const btnPrev = root.querySelector('[data-svx-side-prev]');
+    const btnNext = root.querySelector('[data-svx-side-next]');
+
+    let index = 0;
+    let timer = null;
+    let paused = false;
+
+    const apply = () => {
+      track.style.transform = `translateX(${-50 * index}%)`;
+    };
+
+    const go = (next) => {
+      index = ((next % 2) + 2) % 2;
+      apply();
+    };
+
+    const start = () => {
+      if (reduceMotion) return;
+      if (timer) return;
+      timer = setInterval(() => {
+        if (paused) return;
+        go(index + 1);
+      }, 3000);
+    };
+
+    const stop = () => {
+      if (!timer) return;
+      clearInterval(timer);
+      timer = null;
+    };
+
+    root.addEventListener('mouseenter', () => {
+      paused = true;
+      stop();
+    });
+    root.addEventListener('mouseleave', () => {
+      paused = false;
+      start();
+    });
+
+    btnPrev?.addEventListener('click', () => {
+      go(index - 1);
+    });
+    btnNext?.addEventListener('click', () => {
+      go(index + 1);
+    });
+
+    apply();
+    start();
   }
 };
