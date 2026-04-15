@@ -122,10 +122,15 @@ window.SVXInitLandingVisuals = function SVXInitLandingVisuals(){
           ];
 
           let rgb;
-          if (frac <= 0.6) {
-            rgb = mix(GREEN, YELLOW, frac / 0.6);
+          if (frac <= 0.55) {
+            // green for first 55%
+            rgb = GREEN;
+          } else if (frac <= 0.85) {
+            // fade green -> yellow over next 30%
+            rgb = mix(GREEN, YELLOW, (frac - 0.55) / 0.30);
           } else {
-            rgb = mix(YELLOW, RED, (frac - 0.6) / 0.4);
+            // fade yellow -> red over final 15%
+            rgb = mix(YELLOW, RED, (frac - 0.85) / 0.15);
           }
           fill.style.background = `rgb(${rgb[0]} ${rgb[1]} ${rgb[2]} / ${a})`;
         }
