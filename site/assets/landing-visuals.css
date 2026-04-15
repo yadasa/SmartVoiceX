@@ -237,11 +237,13 @@
   height:0;
   border-radius:8px 8px 0 0;
   background:rgb(var(--c-blue) / 0.38);
-  transition:height 650ms cubic-bezier(.22,.61,.36,1), background 200ms ease;
+  box-shadow: 0 10px 26px rgb(var(--c-blue) / 0.16);
+  transition:height 650ms cubic-bezier(.22,.61,.36,1), background 333ms ease, box-shadow 333ms ease;
 }
 
 .svx-activity-bar:hover{
-  background:rgb(var(--c-blue) / 0.70);
+  background:rgb(var(--c-purple) / 0.72);
+  box-shadow: 0 12px 34px rgb(var(--c-purple) / 0.24);
 }
 
 .svx-activity-axis{
@@ -356,6 +358,26 @@
   }
 }
 
+/* Keep the dot centered while pulsing (dotPulse uses transform, which would override translate). */
+@keyframes svxCenteredDotPulse{
+  0%, 100%{
+    transform: translate(-50%,-50%) scale(1);
+    box-shadow:
+      0 0 0 6px rgb(var(--c-blue) / 0.20),
+      0 0 18px rgb(var(--c-blue) / 0.78),
+      0 0 44px rgb(var(--c-blue) / 0.40);
+    filter: blur(0.8px);
+  }
+  50%{
+    transform: translate(-50%,-50%) scale(1.10);
+    box-shadow:
+      0 0 0 9px rgb(var(--c-blue) / 0.09),
+      0 0 28px rgb(var(--c-blue) / 0.95),
+      0 0 62px rgb(var(--c-blue) / 0.48);
+    filter: blur(1.2px);
+  }
+}
+
 .svx-control-list{
   display:grid;
   gap:8px;
@@ -391,7 +413,13 @@
   transform-origin:50% 100%;
   transform:scaleY(0);
   background:rgb(var(--c-blue) / 0.42);
-  transition:transform 380ms ease, background 200ms ease;
+  box-shadow: 0 10px 28px rgb(var(--c-blue) / 0.14);
+  transition:transform 380ms ease, background 333ms ease, box-shadow 333ms ease;
+}
+
+.svx-uptime-bar:hover{
+  background:rgb(var(--c-purple) / 0.68);
+  box-shadow: 0 12px 36px rgb(var(--c-purple) / 0.22);
 }
 
 .svx-uptime-bar.is-incident{
@@ -437,7 +465,7 @@
     0 0 0 6px rgb(var(--c-blue) / 0.20),
     0 0 18px rgb(var(--c-blue) / 0.78),
     0 0 44px rgb(var(--c-blue) / 0.40);
-  animation: dotPulse 2.2s ease-in-out infinite;
+  animation: svxCenteredDotPulse 2.2s ease-in-out infinite;
   transform-origin:center;
 }
 
